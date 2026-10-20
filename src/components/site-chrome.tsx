@@ -60,8 +60,8 @@ export function SiteHeader() {
       )}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-5">
-        <Link to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <span className="font-display text-[1.65rem] leading-none font-medium tracking-wide">TLE</span>
+        <Link to="/" className="flex items-center" onClick={() => setOpen(false)}>
+          <span className="font-display text-[1.25rem] leading-none font-medium tracking-[0.14em]">TLE</span>
         </Link>
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
           {NAV.map((item) => (
