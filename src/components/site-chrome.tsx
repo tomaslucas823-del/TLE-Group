@@ -61,9 +61,6 @@ export function SiteHeader() {
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-5">
         <Link to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          {light ? null : (
-            <img src="/brand/logo.webp" alt="" width={28} height={28} className="h-7 w-7" />
-          )}
           <span className="font-display text-[1.65rem] leading-none font-medium tracking-wide">TLE</span>
         </Link>
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
