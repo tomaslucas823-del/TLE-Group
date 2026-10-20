@@ -119,30 +119,30 @@ function HomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-5 pb-14 md:pb-16">
-        <div className="flex items-baseline justify-between pb-6">
+        <div className="flex items-baseline justify-between pb-8">
           <h2 className="font-display text-3xl font-normal">Casas</h2>
           <Link to="/portfolio" className="text-sm text-mute underline-offset-4 hover:text-ink hover:underline">
             Todas
           </Link>
         </div>
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.slice(0, 3).map((project) => (
+        <ul className="grid gap-8 md:grid-cols-2 md:gap-10">
+          {projects.slice(0, 4).map((project) => (
             <li key={project.slug}>
               <Link to="/portfolio/$slug" params={{ slug: project.slug }} className="group block">
                 <div className="overflow-hidden border border-line bg-paper">
                   <img
                     src={project.cover}
                     alt={project.images[0]?.alt ?? project.title}
-                    width={800}
-                    height={600}
+                    width={1200}
+                    height={800}
                     loading="lazy"
                     decoding="async"
-                    className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                    className="aspect-[3/2] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
                   />
                 </div>
-                <div className="pt-3">
-                  <h3 className="font-display text-xl font-normal md:text-2xl">{project.title}</h3>
-                  <p className="mt-1 text-sm text-mute">
+                <div className="pt-4">
+                  <h3 className="font-display text-2xl font-normal md:text-3xl">{project.title}</h3>
+                  <p className="mt-1.5 text-sm text-mute">
                     {project.place}
                     <span className="px-1.5">·</span>
                     {project.area}
