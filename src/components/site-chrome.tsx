@@ -56,14 +56,23 @@ export function SiteHeader() {
     <header
       className={cn(
         "no-print fixed inset-x-0 top-0 z-50",
-        light ? "bg-transparent text-paper" : "border-b border-line bg-paper text-ink",
+        light ? "bg-transparent text-paper" : "border-b border-line bg-paper/95 text-ink backdrop-blur-sm",
       )}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-5">
         <Link to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          {light ? null : (
-            <img src="/brand/logo.webp" alt="" width={28} height={28} className="h-7 w-7" />
-          )}
+          <img
+            src="/brand/logo.webp"
+            alt=""
+            width={28}
+            height={28}
+            className={cn(
+              "h-7 w-7 object-contain",
+              // White square in the asset blends into the paper header;
+              // on the transparent hero, invert so the mark stays visible.
+              light ? "brightness-0 invert opacity-95" : "mix-blend-multiply",
+            )}
+          />
           <span className="font-display text-[1.65rem] leading-none font-medium tracking-wide">TLE</span>
         </Link>
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
