@@ -118,29 +118,31 @@ function HomePage() {
         </p>
       </section>
 
-      <section>
-        <div className="mx-auto flex max-w-6xl items-baseline justify-between px-5 pb-4">
+      <section className="mx-auto max-w-6xl px-5 pb-14 md:pb-16">
+        <div className="flex items-baseline justify-between pb-6">
           <h2 className="font-display text-3xl font-normal">Casas</h2>
           <Link to="/portfolio" className="text-sm text-mute underline-offset-4 hover:text-ink hover:underline">
             Todas
           </Link>
         </div>
-        <ul>
+        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {projects.slice(0, 3).map((project) => (
             <li key={project.slug}>
               <Link to="/portfolio/$slug" params={{ slug: project.slug }} className="group block">
-                <img
-                  src={project.cover}
-                  alt={project.images[0]?.alt ?? project.title}
-                  width={1600}
-                  height={900}
-                  loading="lazy"
-                  decoding="async"
-                  className="aspect-[16/10] w-full object-cover"
-                />
-                <div className="mx-auto flex max-w-6xl items-baseline justify-between gap-4 px-5 py-3">
-                  <h3 className="font-display text-3xl font-normal md:text-4xl">{project.title}</h3>
-                  <p className="text-sm text-mute">
+                <div className="overflow-hidden border border-line bg-paper">
+                  <img
+                    src={project.cover}
+                    alt={project.images[0]?.alt ?? project.title}
+                    width={800}
+                    height={600}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                  />
+                </div>
+                <div className="pt-3">
+                  <h3 className="font-display text-xl font-normal md:text-2xl">{project.title}</h3>
+                  <p className="mt-1 text-sm text-mute">
                     {project.place}
                     <span className="px-1.5">·</span>
                     {project.area}
