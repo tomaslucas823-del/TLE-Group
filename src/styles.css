@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Cormorant Garamond", "Times New Roman", Times, serif;
+  --color-paper: #f4f1ec;
+  --color-stone: #ebe6df;
+  --color-mist: #e3ddd4;
+  --color-ink: #161616;
+  --color-charcoal: #2c2c2c;
+  --color-mute: #6d675f;
+  --color-timber: #7a5340;
+  --color-timber-deep: #6a3b28;
+  --color-line: #d8d2c8;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 4.5rem;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transition: opacity 480ms ease;
+}
+
+.reveal.is-in {
+  opacity: 1;
+}
+
+input[type="range"].meter {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1px;
+  background: var(--color-ink);
+  cursor: pointer;
+}
+
+input[type="range"].meter::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 11px;
+  height: 11px;
+  background: var(--color-ink);
+  border: 0;
+  border-radius: 0;
+}
+
+input[type="range"].meter::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  background: var(--color-ink);
+  border: 0;
+  border-radius: 0;
+}
+
+.field {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  background: transparent;
+  padding: 0.55rem 0;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.field:focus {
+  border-bottom-color: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+}
