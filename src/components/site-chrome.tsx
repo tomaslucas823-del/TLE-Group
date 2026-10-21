@@ -88,8 +88,8 @@ export function SiteHeader() {
             to="/"
             hash="orcamento"
             className={cn(
-              "btn-press inline-flex min-h-10 items-center px-4 text-[13px] font-medium",
-              light ? "bg-paper text-ink hover:bg-stone" : "bg-ink text-paper hover:bg-charcoal",
+              "btn btn-shine inline-flex min-h-10 items-center px-4 text-[13px] font-medium",
+              light ? "btn-solid-invert" : "btn-solid",
             )}
           >
             Pedir cotação
@@ -129,7 +129,7 @@ export function SiteHeader() {
             <Link
               to="/"
               hash="orcamento"
-              className="btn-press mt-4 inline-flex min-h-12 items-center justify-center bg-ink text-sm text-paper"
+              className="btn btn-solid btn-shine mt-4 inline-flex min-h-12 items-center justify-center px-4 text-sm"
               onClick={() => setOpen(false)}
             >
               Pedir cotação
@@ -240,7 +240,7 @@ export function WhatsAppButton() {
   return (
     <a
       href={waHref}
-      className="no-print float-in fixed right-5 bottom-5 z-40 border border-ink bg-paper px-3 py-2 text-sm text-ink transition hover:bg-stone"
+      className="no-print float-in btn btn-outline-ink fixed right-5 bottom-5 z-40 px-3 py-2 text-sm"
       aria-label="Falar no WhatsApp"
     >
       WhatsApp
@@ -248,7 +248,6 @@ export function WhatsAppButton() {
   );
 }
 
-/** Botão voltar ao topo — como no casaseconomicas.pt */
 export function ScrollTopButton() {
   const [visible, setVisible] = useState(false);
 
@@ -265,7 +264,7 @@ export function ScrollTopButton() {
     <button
       type="button"
       className={cn(
-        "no-print float-in fixed right-5 z-40 flex h-10 w-10 items-center justify-center border border-ink bg-paper text-sm text-ink transition hover:bg-stone",
+        "no-print float-in btn btn-outline-ink fixed right-5 z-40 flex h-10 w-10 items-center justify-center text-sm",
         waHref ? "bottom-20" : "bottom-5",
         "md:bottom-5",
       )}
