@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { ProjectCard } from "@/components/project-card";
 import { Reveal } from "@/components/reveal";
 import { projects } from "@/data/projects";
 
@@ -25,38 +26,14 @@ function PortfolioPage() {
         </Reveal>
         <Reveal variant="right" delay={120}>
           <p className="max-w-xs text-right text-sm text-mute">
-            Cinco residências vistas inteiras antes da primeira parede.
+            {projects.length} residências vistas inteiras antes da primeira parede.
           </p>
         </Reveal>
       </header>
       <ul className="mx-auto grid max-w-6xl gap-8 px-5 pb-16 md:grid-cols-2 md:gap-10">
         {projects.map((project, i) => (
           <Reveal key={project.slug} as="li" variant="up" delay={(i % 2) * 100} slow>
-            <Link to="/portfolio/$slug" params={{ slug: project.slug }} className="group block">
-              <div className="media-zoom border border-line bg-paper">
-                <img
-                  src={project.cover}
-                  alt={project.images[0]?.alt ?? project.title}
-                  width={1200}
-                  height={800}
-                  loading="lazy"
-                  decoding="async"
-                  className="aspect-[3/2] w-full object-cover"
-                />
-              </div>
-              <div className="pt-4">
-                <h2 className="font-display text-2xl font-normal transition group-hover:opacity-80 md:text-3xl">
-                  {project.title}
-                </h2>
-                <p className="mt-1.5 text-sm text-mute">
-                  {project.place}
-                  <span className="px-1.5">·</span>
-                  {project.year}
-                  <span className="px-1.5">·</span>
-                  {project.area}
-                </p>
-              </div>
-            </Link>
+            <ProjectCard project={project} aspect="aspect-[3/2]" showYear />
           </Reveal>
         ))}
       </ul>
