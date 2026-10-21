@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { CountUp } from "@/components/count-up";
+import { ProjectCard } from "@/components/project-card";
 import { QuoteForm } from "@/components/quote-form";
 import { Reveal, useHeroParallax } from "@/components/reveal";
 import { Simulator, type Draft } from "@/components/simulator";
@@ -82,26 +84,10 @@ const REASONS = [
 ];
 
 const STEPS = [
-  {
-    n: "01",
-    title: "Programa",
-    text: "Metragem, terreno e o que a casa precisa de conter.",
-  },
-  {
-    n: "02",
-    title: "Partido",
-    text: "Volume, chegada e o que a rua pode ver.",
-  },
-  {
-    n: "03",
-    title: "Imagem",
-    text: "Pedra, madeira e luz, no horário certo.",
-  },
-  {
-    n: "04",
-    title: "Entrega",
-    text: "Plantas, prazo e cada revisão no portal.",
-  },
+  { n: "01", title: "Programa", text: "Metragem, terreno e o que a casa precisa de conter." },
+  { n: "02", title: "Partido", text: "Volume, chegada e o que a rua pode ver." },
+  { n: "03", title: "Imagem", text: "Pedra, madeira e luz, no horário certo." },
+  { n: "04", title: "Entrega", text: "Plantas, prazo e cada revisão no portal." },
 ];
 
 const FAQS = [
@@ -126,6 +112,10 @@ const FAQS = [
     a: "Medidas do terreno (ou aproximação), cidade, número de quartos e o que a família precisa. O formulário de cotação guarda também a estimativa do simulador.",
   },
 ];
+
+const areaNumbers = projects.map((p) => parseInt(p.area, 10)).filter((n) => !Number.isNaN(n));
+const minArea = Math.min(...areaNumbers);
+const maxArea = Math.max(...areaNumbers);
 
 function HomePage() {
   const search = Route.useSearch();
@@ -181,22 +171,45 @@ function HomePage() {
             Estudo visual, projeto executivo ou entrega completa. A família decide o volume e os materiais em imagem — não no estaleiro.
           </p>
           <div className="hero-enter hero-enter-delay-4 mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href="#orcamento"
-              className="inline-flex min-h-12 items-center bg-paper px-6 text-sm font-medium text-ink transition hover:bg-stone"
-            >
+            <a href="#orcamento" className="btn btn-solid-invert btn-shine min-h-12 px-6 text-sm font-medium">
               Pedir cotação
             </a>
             <Link
               to="/portfolio"
-              className="inline-flex min-h-12 items-center border border-paper/50 px-6 text-sm text-paper transition hover:border-paper"
+              className="btn btn-outline min-h-12 border-paper/50 px-6 text-sm text-paper"
+              data-cursor="Projetos"
             >
               Ver projetos
             </Link>
           </div>
-          <p className="hero-enter hero-enter-delay-4 mt-8 max-w-md border-l border-paper/30 pl-4 text-sm text-paper/75">
+          <p className="hero-enter hero-enter-delay-5 mt-8 max-w-md border-l border-paper/30 pl-4 text-sm text-paper/75">
             Já tem terreno? Envie medidas, cidade e número de quartos. Respondemos com a imagem e a referência em meticais.
           </p>
+        </div>
+      </section>
+
+      {/* Contadores — só números reais do portefólio */}
+      <section className="border-b border-line bg-paper">
+        <div className="mx-auto grid max-w-6xl grid-cols-3 gap-4 px-5 py-10 md:py-12">
+          <Reveal variant="up">
+            <p className="font-display text-4xl font-normal md:text-5xl">
+              <CountUp to={projects.length} />
+            </p>
+            <p className="mt-1 text-xs tracking-[0.12em] text-mute uppercase">Residências no portefólio</p>
+          </Reveal>
+          <Reveal variant="up" delay={80}>
+            <p className="font-display text-4xl font-normal md:text-5xl">
+              <CountUp to={PATHS.length} />
+            </p>
+            <p className="mt-1 text-xs tracking-[0.12em] text-mute uppercase">Caminhos de entrega</p>
+          </Reveal>
+          <Reveal variant="up" delay={160}>
+            <p className="font-display text-3xl font-normal md:text-5xl">
+              <CountUp to={minArea} />–<CountUp to={maxArea} />
+              <span className="text-2xl text-mute"> m²</span>
+            </p>
+            <p className="mt-1 text-xs tracking-[0.12em] text-mute uppercase">Área nos projetos</p>
+          </Reveal>
         </div>
       </section>
 
@@ -207,32 +220,14 @@ function HomePage() {
               <p className="text-xs tracking-[0.14em] text-mute uppercase">Projetos em destaque</p>
               <h2 className="mt-2 font-display text-3xl font-normal md:text-4xl">Casas vistas inteiras antes da obra</h2>
             </div>
-            <Link to="/portfolio" className="text-sm underline-offset-4 hover:underline">
+            <Link to="/portfolio" className="text-sm underline-offset-4 hover:underline" data-cursor="Todas">
               Ver todos os projetos
             </Link>
           </Reveal>
           <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {projects.slice(0, 4).map((project, i) => (
               <Reveal key={project.slug} as="li" variant="up" delay={i * 90}>
-                <Link to="/portfolio/$slug" params={{ slug: project.slug }} className="group block">
-                  <div className="media-zoom bg-stone">
-                    <img
-                      src={project.cover}
-                      alt={project.images[0]?.alt ?? project.title}
-                      width={800}
-                      height={600}
-                      loading="lazy"
-                      decoding="async"
-                      className="aspect-[4/3] w-full object-cover"
-                    />
-                  </div>
-                  <h3 className="mt-3 font-display text-xl font-normal">{project.title}</h3>
-                  <p className="mt-1 text-sm text-mute">
-                    {project.area}
-                    <span className="px-1.5">·</span>
-                    {project.place}
-                  </p>
-                </Link>
+                <ProjectCard project={project} />
               </Reveal>
             ))}
           </ul>
@@ -252,7 +247,13 @@ function HomePage() {
           </Reveal>
           <ul className="mt-10 grid gap-4 md:grid-cols-3">
             {PATHS.map((path, i) => (
-              <Reveal key={path.title} as="li" variant="up" delay={i * 100} className="flex flex-col border border-paper/15 p-6 transition hover:border-paper/40">
+              <Reveal
+                key={path.title}
+                as="li"
+                variant="up"
+                delay={i * 100}
+                className="lift flex flex-col border border-paper/15 p-6 hover:border-paper/40"
+              >
                 <h3 className="font-display text-2xl font-normal">{path.title}</h3>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-paper/70">{path.text}</p>
                 {path.href.startsWith("/#") ? (
@@ -288,10 +289,7 @@ function HomePage() {
             ))}
           </ol>
           <Reveal className="mt-10" delay={200}>
-            <a
-              href="#orcamento"
-              className="inline-flex min-h-12 items-center bg-ink px-6 text-sm text-paper transition hover:bg-charcoal"
-            >
+            <a href="#orcamento" className="btn btn-solid btn-shine min-h-12 px-6 text-sm">
               Pedir cotação para o meu terreno
             </a>
           </Reveal>
@@ -340,7 +338,7 @@ function HomePage() {
       </section>
 
       <section className="overflow-hidden">
-        <Reveal variant="zoom" className="media-zoom">
+        <Reveal variant="zoom" className="media-zoom" data-cursor="">
           <img
             src="/renders/pavilhao-dia.webp"
             alt="Pavilhão aberto, laje em balanço e chegada sob cobertura"
@@ -370,7 +368,7 @@ function HomePage() {
                     onClick={() => setOpenFaq(open ? null : index)}
                   >
                     <span className="font-display text-lg font-normal md:text-xl">{item.q}</span>
-                    <span className="mt-1 shrink-0 text-mute transition" aria-hidden>
+                    <span className="mt-1 shrink-0 text-mute" aria-hidden>
                       {open ? "−" : "+"}
                     </span>
                   </button>
@@ -398,10 +396,7 @@ function HomePage() {
             </p>
           </Reveal>
           <Reveal variant="right" delay={100}>
-            <a
-              href="#orcamento"
-              className="inline-flex min-h-12 shrink-0 items-center bg-paper px-6 text-sm font-medium text-ink transition hover:bg-stone"
-            >
+            <a href="#orcamento" className="btn btn-solid-invert btn-shine min-h-12 shrink-0 px-6 text-sm font-medium">
               Pedir cotação
             </a>
           </Reveal>
