@@ -45,13 +45,11 @@
   }
 }
 
-/* Hide system cursor when studio cursor is active (desktop) */
 .has-studio-cursor,
 .has-studio-cursor * {
   cursor: none !important;
 }
 
-/* —— Studio cursor —— */
 .studio-cursor {
   pointer-events: none;
   position: fixed;
@@ -103,20 +101,21 @@
   opacity: 1;
 }
 
-/* —— Page transition —— */
-.page-transition {
-  transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
 .page-transition--in {
-  opacity: 1;
+  animation: page-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.page-transition--out {
-  opacity: 0;
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
-/* —— Project card caption rises on hover —— */
 .project-card__caption {
   pointer-events: none;
   position: absolute;
@@ -136,7 +135,6 @@
   opacity: 1;
 }
 
-/* —— Scroll reveals —— */
 .reveal {
   --reveal-delay: 0ms;
   --reveal-duration: 0.85s;
@@ -450,10 +448,9 @@ input[type="range"].meter::-moz-range-thumb {
   .hero-enter,
   .float-in,
   .kenburns,
-  .page-transition {
+  .page-transition--in {
     opacity: 1;
     animation: none;
-    transition: none;
   }
 
   .accent-line {
