@@ -46,10 +46,10 @@
   }
 }
 
-/* —— Reveals leves (padrão: só fade) —— */
+/* Reveals leves — padrão só fade */
 .reveal {
   --reveal-delay: 0ms;
-  --reveal-duration: 0.45s;
+  --reveal-duration: 0.4s;
   opacity: 0;
   transition:
     opacity var(--reveal-duration) ease var(--reveal-delay),
@@ -57,27 +57,27 @@
 }
 
 .reveal--slow {
-  --reveal-duration: 0.55s;
+  --reveal-duration: 0.5s;
 }
 
 .reveal--up {
-  transform: translate3d(0, 12px, 0);
+  transform: translate3d(0, 10px, 0);
 }
 
 .reveal--down {
-  transform: translate3d(0, -10px, 0);
+  transform: translate3d(0, -8px, 0);
 }
 
 .reveal--left {
-  transform: translate3d(-12px, 0, 0);
+  transform: translate3d(-10px, 0, 0);
 }
 
 .reveal--right {
-  transform: translate3d(12px, 0, 0);
+  transform: translate3d(10px, 0, 0);
 }
 
 .reveal--zoom {
-  transform: scale(0.98);
+  transform: scale(0.99);
 }
 
 .reveal--fade {
@@ -97,32 +97,32 @@
   opacity: 0.55;
 }
 
-/* Hero entrance — curto */
+/* Hero — entrada curta */
 .hero-enter {
   opacity: 0;
-  animation: hero-enter 0.55s ease forwards;
+  animation: hero-enter 0.5s ease forwards;
 }
 
 .hero-enter-delay-1 {
-  animation-delay: 0.05s;
+  animation-delay: 0.04s;
 }
 .hero-enter-delay-2 {
-  animation-delay: 0.1s;
+  animation-delay: 0.08s;
 }
 .hero-enter-delay-3 {
-  animation-delay: 0.15s;
+  animation-delay: 0.12s;
 }
 .hero-enter-delay-4 {
-  animation-delay: 0.2s;
+  animation-delay: 0.16s;
 }
 .hero-enter-delay-5 {
-  animation-delay: 0.25s;
+  animation-delay: 0.2s;
 }
 
 @keyframes hero-enter {
   from {
     opacity: 0;
-    transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 8px, 0);
   }
   to {
     opacity: 1;
@@ -130,35 +130,35 @@
   }
 }
 
-/* Zoom suave nas imagens — sem Ken Burns contínuo */
+/* Zoom suave nas imagens */
 .media-zoom {
   overflow: hidden;
 }
 
 .media-zoom img,
 .media-zoom video {
-  transition: transform 0.4s ease;
+  transition: transform 0.35s ease;
 }
 
 .group:hover .media-zoom img,
 .group:hover .media-zoom video,
 .media-zoom:hover img {
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
-/* Legenda no card — rápida */
+/* Legenda no card */
 .project-card__caption {
   pointer-events: none;
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  padding: 1.25rem 1rem 1rem;
-  background: linear-gradient(to top, rgb(12 12 12 / 0.7), transparent);
-  transform: translateY(8px);
+  padding: 1rem;
+  background: linear-gradient(to top, rgb(12 12 12 / 0.65), transparent);
+  transform: translateY(6px);
   opacity: 0;
   transition:
-    transform 0.3s ease,
-    opacity 0.25s ease;
+    transform 0.25s ease,
+    opacity 0.2s ease;
 }
 
 .group:hover .project-card__caption {
@@ -166,24 +166,24 @@
   opacity: 1;
 }
 
-/* Botões — hover simples, sem brilho pesado */
+/* Botões — hover simples */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    opacity 0.2s ease;
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .btn:hover {
-  opacity: 0.92;
+  opacity: 0.9;
 }
 
 .btn:active {
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
 .btn-solid {
@@ -224,17 +224,8 @@
   color: var(--color-paper);
 }
 
-/* Compat: classes antigas sem custo extra */
 .btn-shine::after {
   display: none;
-}
-
-.lift:hover {
-  /* sem translate — evita jank */
-}
-
-.btn-press:hover {
-  opacity: 0.92;
 }
 
 .parallax-layer {
