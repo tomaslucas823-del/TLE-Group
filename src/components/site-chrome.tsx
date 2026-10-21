@@ -56,8 +56,8 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "no-print fixed inset-x-0 top-0 z-50",
-        light ? "bg-transparent text-paper" : "border-b border-line bg-paper text-ink",
+        "no-print fixed inset-x-0 top-0 z-50 transition-colors duration-300",
+        light ? "bg-transparent text-paper" : "border-b border-line bg-paper/95 text-ink backdrop-blur-sm",
       )}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-5">
@@ -71,7 +71,7 @@ export function SiteHeader() {
               to={item.to}
               hash={item.hash}
               className={cn(
-                "text-[13px]",
+                "text-[13px] transition-colors",
                 light ? "text-paper/80 hover:text-paper" : "text-mute hover:text-ink",
                 pathname === item.to && !item.hash && (light ? "text-paper" : "text-ink"),
               )}
@@ -86,7 +86,7 @@ export function SiteHeader() {
             to="/"
             hash="orcamento"
             className={cn(
-              "inline-flex min-h-10 items-center px-4 text-[13px] font-medium",
+              "inline-flex min-h-10 items-center px-4 text-[13px] font-medium transition",
               light ? "bg-paper text-ink hover:bg-stone" : "bg-ink text-paper hover:bg-charcoal",
             )}
           >
@@ -238,11 +238,36 @@ export function WhatsAppButton() {
   return (
     <a
       href={waHref}
-      className="no-print fixed right-5 bottom-5 z-40 border border-ink bg-paper px-3 py-2 text-sm text-ink"
+      className="no-print fixed right-5 bottom-5 z-40 border border-ink bg-paper px-3 py-2 text-sm text-ink transition hover:bg-stone"
       aria-label="Falar no WhatsApp"
     >
       WhatsApp
     </a>
+  );
+}
+
+/** Botão voltar ao topo — como no casaseconomicas.pt */
+export function ScrollTopButton() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 480);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <button
+      type="button"
+      className="no-print fixed right-5 bottom-20 z-40 flex h-10 w-10 items-center justify-center border border-ink bg-paper text-sm text-ink transition hover:bg-stone md:bottom-5"
+      aria-label="Voltar ao topo"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+    >
+      ↑
+    </button>
   );
 }
 

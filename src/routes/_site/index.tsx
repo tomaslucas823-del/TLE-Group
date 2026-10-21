@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QuoteForm } from "@/components/quote-form";
+import { Reveal, useHeroParallax } from "@/components/reveal";
 import { Simulator, type Draft } from "@/components/simulator";
 import { projects } from "@/data/projects";
 import { clampArea, isStyle, isTier } from "@/lib/estimate";
@@ -135,6 +136,7 @@ function HomePage() {
   }));
   const [playHero, setPlayHero] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const parallaxRef = useHeroParallax(true);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPlayHero(false);
@@ -142,81 +144,78 @@ function HomePage() {
 
   return (
     <main>
-      {/* Hero — arrumação clara: badge, título, sub, dois CTAs, dica de terreno */}
-      <section className="relative h-svh min-h-[36rem] bg-ink text-paper">
-        <img
-          src="/hero-poster.webp"
-          alt="Residência em volumes brancos, pedra e madeira, vista da rua"
-          width={1600}
-          height={900}
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {playHero ? (
-          <video
+      <section className="relative h-svh min-h-[36rem] overflow-hidden bg-ink text-paper">
+        <div ref={parallaxRef} className="parallax-layer absolute inset-0">
+          <img
+            src="/hero-poster.webp"
+            alt="Residência em volumes brancos, pedra e madeira, vista da rua"
+            width={1600}
+            height={900}
+            fetchPriority="high"
             className="absolute inset-0 h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/hero-poster.webp"
-            preload="metadata"
-          >
-            <source src="/hero.mp4" type="video/mp4" />
-          </video>
-        ) : null}
+          />
+          {playHero ? (
+            <video
+              className="absolute inset-0 h-full w-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="/hero-poster.webp"
+              preload="metadata"
+            >
+              <source src="/hero.mp4" type="video/mp4" />
+            </video>
+          ) : null}
+        </div>
         <div className="pointer-events-none absolute inset-0 bg-ink/35" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-[linear-gradient(to_top,rgba(12,12,12,0.75),transparent)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-[linear-gradient(to_top,rgb(12,12,12,0.75),transparent)]" />
         <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-5 pb-28 md:pb-24">
-          <p className="inline-flex w-fit border border-paper/25 px-3 py-1 text-[11px] tracking-[0.16em] text-paper/85 uppercase">
+          <p className="hero-enter hero-enter-delay-1 inline-flex w-fit border border-paper/25 px-3 py-1 text-[11px] tracking-[0.16em] text-paper/85 uppercase">
             Visualização residencial · Maputo
           </p>
-          <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[0.95] font-normal tracking-tight text-balance md:text-6xl lg:text-7xl">
+          <h1 className="hero-enter hero-enter-delay-2 mt-4 max-w-3xl font-display text-4xl leading-[0.95] font-normal tracking-tight text-balance md:text-6xl lg:text-7xl">
             A casa, antes da primeira parede.
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-paper/85 md:text-base">
+          <p className="hero-enter hero-enter-delay-3 mt-4 max-w-xl text-sm leading-relaxed text-paper/85 md:text-base">
             Estudo visual, projeto executivo ou entrega completa. A família decide o volume e os materiais em imagem — não no estaleiro.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="hero-enter hero-enter-delay-4 mt-8 flex flex-wrap items-center gap-3">
             <a
               href="#orcamento"
-              className="inline-flex min-h-12 items-center bg-paper px-6 text-sm font-medium text-ink hover:bg-stone"
+              className="inline-flex min-h-12 items-center bg-paper px-6 text-sm font-medium text-ink transition hover:bg-stone"
             >
               Pedir cotação
             </a>
             <Link
               to="/portfolio"
-              className="inline-flex min-h-12 items-center border border-paper/50 px-6 text-sm text-paper hover:border-paper"
+              className="inline-flex min-h-12 items-center border border-paper/50 px-6 text-sm text-paper transition hover:border-paper"
             >
               Ver projetos
             </Link>
           </div>
-          <p className="mt-8 max-w-md border-l border-paper/30 pl-4 text-sm text-paper/75">
+          <p className="hero-enter hero-enter-delay-4 mt-8 max-w-md border-l border-paper/30 pl-4 text-sm text-paper/75">
             Já tem terreno? Envie medidas, cidade e número de quartos. Respondemos com a imagem e a referência em meticais.
           </p>
         </div>
       </section>
 
-      {/* Projetos em destaque */}
       <section className="border-b border-line bg-paper">
         <div className="mx-auto max-w-6xl px-5 py-14 md:py-16">
-          <div className="flex flex-wrap items-end justify-between gap-4">
+          <Reveal className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xs tracking-[0.14em] text-mute uppercase">Projetos em destaque</p>
               <h2 className="mt-2 font-display text-3xl font-normal md:text-4xl">Casas vistas inteiras antes da obra</h2>
             </div>
-            <Link
-              to="/portfolio"
-              className="text-sm underline-offset-4 hover:underline"
-            >
+            <Link to="/portfolio" className="text-sm underline-offset-4 hover:underline">
               Ver todos os projetos
             </Link>
-          </div>
+          </Reveal>
           <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {projects.slice(0, 4).map((project) => (
-              <li key={project.slug}>
+            {projects.slice(0, 4).map((project, i) => (
+              <Reveal key={project.slug} as="li" variant="up" delay={i * 90}>
                 <Link to="/portfolio/$slug" params={{ slug: project.slug }} className="group block">
-                  <div className="overflow-hidden bg-stone">
+                  <div className="media-zoom bg-stone">
                     <img
                       src={project.cover}
                       alt={project.images[0]?.alt ?? project.title}
@@ -224,7 +223,7 @@ function HomePage() {
                       height={600}
                       loading="lazy"
                       decoding="async"
-                      className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                      className="aspect-[4/3] w-full object-cover"
                     />
                   </div>
                   <h3 className="mt-3 font-display text-xl font-normal">{project.title}</h3>
@@ -234,25 +233,26 @@ function HomePage() {
                     {project.place}
                   </p>
                 </Link>
-              </li>
+              </Reveal>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* Qual caminho — espelha as 3 vias comerciais, com a oferta TLE */}
       <section id="servicos" className="bg-ink text-paper">
         <div className="mx-auto max-w-6xl px-5 py-14 md:py-16">
-          <p className="text-xs tracking-[0.14em] text-paper/55 uppercase">Como começar</p>
-          <h2 className="mt-2 max-w-2xl font-display text-3xl font-normal text-balance md:text-5xl">
-            Qual caminho combina consigo?
-          </h2>
-          <p className="mt-4 max-w-xl text-sm text-paper/70">
-            Desde uma estimativa rápida até a entrega com portal e revisões registadas.
-          </p>
+          <Reveal variant="left">
+            <p className="text-xs tracking-[0.14em] text-paper/55 uppercase">Como começar</p>
+            <h2 className="mt-2 max-w-2xl font-display text-3xl font-normal text-balance md:text-5xl">
+              Qual caminho combina consigo?
+            </h2>
+            <p className="mt-4 max-w-xl text-sm text-paper/70">
+              Desde uma estimativa rápida até a entrega com portal e revisões registadas.
+            </p>
+          </Reveal>
           <ul className="mt-10 grid gap-4 md:grid-cols-3">
-            {PATHS.map((path) => (
-              <li key={path.title} className="flex flex-col border border-paper/15 p-6">
+            {PATHS.map((path, i) => (
+              <Reveal key={path.title} as="li" variant="up" delay={i * 100} className="flex flex-col border border-paper/15 p-6 transition hover:border-paper/40">
                 <h3 className="font-display text-2xl font-normal">{path.title}</h3>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-paper/70">{path.text}</p>
                 {path.href.startsWith("/#") ? (
@@ -264,64 +264,67 @@ function HomePage() {
                     {path.cta}
                   </Link>
                 )}
-              </li>
+              </Reveal>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* Porquê TLE */}
       <section className="bg-paper">
         <div className="mx-auto max-w-6xl px-5 py-14 md:py-16">
-          <p className="text-xs tracking-[0.14em] text-mute uppercase">Porquê a TLE</p>
-          <h2 className="mt-2 max-w-2xl font-display text-3xl font-normal md:text-5xl">
-            Menos surpresa na obra. Mais decisão na imagem.
-          </h2>
+          <Reveal variant="right">
+            <p className="text-xs tracking-[0.14em] text-mute uppercase">Porquê a TLE</p>
+            <h2 className="mt-2 max-w-2xl font-display text-3xl font-normal md:text-5xl">
+              Menos surpresa na obra. Mais decisão na imagem.
+            </h2>
+          </Reveal>
           <ol className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {REASONS.map((item) => (
-              <li key={item.n}>
+            {REASONS.map((item, i) => (
+              <Reveal key={item.n} as="li" variant="up" delay={i * 80}>
                 <p className="font-display text-2xl italic text-mute">{item.n}</p>
                 <h3 className="mt-2 font-display text-xl font-normal">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-mute">{item.text}</p>
-              </li>
+              </Reveal>
             ))}
           </ol>
-          <div className="mt-10">
+          <Reveal className="mt-10" delay={200}>
             <a
               href="#orcamento"
-              className="inline-flex min-h-12 items-center bg-ink px-6 text-sm text-paper hover:bg-charcoal"
+              className="inline-flex min-h-12 items-center bg-ink px-6 text-sm text-paper transition hover:bg-charcoal"
             >
               Pedir cotação para o meu terreno
             </a>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* Método */}
       <section id="metodo" className="border-t border-line bg-stone">
         <div className="mx-auto max-w-6xl px-5 py-14 md:py-16">
-          <h2 className="max-w-xl font-display text-3xl font-normal md:text-5xl">
-            Da conversa à imagem aprovada.
-          </h2>
+          <Reveal>
+            <h2 className="max-w-xl font-display text-3xl font-normal md:text-5xl">
+              Da conversa à imagem aprovada.
+            </h2>
+          </Reveal>
           <ol className="mt-8 grid gap-0 border-t border-line md:grid-cols-4">
-            {STEPS.map((step) => (
-              <li
+            {STEPS.map((step, i) => (
+              <Reveal
                 key={step.n}
+                as="li"
+                delay={i * 90}
                 className="border-b border-line py-5 md:border-b-0 md:border-r md:px-5 md:first:pl-0 md:last:border-r-0 md:last:pr-0"
               >
                 <p className="font-display text-2xl italic text-mute">{step.n}</p>
                 <h3 className="mt-3 font-display text-2xl font-normal">{step.title}</h3>
                 <p className="mt-2 text-sm text-mute">{step.text}</p>
-              </li>
+              </Reveal>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* Simulador */}
       <section className="border-t border-line bg-paper">
         <div className="mx-auto max-w-6xl px-5 py-14 md:py-16">
-          <div className="max-w-xl">
+          <Reveal className="max-w-xl">
             <p className="text-xs tracking-[0.14em] text-mute uppercase">Estimativa</p>
             <h2 className="mt-2 font-display text-3xl font-normal md:text-5xl">
               Uma referência em meticais para começar.
@@ -329,35 +332,37 @@ function HomePage() {
             <p className="mt-4 text-sm text-mute">
               Metragem, partido e entrega. Não é proposta fechada — terreno e prazo ainda ajustam o valor.
             </p>
-          </div>
-          <div className="mt-10">
+          </Reveal>
+          <Reveal className="mt-10" delay={120}>
             <Simulator draft={draft} onChange={setDraft} />
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* Imagem de ritmo */}
-      <section>
-        <img
-          src="/renders/pavilhao-dia.webp"
-          alt="Pavilhão aberto, laje em balanço e chegada sob cobertura"
-          width={1600}
-          height={900}
-          loading="lazy"
-          className="aspect-[16/9] w-full object-cover md:aspect-[21/9]"
-        />
+      <section className="overflow-hidden">
+        <Reveal variant="zoom" className="media-zoom">
+          <img
+            src="/renders/pavilhao-dia.webp"
+            alt="Pavilhão aberto, laje em balanço e chegada sob cobertura"
+            width={1600}
+            height={900}
+            loading="lazy"
+            className="aspect-[16/9] w-full object-cover md:aspect-[21/9]"
+          />
+        </Reveal>
       </section>
 
-      {/* FAQ */}
       <section id="duvidas" className="border-t border-line bg-paper">
         <div className="mx-auto max-w-3xl px-5 py-14 md:py-16">
-          <p className="text-xs tracking-[0.14em] text-mute uppercase">Dúvidas frequentes</p>
-          <h2 className="mt-2 font-display text-3xl font-normal md:text-4xl">Ainda tem dúvidas?</h2>
+          <Reveal>
+            <p className="text-xs tracking-[0.14em] text-mute uppercase">Dúvidas frequentes</p>
+            <h2 className="mt-2 font-display text-3xl font-normal md:text-4xl">Ainda tem dúvidas?</h2>
+          </Reveal>
           <ul className="mt-8 border-t border-line">
             {FAQS.map((item, index) => {
               const open = openFaq === index;
               return (
-                <li key={item.q} className="border-b border-line">
+                <Reveal key={item.q} as="li" delay={index * 40} className="border-b border-line">
                   <button
                     type="button"
                     className="flex w-full items-start justify-between gap-4 py-4 text-left"
@@ -365,40 +370,47 @@ function HomePage() {
                     onClick={() => setOpenFaq(open ? null : index)}
                   >
                     <span className="font-display text-lg font-normal md:text-xl">{item.q}</span>
-                    <span className="mt-1 shrink-0 text-mute" aria-hidden>
+                    <span className="mt-1 shrink-0 text-mute transition" aria-hidden>
                       {open ? "−" : "+"}
                     </span>
                   </button>
-                  {open ? <p className="pb-4 text-sm leading-relaxed text-mute">{item.a}</p> : null}
-                </li>
+                  <div
+                    className="grid transition-[grid-template-rows] duration-300 ease-out"
+                    style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="pb-4 text-sm leading-relaxed text-mute">{item.a}</p>
+                    </div>
+                  </div>
+                </Reveal>
               );
             })}
           </ul>
         </div>
       </section>
 
-      {/* CTA final */}
       <section className="bg-ink text-paper">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 py-14 md:flex-row md:items-center md:justify-between md:py-16">
-          <div className="max-w-xl">
+          <Reveal variant="left" className="max-w-xl">
             <h2 className="font-display text-3xl font-normal md:text-4xl">Vamos começar a casa em imagem?</h2>
             <p className="mt-3 text-sm text-paper/70">
               Conte o terreno. A TLE responde com a imagem e a referência em meticais.
             </p>
-          </div>
-          <a
-            href="#orcamento"
-            className="inline-flex min-h-12 shrink-0 items-center bg-paper px-6 text-sm font-medium text-ink hover:bg-stone"
-          >
-            Pedir cotação
-          </a>
+          </Reveal>
+          <Reveal variant="right" delay={100}>
+            <a
+              href="#orcamento"
+              className="inline-flex min-h-12 shrink-0 items-center bg-paper px-6 text-sm font-medium text-ink transition hover:bg-stone"
+            >
+              Pedir cotação
+            </a>
+          </Reveal>
         </div>
       </section>
 
-      {/* Cotação */}
       <section id="orcamento" className="border-t border-line bg-paper">
         <div className="mx-auto grid max-w-6xl gap-12 px-5 py-14 md:grid-cols-2 md:py-16">
-          <div>
+          <Reveal variant="left">
             <p className="text-xs tracking-[0.14em] text-mute uppercase">Cotação</p>
             <h2 className="mt-2 font-display text-3xl font-normal md:text-5xl">Conte o terreno.</h2>
             <p className="mt-4 max-w-sm text-sm text-mute">
@@ -430,8 +442,10 @@ function HomePage() {
                 <dd className="mt-1 text-mute">Instagram, Facebook, LinkedIn — a indicar.</dd>
               </div>
             </dl>
-          </div>
-          <QuoteForm draft={draft} />
+          </Reveal>
+          <Reveal variant="right" delay={80}>
+            <QuoteForm draft={draft} />
+          </Reveal>
         </div>
       </section>
     </main>

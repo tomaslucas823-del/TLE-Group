@@ -45,13 +45,92 @@
   }
 }
 
+/* —— Scroll reveals (Elementor-like fade / slide / zoom) —— */
 .reveal {
+  --reveal-delay: 0ms;
   opacity: 0;
-  transition: opacity 480ms ease;
+  will-change: opacity, transform;
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
+}
+
+.reveal--up {
+  transform: translate3d(0, 28px, 0);
+}
+
+.reveal--left {
+  transform: translate3d(-36px, 0, 0);
+}
+
+.reveal--right {
+  transform: translate3d(36px, 0, 0);
+}
+
+.reveal--zoom {
+  transform: scale(0.94);
+}
+
+.reveal--fade {
+  transform: none;
 }
 
 .reveal.is-in {
   opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Hero entrance on first paint */
+.hero-enter {
+  opacity: 0;
+  animation: hero-enter 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-enter-delay-1 {
+  animation-delay: 0.12s;
+}
+.hero-enter-delay-2 {
+  animation-delay: 0.24s;
+}
+.hero-enter-delay-3 {
+  animation-delay: 0.36s;
+}
+.hero-enter-delay-4 {
+  animation-delay: 0.48s;
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Media hover zoom (project cards) */
+.media-zoom {
+  overflow: hidden;
+}
+
+.media-zoom img,
+.media-zoom video {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group:hover .media-zoom img,
+.group:hover .media-zoom video,
+.media-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* Parallax layer */
+.parallax-layer {
+  will-change: transform;
+  transform: translate3d(0, 0, 0) scale(1.08);
+  transition: none;
 }
 
 input[type="range"].meter {
@@ -102,7 +181,22 @@ input[type="range"].meter::-moz-range-thumb {
 
   .reveal {
     opacity: 1;
+    transform: none;
     transition: none;
+  }
+
+  .hero-enter {
+    opacity: 1;
+    animation: none;
+  }
+
+  .media-zoom img,
+  .media-zoom video {
+    transition: none;
+  }
+
+  .parallax-layer {
+    transform: none !important;
   }
 }
 
@@ -113,5 +207,10 @@ input[type="range"].meter::-moz-range-thumb {
 
   body {
     background: white;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
   }
 }
