@@ -1,5 +1,11 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { CookieBanner, SiteFooter, SiteHeader, WhatsAppButton } from "@/components/site-chrome";
+import {
+  CookieBanner,
+  ScrollTopButton,
+  SiteFooter,
+  SiteHeader,
+  WhatsAppButton,
+} from "@/components/site-chrome";
 
 export const Route = createFileRoute("/_site")({
   component: SiteLayout,
@@ -12,6 +18,7 @@ function SiteLayout() {
       <Outlet />
       <SiteFooter />
       <WhatsAppButton />
+      <ScrollTopButton />
       <CookieBanner />
     </div>
   );
