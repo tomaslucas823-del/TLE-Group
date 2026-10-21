@@ -45,30 +45,39 @@
   }
 }
 
-/* —— Scroll reveals (Elementor-like fade / slide / zoom) —— */
+/* —— Scroll reveals (Elementor: fadeIn / slideIn / zoomIn / fadeInDown) —— */
 .reveal {
   --reveal-delay: 0ms;
+  --reveal-duration: 0.85s;
   opacity: 0;
   will-change: opacity, transform;
   transition:
-    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
-    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
+    opacity var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
+    transform var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
+}
+
+.reveal--slow {
+  --reveal-duration: 1.25s;
 }
 
 .reveal--up {
-  transform: translate3d(0, 28px, 0);
+  transform: translate3d(0, 36px, 0);
+}
+
+.reveal--down {
+  transform: translate3d(0, -28px, 0);
 }
 
 .reveal--left {
-  transform: translate3d(-36px, 0, 0);
+  transform: translate3d(-48px, 0, 0);
 }
 
 .reveal--right {
-  transform: translate3d(36px, 0, 0);
+  transform: translate3d(48px, 0, 0);
 }
 
 .reveal--zoom {
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 
 .reveal--fade {
@@ -80,29 +89,50 @@
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-/* Hero entrance on first paint */
+/* Accent bar above titles — like the gold line on casaseconomicas hero */
+.accent-line {
+  display: block;
+  width: 2.5rem;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.55;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+}
+
+.reveal.is-in .accent-line,
+.hero-enter.is-in .accent-line,
+.accent-line.is-in {
+  transform: scaleX(1);
+}
+
+/* Hero staggered entrance */
 .hero-enter {
   opacity: 0;
-  animation: hero-enter 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: hero-enter 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .hero-enter-delay-1 {
-  animation-delay: 0.12s;
+  animation-delay: 0.1s;
 }
 .hero-enter-delay-2 {
-  animation-delay: 0.24s;
+  animation-delay: 0.22s;
 }
 .hero-enter-delay-3 {
-  animation-delay: 0.36s;
+  animation-delay: 0.34s;
 }
 .hero-enter-delay-4 {
-  animation-delay: 0.48s;
+  animation-delay: 0.46s;
+}
+.hero-enter-delay-5 {
+  animation-delay: 0.58s;
 }
 
 @keyframes hero-enter {
   from {
     opacity: 0;
-    transform: translate3d(0, 18px, 0);
+    transform: translate3d(0, 22px, 0);
   }
   to {
     opacity: 1;
@@ -110,20 +140,60 @@
   }
 }
 
-/* Media hover zoom (project cards) */
+/* Ken Burns slow zoom on static hero poster */
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.kenburns {
+  animation: kenburns 18s ease-out forwards;
+}
+
+/* Media hover zoom + slight lift (Elementor image hover) */
 .media-zoom {
   overflow: hidden;
 }
 
 .media-zoom img,
 .media-zoom video {
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s ease;
 }
 
 .group:hover .media-zoom img,
 .group:hover .media-zoom video,
 .media-zoom:hover img {
-  transform: scale(1.05);
+  transform: scale(1.06);
+}
+
+/* Card / button micro interactions */
+.lift {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.lift:hover {
+  transform: translateY(-3px);
+}
+
+.btn-press {
+  transition:
+    transform 0.2s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.97);
 }
 
 /* Parallax layer */
@@ -131,6 +201,22 @@
   will-change: transform;
   transform: translate3d(0, 0, 0) scale(1.08);
   transition: none;
+}
+
+/* Scroll-top / floating controls */
+.float-in {
+  animation: float-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes float-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 input[type="range"].meter {
@@ -168,6 +254,7 @@ input[type="range"].meter::-moz-range-thumb {
   padding: 0.55rem 0;
   color: var(--color-ink);
   outline: none;
+  transition: border-color 0.25s ease;
 }
 
 .field:focus {
@@ -185,13 +272,22 @@ input[type="range"].meter::-moz-range-thumb {
     transition: none;
   }
 
-  .hero-enter {
+  .hero-enter,
+  .float-in,
+  .kenburns {
     opacity: 1;
     animation: none;
   }
 
+  .accent-line {
+    transform: scaleX(1);
+    transition: none;
+  }
+
   .media-zoom img,
-  .media-zoom video {
+  .media-zoom video,
+  .lift,
+  .btn-press {
     transition: none;
   }
 

@@ -20,7 +20,7 @@ function AuthSlot({ light }: { light: boolean }) {
   if (!mounted || isPending) return <span className="inline-block h-4 w-12" aria-hidden />;
   if (!user) {
     return (
-      <Link to="/login" className={cn("text-sm", light ? "text-paper" : "text-ink")}>
+      <Link to="/login" className={cn("text-sm transition-colors", light ? "text-paper" : "text-ink")}>
         Entrar
       </Link>
     );
@@ -56,8 +56,10 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "no-print fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        light ? "bg-transparent text-paper" : "border-b border-line bg-paper/95 text-ink backdrop-blur-sm",
+        "no-print fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-300",
+        light
+          ? "bg-transparent text-paper"
+          : "border-b border-line bg-paper/90 text-ink backdrop-blur-md",
       )}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-5">
@@ -71,7 +73,7 @@ export function SiteHeader() {
               to={item.to}
               hash={item.hash}
               className={cn(
-                "text-[13px] transition-colors",
+                "text-[13px] transition-colors duration-200",
                 light ? "text-paper/80 hover:text-paper" : "text-mute hover:text-ink",
                 pathname === item.to && !item.hash && (light ? "text-paper" : "text-ink"),
               )}
@@ -86,7 +88,7 @@ export function SiteHeader() {
             to="/"
             hash="orcamento"
             className={cn(
-              "inline-flex min-h-10 items-center px-4 text-[13px] font-medium transition",
+              "btn-press inline-flex min-h-10 items-center px-4 text-[13px] font-medium",
               light ? "bg-paper text-ink hover:bg-stone" : "bg-ink text-paper hover:bg-charcoal",
             )}
           >
@@ -127,7 +129,7 @@ export function SiteHeader() {
             <Link
               to="/"
               hash="orcamento"
-              className="mt-4 inline-flex min-h-12 items-center justify-center bg-ink text-sm text-paper"
+              className="btn-press mt-4 inline-flex min-h-12 items-center justify-center bg-ink text-sm text-paper"
               onClick={() => setOpen(false)}
             >
               Pedir cotação
@@ -238,7 +240,7 @@ export function WhatsAppButton() {
   return (
     <a
       href={waHref}
-      className="no-print fixed right-5 bottom-5 z-40 border border-ink bg-paper px-3 py-2 text-sm text-ink transition hover:bg-stone"
+      className="no-print float-in fixed right-5 bottom-5 z-40 border border-ink bg-paper px-3 py-2 text-sm text-ink transition hover:bg-stone"
       aria-label="Falar no WhatsApp"
     >
       WhatsApp
@@ -262,7 +264,11 @@ export function ScrollTopButton() {
   return (
     <button
       type="button"
-      className="no-print fixed right-5 bottom-20 z-40 flex h-10 w-10 items-center justify-center border border-ink bg-paper text-sm text-ink transition hover:bg-stone md:bottom-5"
+      className={cn(
+        "no-print float-in fixed right-5 z-40 flex h-10 w-10 items-center justify-center border border-ink bg-paper text-sm text-ink transition hover:bg-stone",
+        waHref ? "bottom-20" : "bottom-5",
+        "md:bottom-5",
+      )}
       aria-label="Voltar ao topo"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
     >
