@@ -30,7 +30,7 @@ export function Reveal({
     if (!node) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      node.classList.add("is-in");
+      node.classList.add("is-in"); trans
       return;
     }
 
@@ -67,10 +67,7 @@ export function Reveal({
   );
 }
 
-/** Parallax desligado por desempenho — mantém a API para não quebrar a home. */
+/** Parallax desligado por desempenho — API mantida para a home. */
 export function useHeroParallax(_active: boolean) {
   return useRef<HTMLDivElement | null>(null);
 }
-
-// re-export useRef type helper for callers
-import { useRef } from "react";
