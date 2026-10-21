@@ -6,7 +6,8 @@ import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { site, waHref } from "@/lib/site";
 
 const NAV = [
-  { to: "/portfolio", label: "Trabalho", hash: undefined },
+  { to: "/portfolio", label: "Projetos", hash: undefined },
+  { to: "/", label: "Serviços", hash: "servicos" },
   { to: "/", label: "Método", hash: "metodo" },
   { to: "/simulador", label: "Estimativa", hash: undefined },
   { to: "/portal", label: "Portal", hash: undefined },
@@ -63,7 +64,7 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center" onClick={() => setOpen(false)}>
           <span className="font-display text-[1.25rem] leading-none font-medium tracking-[0.14em]">TLE</span>
         </Link>
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
+        <nav className="hidden items-center gap-7 md:flex" aria-label="Principal">
           {NAV.map((item) => (
             <Link
               key={item.label}
@@ -79,17 +80,17 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-6 md:flex">
+        <div className="hidden items-center gap-5 md:flex">
           <AuthSlot light={light} />
           <Link
             to="/"
             hash="orcamento"
             className={cn(
-              "text-[13px] underline-offset-4 hover:underline",
-              light ? "text-paper" : "text-ink",
+              "inline-flex min-h-10 items-center px-4 text-[13px] font-medium",
+              light ? "bg-paper text-ink hover:bg-stone" : "bg-ink text-paper hover:bg-charcoal",
             )}
           >
-            Cotação
+            Pedir cotação
           </Link>
         </div>
         <button
@@ -126,10 +127,10 @@ export function SiteHeader() {
             <Link
               to="/"
               hash="orcamento"
-              className="flex min-h-12 items-center font-display text-3xl font-normal"
+              className="mt-4 inline-flex min-h-12 items-center justify-center bg-ink text-sm text-paper"
               onClick={() => setOpen(false)}
             >
-              Cotação
+              Pedir cotação
             </Link>
           </nav>
           <div className="mt-8">
@@ -153,7 +154,7 @@ export function SiteFooter() {
             {site.country}
           </p>
         </div>
-        <div className="mt-10 grid gap-10 text-sm md:grid-cols-3">
+        <div className="mt-10 grid gap-10 text-sm md:grid-cols-4">
           <div>
             <p className="text-mute">Contacto</p>
             <ul className="mt-3 space-y-2">
@@ -171,19 +172,16 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <p className="text-mute">Redes</p>
-            <ul className="mt-3 space-y-2">
-              <li>{site.instagram ? <a href={site.instagram}>Instagram</a> : "Instagram — a indicar"}</li>
-              <li>{site.facebook ? <a href={site.facebook}>Facebook</a> : "Facebook — a indicar"}</li>
-              <li>{site.linkedin ? <a href={site.linkedin}>LinkedIn</a> : "LinkedIn — a indicar"}</li>
-            </ul>
-          </div>
-          <div>
-            <p className="text-mute">Estúdio</p>
+            <p className="text-mute">Projetos e serviços</p>
             <ul className="mt-3 space-y-2">
               <li>
                 <Link to="/portfolio" className="hover:underline">
-                  Trabalho
+                  Projetos
+                </Link>
+              </li>
+              <li>
+                <Link to="/" hash="servicos" className="hover:underline">
+                  Serviços
                 </Link>
               </li>
               <li>
@@ -191,6 +189,16 @@ export function SiteFooter() {
                   Estimativa
                 </Link>
               </li>
+              <li>
+                <Link to="/" hash="duvidas" className="hover:underline">
+                  Dúvidas
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-mute">Estúdio</p>
+            <ul className="mt-3 space-y-2">
               <li>
                 <Link to="/portal" className="hover:underline">
                   Portal do cliente
@@ -206,6 +214,14 @@ export function SiteFooter() {
                   Privacidade
                 </Link>
               </li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-mute">Redes</p>
+            <ul className="mt-3 space-y-2">
+              <li>{site.instagram ? <a href={site.instagram}>Instagram</a> : "Instagram — a indicar"}</li>
+              <li>{site.facebook ? <a href={site.facebook}>Facebook</a> : "Facebook — a indicar"}</li>
+              <li>{site.linkedin ? <a href={site.linkedin}>LinkedIn</a> : "LinkedIn — a indicar"}</li>
             </ul>
           </div>
         </div>
