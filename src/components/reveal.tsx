@@ -30,7 +30,7 @@ export function Reveal({
     if (!node) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      node.classList.add("is-in"); trans
+      node.classList.add("is-in");
       return;
     }
 
