@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ClientPortal } from "@/components/client-portal";
 import { SessionGate } from "@/components/session-gate";
-import { loadStudio, type StudioData } from "@/lib/studio.functions";
+import { loadPortal, type StudioData } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_site/portal")({
   head: () => ({
@@ -27,12 +27,12 @@ function PortalBody() {
   const [error, setError] = useState("");
 
   const reload = useCallback(async () => {
-    setData(await loadStudio());
+    setData(await loadPortal());
   }, []);
 
   useEffect(() => {
     let live = true;
-    loadStudio()
+    loadPortal()
       .then((next) => {
         if (live) setData(next);
       })

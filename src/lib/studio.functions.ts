@@ -1,6 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
+import {
+  PUBLIC_LEAD_INBOX,
+  publicLeadOwnerId,
+  requireStudio,
+  resolvePortalScope,
+  studioWorkspaceId,
+} from "@/lib/auth/roles.server";
+import { assertRateLimit } from "@/lib/rate-limit.server";
 import {
   clampArea,
   estimateCents,
@@ -105,6 +114,32 @@ const PAY_METHOD = ["", "mpesa", "emola", "cartao", "transferencia"] as const;
 
 function text(value: unknown, max: number) {
   return String(value ?? "").trim().slice(0, max);
+}
+
+function clientIp(): string {
+  const request = getRequest();
+  if (!request) return "unknown";
+  const h = request.headers;
+  const forwarded = h.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return forwarded || h.get("x-real-ip") || "unknown";
+}
+
+function normalizeLead(input: unknown) {
+  const row = (input ?? {}) as Record<string, unknown>;
+  const name = text(row.name, 80);
+  const email = text(row.email, 120).toLowerCase();
+  const phone = text(row.phone, 24);
+  const message = text(row.message, 800);
+  const style = text(row.style, 40);
+  const complexity = text(row.complexity, 40);
+  const areaM2 = clampArea(Number(row.areaM2));
+  if (name.length < 2) throw new Error("Informe o nome.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("E-mail inválido.");
+  const digits = phone.replace(/\D/g, "");
+  // Moçambique: 9 dígitos local ou com indicativo 258
+  if (digits.length < 9 || digits.length > 13) throw new Error("Telefone inválido.");
+  if (!isStyle(style) || !isTier(complexity)) throw new Error("Estimativa incompleta.");
+  return { name, email, phone, areaM2, style, complexity, message };
 }
 
 async function seed(uid: string) {
@@ -282,39 +317,191 @@ async function seed(uid: string) {
   `;
 }
 
+async function loadWorkspace(uid: string): Promise<StudioData> {
+  const sql = await getSql();
+  const inbox = publicLeadOwnerId();
+  // Leads públicos (inbox) + dados do workspace do estúdio
+  const leadOwnerFilter =
+    uid === inbox || inbox === PUBLIC_LEAD_INBOX
+      ? null
+      : inbox;
+
+  const [clients, ownLeads, inboxLeads, projects, milestones, approvals, meetings, proposals, installments] =
+    await Promise.all([
+      sql<ClientRow>`select id, name, email, phone, city, notes from clients where user_id = ${uid} order by id`,
+      sql<LeadRow>`select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status from leads where user_id = ${uid} order by id desc`,
+      leadOwnerFilter && leadOwnerFilter !== uid
+        ? sql<LeadRow>`select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status from leads where user_id = ${leadOwnerFilter} order by id desc`
+        : Promise.resolve([] as LeadRow[]),
+      // Also pull PUBLIC_LEAD_INBOX if different
+      sql<ProjectRow>`select id, client_id, title, place, stage, cover, summary from projects where user_id = ${uid} order by id`,
+      sql<MilestoneRow>`select id, project_id, label, status, position from milestones where user_id = ${uid} order by position`,
+      sql<ApprovalRow>`select id, project_id, label, image, approved from approvals where user_id = ${uid} order by id`,
+      sql<MeetingRow>`select id, client_name, title, starts_at, place, notes from meetings where user_id = ${uid} order by starts_at`,
+      sql<ProposalRow>`select id, lead_id, client_name, project_title, total_cents, scope from proposals where user_id = ${uid} order by id desc`,
+      sql<InstallmentRow>`select id, proposal_id, label, percent, amount_cents, due_label, status, method from installments where user_id = ${uid} order by id`,
+    ]);
+
+  // Merge public inbox leads when workspace user owns the inbox config
+  let publicInbox: LeadRow[] = [];
+  if (inbox === PUBLIC_LEAD_INBOX || uid === inbox) {
+    publicInbox = await sql<LeadRow>`
+      select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status
+      from leads where user_id = ${PUBLIC_LEAD_INBOX} order by id desc
+    `;
+  }
+
+  const leads = [...ownLeads, ...inboxLeads, ...publicInbox].filter(
+    (lead, index, arr) => arr.findIndex((l) => l.id === lead.id) === index,
+  );
+
+  return {
+    clients,
+    leads,
+    projects,
+    milestones,
+    approvals: approvals.map((row) => ({ ...row, approved: Boolean(row.approved) })),
+    meetings,
+    proposals,
+    installments,
+  };
+}
+
 export const loadStudio = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }): Promise<StudioData> => {
-    await seed(context.userId);
+    await requireStudio(context.userId);
+    const uid = studioWorkspaceId(context.userId);
+    await seed(uid);
+    return loadWorkspace(uid);
+  });
+
+/** Portal: cliente vê só o seu projeto; estúdio vê o workspace. */
+export const loadPortal = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }): Promise<StudioData> => {
+    const scope = await resolvePortalScope(context.userId);
+    if (scope.kind === "studio") {
+      await seed(scope.workspaceId);
+      return loadWorkspace(scope.workspaceId);
+    }
+
     const sql = await getSql();
-    const uid = context.userId;
-    const [clients, leads, projects, milestones, approvals, meetings, proposals, installments] =
-      await Promise.all([
-        sql<ClientRow>`select id, name, email, phone, city, notes from clients where user_id = ${uid} order by id`,
-        sql<LeadRow>`select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status from leads where user_id = ${uid} order by id desc`,
-        sql<ProjectRow>`select id, client_id, title, place, stage, cover, summary from projects where user_id = ${uid} order by id`,
-        sql<MilestoneRow>`select id, project_id, label, status, position from milestones where user_id = ${uid} order by position`,
-        sql<ApprovalRow>`select id, project_id, label, image, approved from approvals where user_id = ${uid} order by id`,
-        sql<MeetingRow>`select id, client_name, title, starts_at, place, notes from meetings where user_id = ${uid} order by starts_at`,
-        sql<ProposalRow>`select id, lead_id, client_name, project_title, total_cents, scope from proposals where user_id = ${uid} order by id desc`,
-        sql<InstallmentRow>`select id, proposal_id, label, percent, amount_cents, due_label, status, method from installments where user_id = ${uid} order by id`,
-      ]);
+    const { workspaceId, clientId } = scope;
+    const clients = await sql<ClientRow>`
+      select id, name, email, phone, city, notes from clients
+      where user_id = ${workspaceId} and id = ${clientId}
+    `;
+    const projects = await sql<ProjectRow>`
+      select id, client_id, title, place, stage, cover, summary from projects
+      where user_id = ${workspaceId} and client_id = ${clientId} order by id
+    `;
+    const projectIds = projects.map((p) => p.id);
+    if (!projectIds.length) {
+      return {
+        clients,
+        leads: [],
+        projects: [],
+        milestones: [],
+        approvals: [],
+        meetings: [],
+        proposals: [],
+        installments: [],
+      };
+    }
+
+    const milestones = await sql<MilestoneRow>`
+      select id, project_id, label, status, position from milestones
+      where user_id = ${workspaceId} and project_id = any(${projectIds}::int[])
+      order by position
+    `;
+    const approvals = await sql<ApprovalRow>`
+      select id, project_id, label, image, approved from approvals
+      where user_id = ${workspaceId} and project_id = any(${projectIds}::int[])
+      order by id
+    `;
+    const clientName = clients[0]?.name ?? "";
+    const proposals = clientName
+      ? await sql<ProposalRow>`
+          select id, lead_id, client_name, project_title, total_cents, scope from proposals
+          where user_id = ${workspaceId} and client_name = ${clientName}
+          order by id desc
+        `
+      : [];
+    const proposalIds = proposals.map((p) => p.id);
+    const installments = proposalIds.length
+      ? await sql<InstallmentRow>`
+          select id, proposal_id, label, percent, amount_cents, due_label, status, method
+          from installments
+          where user_id = ${workspaceId} and proposal_id = any(${proposalIds}::int[])
+          order by id
+        `
+      : [];
+
     return {
       clients,
-      leads,
+      leads: [],
       projects,
       milestones,
       approvals: approvals.map((row) => ({ ...row, approved: Boolean(row.approved) })),
-      meetings,
+      meetings: [],
       proposals,
       installments,
     };
   });
 
+/**
+ * Cotação pública (sem login).
+ * Rate limit: 8 pedidos / 10 min por IP.
+ * Honeypot: campo `company` deve estar vazio.
+ */
+export const submitPublicLead = createServerFn({ method: "POST" })
+  .validator((input: unknown) => {
+    const row = (input ?? {}) as Record<string, unknown>;
+    const company = text(row.company, 120);
+    if (company) {
+      // Bot: aceitar em silêncio no validator e marcar
+      return { honeypot: true as const };
+    }
+    return { honeypot: false as const, lead: normalizeLead(input) };
+  })
+  .handler(async ({ data }) => {
+    if (data.honeypot) {
+      return { id: 0, ok: true };
+    }
+
+    assertRateLimit(`public-lead:${clientIp()}`, 8, 10 * 60 * 1000);
+
+    const lead = data.lead;
+    const owner = publicLeadOwnerId();
+    const sql = await getSql();
+    const cents = estimateCents(lead.areaM2, lead.style, lead.complexity);
+    const rows = await sql<{ id: number }>`
+      insert into leads (
+        user_id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status
+      ) values (
+        ${owner},
+        ${lead.name},
+        ${lead.email},
+        ${lead.phone},
+        ${lead.areaM2},
+        ${lead.style},
+        ${lead.complexity},
+        ${cents},
+        ${lead.message},
+        ${"novo"}
+      )
+      returning id
+    `;
+    return { id: rows[0].id, ok: true };
+  });
+
+/** @deprecated Prefer submitPublicLead for the public form. Kept for authenticated imports. */
 export const submitLead = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: unknown) => normalizeLead(input))
   .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
     const sql = await getSql();
     const cents = estimateCents(data.areaM2, data.style, data.complexity);
     const rows = await sql<{ id: number }>`
@@ -350,6 +537,7 @@ export const importLocalLeads = createServerFn({ method: "POST" })
     });
   })
   .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
     const sql = await getSql();
     for (const lead of data) {
       const cents = estimateCents(lead.areaM2, lead.style, lead.complexity);
@@ -373,23 +561,6 @@ export const importLocalLeads = createServerFn({ method: "POST" })
     return { imported: data.length };
   });
 
-function normalizeLead(input: unknown) {
-  const row = (input ?? {}) as Record<string, unknown>;
-  const name = text(row.name, 80);
-  const email = text(row.email, 120).toLowerCase();
-  const phone = text(row.phone, 24);
-  const message = text(row.message, 800);
-  const style = text(row.style, 40);
-  const complexity = text(row.complexity, 40);
-  const areaM2 = clampArea(Number(row.areaM2));
-  if (name.length < 2) throw new Error("Informe o nome.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("E-mail inválido.");
-  const digits = phone.replace(/\D/g, "");
-  if (digits.length < 10 || digits.length > 13) throw new Error("Telefone inválido.");
-  if (!isStyle(style) || !isTier(complexity)) throw new Error("Estimativa incompleta.");
-  return { name, email, phone, areaM2, style, complexity, message };
-}
-
 export const setLeadStatus = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: unknown) => {
@@ -403,10 +574,13 @@ export const setLeadStatus = createServerFn({ method: "POST" })
     return { id, status };
   })
   .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
     const sql = await getSql();
+    const owner = publicLeadOwnerId();
     await sql`
       update leads set status = ${data.status}
-      where id = ${data.id} and user_id = ${context.userId}
+      where id = ${data.id}
+        and (user_id = ${context.userId} or user_id = ${owner} or user_id = ${PUBLIC_LEAD_INBOX})
     `;
     return { ok: true };
   });
@@ -424,6 +598,7 @@ export const addClient = createServerFn({ method: "POST" })
     return { name, email, phone, city, notes };
   })
   .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
     const sql = await getSql();
     await sql`
       insert into clients (user_id, name, email, phone, city, notes)
@@ -447,6 +622,7 @@ export const addMeeting = createServerFn({ method: "POST" })
     return { clientName, title, startsAt, place, notes };
   })
   .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
     const sql = await getSql();
     await sql`
       insert into meetings (user_id, client_name, title, starts_at, place, notes)
@@ -465,15 +641,19 @@ export const createProposal = createServerFn({ method: "POST" })
     return { leadId: id };
   })
   .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
     const sql = await getSql();
     const uid = context.userId;
+    const owner = publicLeadOwnerId();
     const existing = await sql<{ id: number }>`
       select id from proposals where user_id = ${uid} and lead_id = ${data.leadId} limit 1
     `;
     if (existing.length) return { id: existing[0].id };
     const leads = await sql<LeadRow>`
       select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status
-      from leads where id = ${data.leadId} and user_id = ${uid}
+      from leads
+      where id = ${data.leadId}
+        and (user_id = ${uid} or user_id = ${owner} or user_id = ${PUBLIC_LEAD_INBOX})
     `;
     const lead = leads[0];
     if (!lead) throw new Error("Lead não encontrado.");
@@ -501,7 +681,7 @@ export const createProposal = createServerFn({ method: "POST" })
     }
     await sql`
       update leads set status = ${"proposta"}
-      where id = ${lead.id} and user_id = ${uid}
+      where id = ${lead.id}
     `;
     return { id: created[0].id };
   });
@@ -523,6 +703,7 @@ export const setInstallment = createServerFn({ method: "POST" })
     return { id, status, method };
   })
   .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
     const sql = await getSql();
     await sql`
       update installments
@@ -532,6 +713,7 @@ export const setInstallment = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Cliente pode aprovar imagens do seu projeto; estúdio pode em qualquer do workspace. */
 export const setApproval = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: unknown) => {
@@ -541,10 +723,53 @@ export const setApproval = createServerFn({ method: "POST" })
     return { id, approved: Boolean(row.approved) };
   })
   .handler(async ({ context, data }) => {
+    const scope = await resolvePortalScope(context.userId);
     const sql = await getSql();
+
+    if (scope.kind === "studio") {
+      await sql`
+        update approvals set approved = ${data.approved}
+        where id = ${data.id} and user_id = ${context.userId}
+      `;
+      return { ok: true };
+    }
+
     await sql`
-      update approvals set approved = ${data.approved}
-      where id = ${data.id} and user_id = ${context.userId}
+      update approvals a
+      set approved = ${data.approved}
+      from projects p
+      where a.id = ${data.id}
+        and a.project_id = p.id
+        and a.user_id = ${scope.workspaceId}
+        and p.user_id = ${scope.workspaceId}
+        and p.client_id = ${scope.clientId}
+    `;
+    return { ok: true };
+  });
+
+/** Liga um utilizador autenticado a um client_id (só estúdio). */
+export const linkClientAccount = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: unknown) => {
+    const row = (input ?? {}) as Record<string, unknown>;
+    const targetUserId = text(row.targetUserId, 120);
+    const clientId = Number(row.clientId);
+    if (!targetUserId || !Number.isInteger(clientId) || clientId < 1) {
+      throw new Error("Dados inválidos.");
+    }
+    return { targetUserId, clientId };
+  })
+  .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
+    const sql = await getSql();
+    const owned = await sql<{ id: number }>`
+      select id from clients where id = ${data.clientId} and user_id = ${context.userId}
+    `;
+    if (!owned.length) throw new Error("Cliente não encontrado neste estúdio.");
+    await sql`
+      insert into profiles (user_id, role, client_id)
+      values (${data.targetUserId}, ${"client"}, ${data.clientId})
+      on conflict (user_id) do update set role = ${"client"}, client_id = ${data.clientId}
     `;
     return { ok: true };
   });

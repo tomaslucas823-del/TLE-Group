@@ -3,7 +3,7 @@ import type { Draft } from "@/components/simulator";
 import { estimateCents, styleLabel, tierLabel } from "@/lib/estimate";
 import { brlFromCents } from "@/lib/format";
 import { pushLocalLead } from "@/lib/local-leads";
-import { submitLead } from "@/lib/studio.functions";
+import { submitPublicLead } from "@/lib/studio.functions";
 
 type FieldErrors = { nome?: string; email?: string; telefone?: string };
 
@@ -32,10 +32,7 @@ export function QuoteForm({ draft }: { draft: Draft }) {
     const next = validate(nome, email, telefone);
     setErrors(next);
     if (Object.keys(next).length) return;
-    if (company.trim()) {
-      setResult("cloud");
-      return;
-    }
+
     const payload = {
       name: nome.trim(),
       email: email.trim(),
@@ -44,14 +41,28 @@ export function QuoteForm({ draft }: { draft: Draft }) {
       style: draft.style,
       complexity: draft.tier,
       message: mensagem.trim(),
+      company: company.trim(),
     };
     setPending(true);
     try {
-      await submitLead({ data: payload });
+      await submitPublicLead({ data: payload });
       setResult("cloud");
     } catch {
-      pushLocalLead(payload);
-      setResult("local");
+      // Rede / rate limit: guarda localmente e importa no próximo login do estúdio
+      if (!company.trim()) {
+        pushLocalLead({
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          areaM2: payload.areaM2,
+          style: payload.style,
+          complexity: payload.complexity,
+          message: payload.message,
+        });
+        setResult("local");
+      } else {
+        setResult("cloud");
+      }
     } finally {
       setPending(false);
     }
@@ -82,6 +93,7 @@ export function QuoteForm({ draft }: { draft: Draft }) {
         <label htmlFor="empresa">Empresa</label>
         <input
           id="empresa"
+          name="company"
           value={company}
           onChange={(event) => setCompany(event.target.value)}
           tabIndex={-1}
