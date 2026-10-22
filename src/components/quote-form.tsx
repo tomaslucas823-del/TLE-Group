@@ -1,18 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Draft } from "@/components/simulator";
 import { estimateCents, styleLabel, tierLabel } from "@/lib/estimate";
 import { brlFromCents } from "@/lib/format";
 import { pushLocalLead } from "@/lib/local-leads";
-import { submitPublicLead } from "@/lib/studio.functions";
+import { getCaptchaChallenge, submitPublicLead } from "@/lib/studio.functions";
 
-type FieldErrors = { nome?: string; email?: string; telefone?: string };
+type FieldErrors = { nome?: string; email?: string; telefone?: string; captcha?: string };
 
-function validate(nome: string, email: string, telefone: string): FieldErrors {
+function validate(nome: string, email: string, telefone: string, captchaAnswer: string): FieldErrors {
   const errors: FieldErrors = {};
   if (nome.trim().length < 2) errors.nome = "Indique o seu nome.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errors.email = "Indique um e-mail válido.";
   const digits = telefone.replace(/\D/g, "");
   if (digits.length < 9 || digits.length > 13) errors.telefone = "Indique um telefone válido.";
+  if (!captchaAnswer.trim()) errors.captcha = "Resolva a verificação de segurança.";
   return errors;
 }
 
@@ -22,14 +23,32 @@ export function QuoteForm({ draft }: { draft: Draft }) {
   const [telefone, setTelefone] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [company, setCompany] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<"cloud" | "local" | null>(null);
   const total = estimateCents(draft.area, draft.style, draft.tier);
 
+  async function loadCaptcha() {
+    try {
+      const challenge = await getCaptchaChallenge();
+      setCaptchaToken(challenge.token);
+      setCaptchaQuestion(challenge.question);
+      setCaptchaAnswer("");
+    } catch {
+      setCaptchaQuestion("Verificação indisponível — actualize a página.");
+    }
+  }
+
+  useEffect(() => {
+    void loadCaptcha();
+  }, []);
+
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const next = validate(nome, email, telefone);
+    const next = validate(nome, email, telefone, captchaAnswer);
     setErrors(next);
     if (Object.keys(next).length) return;
 
@@ -42,13 +61,21 @@ export function QuoteForm({ draft }: { draft: Draft }) {
       complexity: draft.tier,
       message: mensagem.trim(),
       company: company.trim(),
+      captchaToken,
+      captchaAnswer: captchaAnswer.trim(),
     };
     setPending(true);
     try {
       await submitPublicLead({ data: payload });
       setResult("cloud");
-    } catch {
-      // Rede / rate limit: guarda localmente e importa no próximo login do estúdio
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      if (/verificação|desafio|incorrecta|expirado|captcha/i.test(message)) {
+        setErrors({ captcha: message || "Verificação falhou. Tente de novo." });
+        void loadCaptcha();
+        setPending(false);
+        return;
+      }
       if (!company.trim()) {
         pushLocalLead({
           name: payload.name,
@@ -132,7 +159,27 @@ export function QuoteForm({ draft }: { draft: Draft }) {
           suppressHydrationWarning
         />
       </label>
-      <button type="submit" disabled={pending} className="mt-2 min-h-11 w-fit bg-ink px-6 text-sm text-paper">
+      <label className="block text-sm text-mute" htmlFor="captcha">
+        Segurança — {captchaQuestion || "A carregar…"}
+        <input
+          id="captcha"
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={captchaAnswer}
+          onChange={(event) => setCaptchaAnswer(event.target.value)}
+          aria-invalid={Boolean(errors.captcha)}
+          aria-describedby={errors.captcha ? "captcha-erro" : undefined}
+          className="field"
+          suppressHydrationWarning
+        />
+        {errors.captcha ? (
+          <span id="captcha-erro" className="mt-1 block text-timber-deep">
+            {errors.captcha}
+          </span>
+        ) : null}
+      </label>
+      <button type="submit" disabled={pending || !captchaToken} className="mt-2 min-h-11 w-fit bg-ink px-6 text-sm text-paper">
         {pending ? "A enviar…" : "Enviar"}
       </button>
     </form>
