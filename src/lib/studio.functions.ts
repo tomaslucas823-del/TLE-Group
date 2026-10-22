@@ -136,7 +136,6 @@ function normalizeLead(input: unknown) {
   if (name.length < 2) throw new Error("Informe o nome.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("E-mail inválido.");
   const digits = phone.replace(/\D/g, "");
-  // Moçambique: 9 dígitos local ou com indicativo 258
   if (digits.length < 9 || digits.length > 13) throw new Error("Telefone inválido.");
   if (!isStyle(style) || !isTier(complexity)) throw new Error("Estimativa incompleta.");
   return { name, email, phone, areaM2, style, complexity, message };
@@ -320,11 +319,7 @@ async function seed(uid: string) {
 async function loadWorkspace(uid: string): Promise<StudioData> {
   const sql = await getSql();
   const inbox = publicLeadOwnerId();
-  // Leads públicos (inbox) + dados do workspace do estúdio
-  const leadOwnerFilter =
-    uid === inbox || inbox === PUBLIC_LEAD_INBOX
-      ? null
-      : inbox;
+  const leadOwnerFilter = uid === inbox || inbox === PUBLIC_LEAD_INBOX ? null : inbox;
 
   const [clients, ownLeads, inboxLeads, projects, milestones, approvals, meetings, proposals, installments] =
     await Promise.all([
@@ -333,7 +328,6 @@ async function loadWorkspace(uid: string): Promise<StudioData> {
       leadOwnerFilter && leadOwnerFilter !== uid
         ? sql<LeadRow>`select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status from leads where user_id = ${leadOwnerFilter} order by id desc`
         : Promise.resolve([] as LeadRow[]),
-      // Also pull PUBLIC_LEAD_INBOX if different
       sql<ProjectRow>`select id, client_id, title, place, stage, cover, summary from projects where user_id = ${uid} order by id`,
       sql<MilestoneRow>`select id, project_id, label, status, position from milestones where user_id = ${uid} order by position`,
       sql<ApprovalRow>`select id, project_id, label, image, approved from approvals where user_id = ${uid} order by id`,
@@ -342,7 +336,6 @@ async function loadWorkspace(uid: string): Promise<StudioData> {
       sql<InstallmentRow>`select id, proposal_id, label, percent, amount_cents, due_label, status, method from installments where user_id = ${uid} order by id`,
     ]);
 
-  // Merge public inbox leads when workspace user owns the inbox config
   let publicInbox: LeadRow[] = [];
   if (inbox === PUBLIC_LEAD_INBOX || uid === inbox) {
     publicInbox = await sql<LeadRow>`
@@ -376,7 +369,6 @@ export const loadStudio = createServerFn({ method: "GET" })
     return loadWorkspace(uid);
   });
 
-/** Portal: cliente vê só o seu projeto; estúdio vê o workspace. */
 export const loadPortal = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }): Promise<StudioData> => {
@@ -396,8 +388,8 @@ export const loadPortal = createServerFn({ method: "GET" })
       select id, client_id, title, place, stage, cover, summary from projects
       where user_id = ${workspaceId} and client_id = ${clientId} order by id
     `;
-    const projectIds = projects.map((p) => p.id);
-    if (!projectIds.length) {
+    const projectIdSet = new Set(projects.map((p) => p.id));
+    if (!projectIdSet.size) {
       return {
         clients,
         leads: [],
@@ -410,16 +402,17 @@ export const loadPortal = createServerFn({ method: "GET" })
       };
     }
 
-    const milestones = await sql<MilestoneRow>`
+    const allMilestones = await sql<MilestoneRow>`
       select id, project_id, label, status, position from milestones
-      where user_id = ${workspaceId} and project_id = any(${projectIds}::int[])
-      order by position
+      where user_id = ${workspaceId} order by position
     `;
-    const approvals = await sql<ApprovalRow>`
+    const allApprovals = await sql<ApprovalRow>`
       select id, project_id, label, image, approved from approvals
-      where user_id = ${workspaceId} and project_id = any(${projectIds}::int[])
-      order by id
+      where user_id = ${workspaceId} order by id
     `;
+    const milestones = allMilestones.filter((m) => projectIdSet.has(m.project_id));
+    const approvals = allApprovals.filter((a) => projectIdSet.has(a.project_id));
+
     const clientName = clients[0]?.name ?? "";
     const proposals = clientName
       ? await sql<ProposalRow>`
@@ -428,15 +421,14 @@ export const loadPortal = createServerFn({ method: "GET" })
           order by id desc
         `
       : [];
-    const proposalIds = proposals.map((p) => p.id);
-    const installments = proposalIds.length
+    const proposalIdSet = new Set(proposals.map((p) => p.id));
+    const allInstallments = proposalIdSet.size
       ? await sql<InstallmentRow>`
           select id, proposal_id, label, percent, amount_cents, due_label, status, method
-          from installments
-          where user_id = ${workspaceId} and proposal_id = any(${proposalIds}::int[])
-          order by id
+          from installments where user_id = ${workspaceId} order by id
         `
       : [];
+    const installments = allInstallments.filter((i) => proposalIdSet.has(i.proposal_id));
 
     return {
       clients,
@@ -450,25 +442,15 @@ export const loadPortal = createServerFn({ method: "GET" })
     };
   });
 
-/**
- * Cotação pública (sem login).
- * Rate limit: 8 pedidos / 10 min por IP.
- * Honeypot: campo `company` deve estar vazio.
- */
 export const submitPublicLead = createServerFn({ method: "POST" })
   .validator((input: unknown) => {
     const row = (input ?? {}) as Record<string, unknown>;
     const company = text(row.company, 120);
-    if (company) {
-      // Bot: aceitar em silêncio no validator e marcar
-      return { honeypot: true as const };
-    }
+    if (company) return { honeypot: true as const };
     return { honeypot: false as const, lead: normalizeLead(input) };
   })
   .handler(async ({ data }) => {
-    if (data.honeypot) {
-      return { id: 0, ok: true };
-    }
+    if (data.honeypot) return { id: 0, ok: true };
 
     assertRateLimit(`public-lead:${clientIp()}`, 8, 10 * 60 * 1000);
 
@@ -496,7 +478,6 @@ export const submitPublicLead = createServerFn({ method: "POST" })
     return { id: rows[0].id, ok: true };
   });
 
-/** @deprecated Prefer submitPublicLead for the public form. Kept for authenticated imports. */
 export const submitLead = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: unknown) => normalizeLead(input))
@@ -657,7 +638,7 @@ export const createProposal = createServerFn({ method: "POST" })
     `;
     const lead = leads[0];
     if (!lead) throw new Error("Lead não encontrado.");
-    const scope = `${tierLabel(lead.complexity)} · ${styleLabel(lead.style)} · ${lead.area_m2} m². Pagamento em sinal, projeto executivo e imagens finais.`;
+    const scopeText = `${tierLabel(lead.complexity)} · ${styleLabel(lead.style)} · ${lead.area_m2} m². Pagamento em sinal, projeto executivo e imagens finais.`;
     const created = await sql<{ id: number }>`
       insert into proposals (user_id, lead_id, client_name, project_title, total_cents, scope)
       values (
@@ -666,7 +647,7 @@ export const createProposal = createServerFn({ method: "POST" })
         ${lead.name},
         ${`Residência ${lead.area_m2} m²`},
         ${lead.estimate_cents},
-        ${scope}
+        ${scopeText}
       )
       returning id
     `;
@@ -679,10 +660,7 @@ export const createProposal = createServerFn({ method: "POST" })
         )
       `;
     }
-    await sql`
-      update leads set status = ${"proposta"}
-      where id = ${lead.id}
-    `;
+    await sql`update leads set status = ${"proposta"} where id = ${lead.id}`;
     return { id: created[0].id };
   });
 
@@ -713,7 +691,6 @@ export const setInstallment = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/** Cliente pode aprovar imagens do seu projeto; estúdio pode em qualquer do workspace. */
 export const setApproval = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: unknown) => {
@@ -747,7 +724,6 @@ export const setApproval = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/** Liga um utilizador autenticado a um client_id (só estúdio). */
 export const linkClientAccount = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: unknown) => {
