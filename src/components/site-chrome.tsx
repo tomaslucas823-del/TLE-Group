@@ -78,7 +78,7 @@ export function SiteHeader() {
               to={item.to}
               hash={item.hash}
               className={cn(
-                "text-[13px] transition-colors duration-200",
+                "link-underline text-[13px] transition-colors duration-200",
                 light ? "text-paper/80 hover:text-paper" : "text-mute hover:text-ink",
                 pathname === item.to && !item.hash && (light ? "text-paper" : "text-ink"),
               )}
@@ -252,15 +252,22 @@ export function SiteFooter() {
   );
 }
 
+/** Sticky CTA — inspirado no botão flutuante de referência, cantos quadrados. */
 export function WhatsAppButton() {
+  const { t } = useI18n();
   if (!waHref) return null;
   return (
     <a
       href={waHref}
-      className="no-print float-in btn btn-outline-ink fixed right-5 bottom-5 z-40 px-3 py-2 text-sm"
+      target="_blank"
+      rel="noreferrer"
+      className="no-print float-in btn btn-solid fixed right-5 bottom-5 z-40 min-h-11 px-4 text-sm font-medium shadow-lg"
       aria-label="WhatsApp"
     >
-      WhatsApp
+      {t.nav.quote}
+      <span className="ml-2 opacity-70" aria-hidden>
+        →
+      </span>
     </a>
   );
 }
@@ -282,9 +289,8 @@ export function ScrollTopButton() {
     <button
       type="button"
       className={cn(
-        "no-print float-in btn btn-outline-ink fixed right-5 z-40 flex h-10 w-10 items-center justify-center text-sm",
-        waHref ? "bottom-20" : "bottom-5",
-        "md:bottom-5",
+        "no-print float-in btn btn-outline-ink fixed z-40 flex h-10 w-10 items-center justify-center text-sm",
+        waHref ? "right-5 bottom-[4.75rem]" : "right-5 bottom-5",
       )}
       aria-label={t.a11y.backTop}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
