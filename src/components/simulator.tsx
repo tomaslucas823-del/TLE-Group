@@ -107,13 +107,19 @@ export function Simulator({
             to="/"
             hash="orcamento"
             search={{ area: draft.area, estilo: draft.style, entrega: draft.tier }}
-            className="mt-8 inline-flex min-h-11 items-center bg-ink px-5 text-sm text-paper"
+            className="btn-cta btn-cta--dark mt-8"
           >
             {t.estimate.handoff}
+            <span className="btn-cta__icon" aria-hidden>
+              →
+            </span>
           </Link>
         ) : (
-          <a href="#orcamento" className="mt-8 inline-flex min-h-11 items-center bg-ink px-5 text-sm text-paper">
+          <a href="#orcamento" className="btn-cta btn-cta--dark mt-8">
             {t.estimate.cta}
+            <span className="btn-cta__icon" aria-hidden>
+              →
+            </span>
           </a>
         )}
       </aside>
