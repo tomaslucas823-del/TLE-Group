@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { I18nProvider } from "@/components/i18n-provider";
 import { PageTransition } from "@/components/page-transition";
+import { ScrollProgress } from "@/components/scroll-progress";
 import {
   CookieBanner,
   ScrollTopButton,
@@ -18,6 +19,7 @@ function SiteLayout() {
   return (
     <I18nProvider>
       <SmoothScroll />
+      <ScrollProgress />
       <div className="min-h-screen bg-paper text-ink">
         <SiteHeader />
         <PageTransition>
