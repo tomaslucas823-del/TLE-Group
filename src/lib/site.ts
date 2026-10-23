@@ -5,11 +5,11 @@ export const site = {
   nuit: "000 000 000",
   city: "Maputo",
   country: "Moçambique",
-  /** Morada definitiva — ainda por indicar. */
-  address: "Morada a indicar — Maputo",
-  /** E-mail definitivo — ainda por indicar. */
+  /** Morada definitiva - ainda por indicar. */
+  address: "Morada a indicar, Maputo",
+  /** E-mail definitivo - ainda por indicar. */
   email: "contacto@tle.co.mz",
-  /** Telefone definitivo — ainda por indicar. */
+  /** Telefone definitivo - ainda por indicar. */
   phoneDisplay: "+258 8X XXX XXXX",
   /** Só dígitos, com indicativo. Vazio = o botão de WhatsApp fica oculto. */
   phoneWa: "",
