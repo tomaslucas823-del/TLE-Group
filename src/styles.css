@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-display: "Cormorant Garamond", "Times New Roman", Times, serif;
+  --font-sans: "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Instrument Serif", "Times New Roman", Times, serif;
   --color-paper: #f4f1ec;
   --color-stone: #ebe6df;
   --color-mist: #e3ddd4;
@@ -276,7 +276,7 @@ html.dark .scroll-progress__bar {
   }
 }
 
-/* —— Buttons (pill + circular arrow, inspired by reference) —— */
+/* —— Buttons (pill + circular arrow) —— */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -345,7 +345,6 @@ html.dark .scroll-progress__bar {
   color: var(--color-paper);
 }
 
-/* Primary CTA: text + circular arrow badge */
 .btn-cta {
   display: inline-flex;
   align-items: center;
@@ -401,7 +400,6 @@ html.dark .scroll-progress__bar {
   color: #fff;
 }
 
-/* Nav pill cluster (reference-style) */
 .nav-pills {
   display: inline-flex;
   align-items: center;
@@ -454,7 +452,6 @@ html.dark .scroll-progress__bar {
   color: var(--color-paper);
 }
 
-/* Floating bar like reference */
 .float-bar {
   display: inline-flex;
   align-items: center;
