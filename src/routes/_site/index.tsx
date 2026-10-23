@@ -37,8 +37,6 @@ export const Route = createFileRoute("/_site/")({
 const featured = projects.slice(0, 3);
 const [featuredMain, ...featuredSide] = featured;
 
-const stripImages = projects.flatMap((p) => [{ src: p.cover, alt: p.title, slug: p.slug }]).slice(0, 8);
-
 function HomePage() {
   const { t } = useI18n();
   const search = Route.useSearch();
@@ -140,26 +138,6 @@ function HomePage() {
           ) : null}
         </div>
       </section>
-
-      {stripImages.length > 0 ? (
-        <section className="border-y border-line bg-stone py-6 md:py-8" aria-hidden>
-          <div className="marquee">
-            <div className="marquee__track">
-              {[...stripImages, ...stripImages].map((item, i) => (
-                <Link
-                  key={`${item.slug}-${i}`}
-                  to="/portfolio/$slug"
-                  params={{ slug: item.slug }}
-                  className="marquee__item"
-                  tabIndex={i >= stripImages.length ? -1 : undefined}
-                >
-                  <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <section id="servicos" className="bg-ink text-paper">
         <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
