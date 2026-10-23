@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -47,14 +47,13 @@ type NavItem = {
   home?: boolean;
 };
 
-function activeFromLocation(pathname: string, hash: string): string {
-  const h = hash.replace(/^#/, "");
+function resolveActiveId(pathname: string): string {
   if (pathname.startsWith("/portfolio")) return "projects";
   if (pathname.startsWith("/simulador")) return "estimate";
   if (pathname === "/") {
+    const h = typeof window !== "undefined" ? window.location.hash.replace(/^#/, "") : "";
     if (h === "servicos") return "services";
     if (h === "metodo") return "method";
-    if (h === "orcamento" || h === "duvidas") return "home";
     return "home";
   }
   return "";
@@ -63,15 +62,12 @@ function activeFromLocation(pathname: string, hash: string): string {
 export function SiteHeader() {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const { pathname, hash } = useRouterState({
-    select: (state) => ({
-      pathname: state.location.pathname,
-      hash: state.location.hash.replace(/^#/, ""),
-    }),
-  });
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeId, setActiveId] = useState(() => activeFromLocation(pathname, hash));
+  const [activeId, setActiveId] = useState("home");
+  /** When true, location-sync effect must not overwrite a fresh click. */
+  const lockActive = useRef(false);
 
   const NAV: NavItem[] = [
     { id: "home", to: "/", label: "Início", home: true },
@@ -81,17 +77,16 @@ export function SiteHeader() {
     { id: "estimate", to: "/simulador", label: t.nav.estimate },
   ];
 
-  // Keep highlight in sync when the URL changes (back/forward, direct links)
+  // Sync from URL only when not locked by a click
   useEffect(() => {
-    setActiveId(activeFromLocation(pathname, hash));
-    setOpen(false);
-  }, [pathname, hash]);
+    if (lockActive.current) return;
+    setActiveId(resolveActiveId(pathname));
+  }, [pathname]);
 
-  // Also react to browser hash changes from pushState
   useEffect(() => {
     const sync = () => {
-      const h = window.location.hash.replace(/^#/, "");
-      setActiveId(activeFromLocation(window.location.pathname, h));
+      if (lockActive.current) return;
+      setActiveId(resolveActiveId(window.location.pathname));
     };
     window.addEventListener("hashchange", sync);
     window.addEventListener("popstate", sync);
@@ -115,28 +110,31 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  useEffect(() => {
-    if (pathname !== "/" || !hash) return;
-    const timer = window.setTimeout(() => scrollToId(hash), 80);
-    return () => window.clearTimeout(timer);
-  }, [pathname, hash]);
-
   const light = pathname === "/" && !scrolled && !open;
+
+  function selectNav(item: NavItem) {
+    lockActive.current = true;
+    setActiveId(item.id);
+    setOpen(false);
+    // Release lock after navigation/hash settles
+    window.setTimeout(() => {
+      lockActive.current = false;
+    }, 400);
+  }
 
   async function onNavClick(item: NavItem, event: React.MouseEvent) {
     event.preventDefault();
-    setOpen(false);
-    // Move highlight immediately — do not wait for the router
-    setActiveId(item.id);
+    selectNav(item);
 
     if (item.hash) {
+      // Always update the real URL hash so resolveActiveId stays correct
       if (pathname === "/") {
         window.history.pushState(null, "", `/#${item.hash}`);
         scrollToId(item.hash);
-        return;
+      } else {
+        await navigate({ to: "/", hash: item.hash });
+        window.setTimeout(() => scrollToId(item.hash!), 120);
       }
-      await navigate({ to: "/", hash: item.hash });
-      window.setTimeout(() => scrollToId(item.hash!), 100);
       return;
     }
 
@@ -159,10 +157,7 @@ export function SiteHeader() {
             "relative z-10 flex items-center rounded-full px-1 py-1 transition-colors",
             light ? "text-paper" : "text-ink",
           )}
-          onClick={() => {
-            setOpen(false);
-            setActiveId("home");
-          }}
+          onClick={() => selectNav({ id: "home", to: "/", label: "Início", home: true })}
         >
           <span className="font-display text-[1.2rem] leading-none font-medium tracking-[0.16em]">TLE</span>
         </Link>
@@ -171,17 +166,21 @@ export function SiteHeader() {
           className={cn("nav-pills relative z-10 hidden md:inline-flex", !light && "nav-pills--solid")}
           aria-label="Principal"
         >
-          {NAV.map((item) => (
-            <a
-              key={item.id}
-              href={item.hash ? `/#${item.hash}` : item.to}
-              className={cn("nav-pill", activeId === item.id && "nav-pill--active")}
-              aria-current={activeId === item.id ? "page" : undefined}
-              onClick={(e) => onNavClick(item, e)}
-            >
-              {item.label}
-            </a>
-          ))}
+          {NAV.map((item) => {
+            const active = activeId === item.id;
+            return (
+              <a
+                key={item.id}
+                href={item.hash ? `/#${item.hash}` : item.to}
+                className={cn("nav-pill", active && "nav-pill--active")}
+                aria-current={active ? "page" : undefined}
+                data-active={active ? "true" : "false"}
+                onClick={(e) => onNavClick(item, e)}
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </nav>
 
         <div className="relative z-10 hidden items-center gap-2 md:flex">
@@ -195,13 +194,13 @@ export function SiteHeader() {
             className="btn-cta"
             onClick={(e) => {
               e.preventDefault();
-              setActiveId("home");
+              selectNav({ id: "home", to: "/", label: "Início", home: true });
               if (pathname === "/") {
                 window.history.pushState(null, "", "/#orcamento");
                 scrollToId("orcamento");
               } else {
                 void navigate({ to: "/", hash: "orcamento" }).then(() =>
-                  window.setTimeout(() => scrollToId("orcamento"), 100),
+                  window.setTimeout(() => scrollToId("orcamento"), 120),
                 );
               }
             }}
@@ -254,14 +253,13 @@ export function SiteHeader() {
               className="btn-cta mt-4 self-start"
               onClick={(e) => {
                 e.preventDefault();
-                setOpen(false);
-                setActiveId("home");
+                selectNav({ id: "home", to: "/", label: "Início", home: true });
                 if (pathname === "/") {
                   window.history.pushState(null, "", "/#orcamento");
                   scrollToId("orcamento");
                 } else {
                   void navigate({ to: "/", hash: "orcamento" }).then(() =>
-                    window.setTimeout(() => scrollToId("orcamento"), 100),
+                    window.setTimeout(() => scrollToId("orcamento"), 120),
                   );
                 }
               }}
