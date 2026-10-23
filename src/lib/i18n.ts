@@ -72,7 +72,7 @@ export const messages = {
     },
     styles: {
       pedra: { label: "Branco, pedra e madeira", note: "Volumes fechados, um plano de pedra e madeira quente." },
-      concreto: { label: "Concreto e óculo", note: "Massa contínua, abertura circular e jardim solto." },
+      oculo: { label: "Concreto e óculo", note: "Massa contínua, abertura circular e jardim solto." },
       ripado: { label: "Ripado e grandes vãos", note: "Fachada linear, brises e vidro do chão ao teto." },
       pavilhao: { label: "Pavilhão aberto", note: "Laje em balanço, pórtico e chegada sob cobertura." },
     },
@@ -226,7 +226,7 @@ export const messages = {
     },
     styles: {
       pedra: { label: "White, stone and timber", note: "Closed volumes, a stone plane and warm wood." },
-      concreto: { label: "Concrete and oculus", note: "Continuous mass, circular opening and loose garden." },
+      oculo: { label: "Concrete and oculus", note: "Continuous mass, circular opening and loose garden." },
       ripado: { label: "Batten and wide spans", note: "Linear façade, brise-soleil and floor-to-ceiling glass." },
       pavilhao: { label: "Open pavilion", note: "Cantilevered slab, portico and arrival under cover." },
     },
