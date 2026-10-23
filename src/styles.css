@@ -14,7 +14,7 @@
   --color-line: #d8d2c8;
 }
 
-/* Modo escuro — tokens invertidos, tom editorial quente */
+/* Modo escuro - tokens invertidos, tom editorial quente */
 html.dark {
   --color-paper: #121110;
   --color-stone: #1a1917;
@@ -182,6 +182,7 @@ html.dark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 0;
   transition:
     background-color 0.15s ease,
     border-color 0.15s ease,
