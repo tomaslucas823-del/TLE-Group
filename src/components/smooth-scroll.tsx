@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 /**
- * Lightweight inertia scroll (no Lenis dependency).
+ * Lightweight inertia scroll inspired by Lenis (no dependency).
  * Respects prefers-reduced-motion and touch devices (native scroll stays).
  */
 export function SmoothScroll() {
@@ -15,11 +15,15 @@ export function SmoothScroll() {
     let raf = 0;
     let running = false;
 
-    const ease = 0.12;
+    // Softer than before - closer to Lenis default feel
+    const ease = 0.085;
+
+    const maxScroll = () =>
+      Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
 
     const tick = () => {
       current += (target - current) * ease;
-      if (Math.abs(target - current) < 0.35) {
+      if (Math.abs(target - current) < 0.4) {
         current = target;
         running = false;
         window.scrollTo(0, current);
@@ -31,14 +35,18 @@ export function SmoothScroll() {
 
     const onWheel = (e: WheelEvent) => {
       if (e.ctrlKey) return; // pinch-zoom
+      // Nested scrollable areas keep native behavior
+      const path = e.composedPath?.() ?? [];
+      for (const node of path) {
+        if (!(node instanceof HTMLElement)) continue;
+        const style = window.getComputedStyle(node);
+        const oy = style.overflowY;
+        if ((oy === "auto" || oy === "scroll") && node.scrollHeight > node.clientHeight + 1) {
+          return;
+        }
+      }
       e.preventDefault();
-      target = Math.max(
-        0,
-        Math.min(
-          target + e.deltaY,
-          document.documentElement.scrollHeight - window.innerHeight,
-        ),
-      );
+      target = Math.max(0, Math.min(target + e.deltaY, maxScroll()));
       if (!running) {
         running = true;
         raf = requestAnimationFrame(tick);
@@ -48,7 +56,6 @@ export function SmoothScroll() {
     const onKey = (e: KeyboardEvent) => {
       const keys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "];
       if (!keys.includes(e.key)) return;
-      // Let native handle keys; sync target after
       requestAnimationFrame(() => {
         target = window.scrollY;
         current = window.scrollY;
@@ -56,7 +63,6 @@ export function SmoothScroll() {
     };
 
     const onScrollUser = () => {
-      // If user dragged scrollbar, resync
       if (!running) {
         target = window.scrollY;
         current = window.scrollY;
