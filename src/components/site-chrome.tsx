@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import { LangToggle } from "@/components/lang-toggle";
@@ -32,23 +32,44 @@ function CtaArrow() {
   );
 }
 
+function scrollToId(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return false;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  return true;
+}
+
+type NavItem = {
+  id: string;
+  to: "/" | "/portfolio" | "/simulador";
+  label: string;
+  hash?: string;
+  home?: boolean;
+};
+
 export function SiteHeader() {
   const { t } = useI18n();
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const navigate = useNavigate();
+  const { pathname, hash } = useRouterState({
+    select: (state) => ({
+      pathname: state.location.pathname,
+      hash: state.location.hash.replace(/^#/, ""),
+    }),
+  });
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const NAV = [
-    { to: "/" as const, label: t.nav.home ?? "Início", hash: undefined, home: true },
-    { to: "/portfolio" as const, label: t.nav.projects, hash: undefined },
-    { to: "/" as const, label: t.nav.services, hash: "servicos" },
-    { to: "/" as const, label: t.nav.method, hash: "metodo" },
-    { to: "/simulador" as const, label: t.nav.estimate, hash: undefined },
+  const NAV: NavItem[] = [
+    { id: "home", to: "/", label: "Início", home: true },
+    { id: "projects", to: "/portfolio", label: t.nav.projects },
+    { id: "services", to: "/", label: t.nav.services, hash: "servicos" },
+    { id: "method", to: "/", label: t.nav.method, hash: "metodo" },
+    { id: "estimate", to: "/simulador", label: t.nav.estimate },
   ];
 
   useEffect(() => {
     setOpen(false);
-  }, [pathname]);
+  }, [pathname, hash]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -64,18 +85,49 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  // When landing on /#section, scroll after paint
+  useEffect(() => {
+    if (pathname !== "/" || !hash) return;
+    const t = window.setTimeout(() => scrollToId(hash), 80);
+    return () => window.clearTimeout(t);
+  }, [pathname, hash]);
+
   const light = pathname === "/" && !scrolled && !open;
 
-  function isActive(item: (typeof NAV)[number]) {
-    if (item.hash) return false;
-    if (item.home) return pathname === "/";
-    return pathname === item.to || pathname.startsWith(item.to + "/");
+  function isActive(item: NavItem) {
+    if (item.hash) return pathname === "/" && hash === item.hash;
+    if (item.home) return pathname === "/" && !hash;
+    return pathname === item.to || pathname.startsWith(`${item.to}/`);
+  }
+
+  async function onNavClick(item: NavItem, event: React.MouseEvent) {
+    event.preventDefault();
+    setOpen(false);
+
+    if (item.hash) {
+      if (pathname === "/") {
+        // Already home: update hash + scroll
+        window.history.pushState(null, "", `/#${item.hash}`);
+        scrollToId(item.hash);
+        return;
+      }
+      await navigate({ to: "/", hash: item.hash });
+      window.setTimeout(() => scrollToId(item.hash!), 100);
+      return;
+    }
+
+    if (item.home) {
+      await navigate({ to: "/" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    await navigate({ to: item.to });
   }
 
   return (
     <header className="no-print fixed inset-x-0 top-0 z-50 bg-transparent">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
-        {/* Logo — transparent, always readable */}
         <Link
           to="/"
           className={cn(
@@ -87,49 +139,54 @@ export function SiteHeader() {
           <span className="font-display text-[1.2rem] leading-none font-medium tracking-[0.16em]">TLE</span>
         </Link>
 
-        {/* Center nav pills */}
         <nav
-          className={cn("nav-pills hidden md:inline-flex", !light && "nav-pills--solid")}
+          className={cn("nav-pills relative z-10 hidden md:inline-flex", !light && "nav-pills--solid")}
           aria-label="Principal"
         >
           {NAV.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              hash={item.hash}
+            <a
+              key={item.id}
+              href={item.hash ? `/#${item.hash}` : item.to}
               className={cn("nav-pill", isActive(item) && "nav-pill--active")}
+              onClick={(e) => onNavClick(item, e)}
             >
               {item.label}
-            </Link>
+            </a>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <div
-            className={cn(
-              "nav-pills",
-              !light && "nav-pills--solid",
-            )}
-          >
+        <div className="relative z-10 hidden items-center gap-2 md:flex">
+          <div className={cn("nav-pills", !light && "nav-pills--solid")}>
             <LangToggle light={light} />
             <ThemeToggle light={light} />
           </div>
           <AuthSlot light={light} />
-          <Link to="/" hash="orcamento" className="btn-cta">
+          <a
+            href="/#orcamento"
+            className="btn-cta"
+            onClick={(e) => {
+              e.preventDefault();
+              if (pathname === "/") {
+                window.history.pushState(null, "", "/#orcamento");
+                scrollToId("orcamento");
+              } else {
+                void navigate({ to: "/", hash: "orcamento" }).then(() =>
+                  window.setTimeout(() => scrollToId("orcamento"), 100),
+                );
+              }
+            }}
+          >
             {t.nav.quote}
             <CtaArrow />
-          </Link>
+          </a>
         </div>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="relative z-10 flex items-center gap-2 md:hidden">
           <LangToggle light={light} />
           <ThemeToggle light={light} />
           <button
             type="button"
-            className={cn(
-              "nav-pill",
-              light ? "bg-white/10 text-paper" : "bg-ink/5 text-ink",
-            )}
+            className={cn("nav-pill", light ? "bg-white/10 text-paper" : "bg-ink/5 text-ink")}
             aria-expanded={open}
             aria-label={open ? t.nav.close : t.nav.menu}
             onClick={() => setOpen((value) => !value)}
@@ -143,15 +200,14 @@ export function SiteHeader() {
         <div className="border-t border-line bg-paper/95 px-5 py-8 text-ink backdrop-blur-md md:hidden">
           <nav className="flex flex-col gap-1" aria-label="Mobile">
             {NAV.map((item) => (
-              <Link
-                key={item.label}
-                to={item.to}
-                hash={item.hash}
+              <a
+                key={item.id}
+                href={item.hash ? `/#${item.hash}` : item.to}
                 className="flex min-h-12 items-center font-display text-3xl font-normal"
-                onClick={() => setOpen(false)}
+                onClick={(e) => onNavClick(item, e)}
               >
                 {item.label}
-              </Link>
+              </a>
             ))}
             <Link
               to="/estudio"
@@ -160,10 +216,25 @@ export function SiteHeader() {
             >
               {t.nav.studio}
             </Link>
-            <Link to="/" hash="orcamento" className="btn-cta mt-4 self-start" onClick={() => setOpen(false)}>
+            <a
+              href="/#orcamento"
+              className="btn-cta mt-4 self-start"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpen(false);
+                if (pathname === "/") {
+                  window.history.pushState(null, "", "/#orcamento");
+                  scrollToId("orcamento");
+                } else {
+                  void navigate({ to: "/", hash: "orcamento" }).then(() =>
+                    window.setTimeout(() => scrollToId("orcamento"), 100),
+                  );
+                }
+              }}
+            >
               {t.nav.quote}
               <CtaArrow />
-            </Link>
+            </a>
           </nav>
           <div className="mt-8">
             <AuthSlot light={false} />
@@ -213,9 +284,9 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link to="/" hash="servicos" className="hover:underline">
+                <a href="/#servicos" className="hover:underline">
                   {t.nav.services}
-                </Link>
+                </a>
               </li>
               <li>
                 <Link to="/simulador" className="hover:underline">
@@ -223,9 +294,9 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link to="/" hash="duvidas" className="hover:underline">
+                <a href="/#duvidas" className="hover:underline">
                   {t.footer.faq}
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
@@ -271,7 +342,6 @@ export function SiteFooter() {
   );
 }
 
-/** Floating bar: TLE mark + CTA with circular arrow */
 export function WhatsAppButton() {
   const { t } = useI18n();
   if (!waHref) return null;
