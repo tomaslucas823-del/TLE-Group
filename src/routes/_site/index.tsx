@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_site/")({
   }),
   head: () => ({
     meta: [
-      { title: "TLE Arquitetura — a casa, antes da primeira parede" },
+      { title: "TLE Arquitetura - a casa, antes da primeira parede" },
       {
         name: "description",
         content:
