@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
 /**
- * Lightweight inertia scroll inspired by Lenis (no dependency).
- * Respects prefers-reduced-motion and touch devices (native scroll stays).
+ * Light inertia scroll. Higher ease = less lag, still soft.
+ * Disabled on touch and prefers-reduced-motion.
  */
 export function SmoothScroll() {
   useEffect(() => {
@@ -15,15 +15,15 @@ export function SmoothScroll() {
     let raf = 0;
     let running = false;
 
-    // Softer than before - closer to Lenis default feel
-    const ease = 0.085;
+    // Snappier than before — less "heavy" feel
+    const ease = 0.16;
 
     const maxScroll = () =>
       Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
 
     const tick = () => {
       current += (target - current) * ease;
-      if (Math.abs(target - current) < 0.4) {
+      if (Math.abs(target - current) < 0.5) {
         current = target;
         running = false;
         window.scrollTo(0, current);
@@ -34,8 +34,7 @@ export function SmoothScroll() {
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey) return; // pinch-zoom
-      // Nested scrollable areas keep native behavior
+      if (e.ctrlKey) return;
       const path = e.composedPath?.() ?? [];
       for (const node of path) {
         if (!(node instanceof HTMLElement)) continue;
