@@ -19,7 +19,7 @@ type RevealProps = {
   once?: boolean;
 };
 
-/** Scroll reveal with smoother easing and more travel distance. */
+/** Scroll reveal — short travel, light motion. */
 export function Reveal({
   children,
   as: Tag = "div",
@@ -51,7 +51,7 @@ export function Reveal({
           }
         }
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+      { rootMargin: "0px 0px -4% 0px", threshold: 0.06 },
     );
 
     observer.observe(node);
@@ -59,7 +59,7 @@ export function Reveal({
   }, [once]);
 
   const style = delay
-    ? ({ "--reveal-delay": `${Math.min(delay, 400)}ms` } as CSSProperties)
+    ? ({ "--reveal-delay": `${Math.min(delay, 220)}ms` } as CSSProperties)
     : undefined;
 
   return (
@@ -73,11 +73,10 @@ export function Reveal({
   );
 }
 
-/** Stagger children reveals by index (wrapper only). */
 export function RevealStagger({
   children,
   className,
-  step = 70,
+  step = 50,
 }: {
   children: ReactNode[];
   className?: string;
@@ -94,10 +93,7 @@ export function RevealStagger({
   );
 }
 
-/**
- * Hero media parallax: slight translate + scale tied to scroll.
- * Returns a ref to attach to the media layer.
- */
+/** Subtle hero parallax (low intensity for performance). */
 export function useHeroParallax(active: boolean) {
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -115,9 +111,8 @@ export function useHeroParallax(active: boolean) {
         const y = window.scrollY;
         const h = window.innerHeight || 1;
         const t = Math.min(1, Math.max(0, y / h));
-        // Move down slowly and scale up as user leaves hero
-        node.style.transform = `translate3d(0, ${t * 12}%, 0) scale(${1 + t * 0.08})`;
-        node.style.opacity = String(1 - t * 0.45);
+        node.style.transform = `translate3d(0, ${t * 5}%, 0) scale(${1 + t * 0.03})`;
+        node.style.opacity = String(1 - t * 0.25);
       });
     };
 
