@@ -14,6 +14,19 @@
   --color-line: #d8d2c8;
 }
 
+/* Modo escuro — tokens invertidos, tom editorial quente */
+html.dark {
+  --color-paper: #121110;
+  --color-stone: #1a1917;
+  --color-mist: #22211e;
+  --color-ink: #f0ebe3;
+  --color-charcoal: #cfc8bc;
+  --color-mute: #9a948a;
+  --color-timber: #c4a090;
+  --color-timber-deep: #d4b0a0;
+  --color-line: #2a2825;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -27,6 +40,9 @@
     font-weight: 400;
     line-height: 1.5;
     text-rendering: optimizeLegibility;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
   }
 
   button:not(:disabled),
@@ -46,7 +62,6 @@
   }
 }
 
-/* Reveals leves — padrão só fade */
 .reveal {
   --reveal-delay: 0ms;
   --reveal-duration: 0.4s;
@@ -97,7 +112,6 @@
   opacity: 0.55;
 }
 
-/* Hero — entrada curta */
 .hero-enter {
   opacity: 0;
   animation: hero-enter 0.5s ease forwards;
@@ -130,7 +144,6 @@
   }
 }
 
-/* Zoom suave nas imagens */
 .media-zoom {
   overflow: hidden;
 }
@@ -146,7 +159,6 @@
   transform: scale(1.02);
 }
 
-/* Legenda no card */
 .project-card__caption {
   pointer-events: none;
   position: absolute;
@@ -166,7 +178,6 @@
   opacity: 1;
 }
 
-/* Botões — hover simples */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -279,6 +290,10 @@ input[type="range"].meter::-moz-range-thumb {
     scroll-behavior: auto;
   }
 
+  body {
+    transition: none;
+  }
+
   .reveal {
     opacity: 1;
     transform: none;
@@ -315,8 +330,16 @@ input[type="range"].meter::-moz-range-thumb {
     display: none !important;
   }
 
+  html.dark {
+    --color-paper: #ffffff;
+    --color-ink: #000000;
+    --color-mute: #444444;
+    --color-line: #cccccc;
+  }
+
   body {
     background: white;
+    color: black;
   }
 
   .reveal {

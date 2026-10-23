@@ -1,6 +1,7 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AuthProvider } from "@/lib/auth/provider";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import { site } from "@/lib/site";
 import appCss from "../styles.css?url";
 
@@ -16,6 +17,7 @@ export const Route = createRootRoute({
           "Estúdio de visualização residencial em Maputo. A casa desenhada antes da primeira parede, com cotação em meticais.",
       },
       { name: "theme-color", content: "#f4f1ec" },
+      { name: "color-scheme", content: "light dark" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -38,6 +40,7 @@ function RootDocument() {
     <html lang="pt" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body>
         <PreviewHostBridge />

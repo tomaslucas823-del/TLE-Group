@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/cn";
 import { UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
@@ -82,28 +83,32 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-5 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle light={light} />
           <AuthSlot light={light} />
           <Link
             to="/"
             hash="orcamento"
             className={cn(
-              "btn btn-shine inline-flex min-h-10 items-center px-4 text-[13px] font-medium",
+              "btn inline-flex min-h-10 items-center px-4 text-[13px] font-medium",
               light ? "btn-solid-invert" : "btn-solid",
             )}
           >
             Pedir cotação
           </Link>
         </div>
-        <button
-          type="button"
-          className="text-sm md:hidden"
-          aria-expanded={open}
-          aria-label={open ? "Fechar menu" : "Abrir menu"}
-          onClick={() => setOpen((value) => !value)}
-        >
-          {open ? "Fechar" : "Menu"}
-        </button>
+        <div className="flex items-center gap-3 md:hidden">
+          <ThemeToggle light={light} />
+          <button
+            type="button"
+            className="text-sm"
+            aria-expanded={open}
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? "Fechar" : "Menu"}
+          </button>
+        </div>
       </div>
       {open ? (
         <div className="border-t border-line bg-paper px-5 py-8 text-ink md:hidden">
@@ -129,7 +134,7 @@ export function SiteHeader() {
             <Link
               to="/"
               hash="orcamento"
-              className="btn btn-solid btn-shine mt-4 inline-flex min-h-12 items-center justify-center px-4 text-sm"
+              className="btn btn-solid mt-4 inline-flex min-h-12 items-center justify-center px-4 text-sm"
               onClick={() => setOpen(false)}
             >
               Pedir cotação
