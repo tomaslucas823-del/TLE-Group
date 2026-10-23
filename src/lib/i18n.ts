@@ -33,7 +33,7 @@ export const messages = {
       paths: [
         {
           title: "Estudo visual",
-          text: "Partido, três imagens e uma rodada de ajustes — para decidir o volume antes da execução.",
+          text: "Partido, três imagens e uma rodada de ajustes, para decidir o volume antes da execução.",
           cta: "Ver estimativa",
         },
         {
@@ -61,7 +61,7 @@ export const messages = {
     estimate: {
       kicker: "Estimativa",
       title: "Uma referência em meticais.",
-      lead: "Metragem, partido e entrega. Não é proposta fechada — terreno e prazo ainda ajustam o valor.",
+      lead: "Metragem, partido e entrega. Não é proposta fechada: terreno e prazo ainda ajustam o valor.",
       area: "Metragem",
       style: "Partido",
       tier: "Entrega",
@@ -100,7 +100,7 @@ export const messages = {
         },
         {
           q: "Atendem fora de Maputo?",
-          a: "Sim. O acompanhamento pode ser online — Maputo, Matola, Costa do Sol, Boane e outras localidades em Moçambique.",
+          a: "Sim. O acompanhamento pode ser online: Maputo, Matola, Costa do Sol, Boane e outras localidades em Moçambique.",
         },
         {
           q: "Como acompanho o projeto?",
@@ -132,12 +132,13 @@ export const messages = {
       studio: "Estúdio",
       social: "Redes",
       privacy: "Privacidade",
+      terms: "Termos",
       clientPortal: "Portal do cliente",
       studioArea: "Área do estúdio",
       faq: "Dúvidas",
-      igPending: "Instagram — a indicar",
-      fbPending: "Facebook — a indicar",
-      liPending: "LinkedIn — a indicar",
+      igPending: "Instagram (a indicar)",
+      fbPending: "Facebook (a indicar)",
+      liPending: "LinkedIn (a indicar)",
     },
     cookies: {
       text: "Cookies só para medir o acesso, e apenas com o seu aceite.",
@@ -187,7 +188,7 @@ export const messages = {
       paths: [
         {
           title: "Visual study",
-          text: "Massing, three images and one round of revisions — decide the volume before execution.",
+          text: "Massing, three images and one round of revisions, to decide the volume before execution.",
           cta: "See estimate",
         },
         {
@@ -215,7 +216,7 @@ export const messages = {
     estimate: {
       kicker: "Estimate",
       title: "A reference in meticais.",
-      lead: "Floor area, massing and delivery. Not a final proposal — site and timeline still adjust the figure.",
+      lead: "Floor area, massing and delivery. Not a final proposal: site and timeline still adjust the figure.",
       area: "Floor area",
       style: "Massing",
       tier: "Delivery",
@@ -254,7 +255,7 @@ export const messages = {
         },
         {
           q: "Do you work outside Maputo?",
-          a: "Yes. Coordination can be online — Maputo, Matola, Costa do Sol, Boane and other places in Mozambique.",
+          a: "Yes. Coordination can be online: Maputo, Matola, Costa do Sol, Boane and other places in Mozambique.",
         },
         {
           q: "How do I follow the project?",
@@ -265,7 +266,7 @@ export const messages = {
     quote: {
       kicker: "Quote",
       title: "Tell us about the site.",
-      lead: "Your request includes this page’s estimate. We reply with the image and a metical reference.",
+      lead: "Your request includes this page's estimate. We reply with the image and a metical reference.",
       phone: "Phone",
       email: "Email",
       address: "Address",
@@ -282,16 +283,17 @@ export const messages = {
     },
     footer: {
       contact: "Contact",
-      projectsServices: "Projects & services",
+      projectsServices: "Projects and services",
       studio: "Studio",
       social: "Social",
       privacy: "Privacy",
+      terms: "Terms",
       clientPortal: "Client portal",
       studioArea: "Studio area",
       faq: "FAQ",
-      igPending: "Instagram — soon",
-      fbPending: "Facebook — soon",
-      liPending: "LinkedIn — soon",
+      igPending: "Instagram (soon)",
+      fbPending: "Facebook (soon)",
+      liPending: "LinkedIn (soon)",
     },
     cookies: {
       text: "Cookies only to measure visits, and only with your consent.",
