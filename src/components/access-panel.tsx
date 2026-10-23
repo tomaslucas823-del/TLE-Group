@@ -1,20 +1,19 @@
 import { GROK_PROVIDERS, authEnabled, signIn } from "@/lib/auth/client";
-import { buttonVariants } from "@/components/ui/button";
 
 export function AccessPanel({ title, callbackURL }: { title: string; callbackURL: string }) {
   return (
-    <main className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-5 pt-28 pb-16">
-      <h1 className="font-display text-5xl leading-none font-normal">{title}</h1>
-      <p className="mt-4 text-mute">
+    <main className="mx-auto flex min-h-[calc(100svh-8rem)] max-w-md flex-col items-center justify-center px-5 py-24 text-center">
+      <h1 className="font-display text-4xl leading-none font-normal md:text-5xl">{title}</h1>
+      <p className="mt-4 max-w-sm text-sm leading-relaxed text-mute md:text-[15px]">
         Entre para acompanhar projetos, propostas e a agenda. Cada conta vê apenas os próprios registros.
       </p>
-      <div className="mt-8 flex flex-col gap-3">
+      <div className="mt-8 flex w-full max-w-xs flex-col gap-3">
         {authEnabled ? (
           GROK_PROVIDERS.map((provider) => (
             <button
               key={provider.providerId}
               type="button"
-              className={buttonVariants({ variant: "line" })}
+              className="btn btn-outline-ink min-h-11 w-full px-5 text-sm"
               onClick={() => signIn(provider.providerId, { callbackURL })}
             >
               Continuar com {provider.label}
