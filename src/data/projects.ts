@@ -19,6 +19,12 @@ const shot = (name: string, alt: string): Shot => ({
   alt,
 });
 
+/** Encode path segments so spaces/parentheses in uploaded names work in URLs. */
+const media = (filename: string, alt: string): Shot => ({
+  src: `/renders/${encodeURIComponent(filename)}`,
+  alt,
+});
+
 export const projects: Project[] = [
   {
     slug: "casa-brise",
@@ -32,13 +38,28 @@ export const projects: Project[] = [
     concept:
       "Dados provisórios até confirmação do cliente. A casa organiza a chegada pela garagem coberta, o ripado filtra a luz e a pedra marca o volume de estar. Nome, local e metragem serão actualizados quando o estúdio fechar a ficha.",
     materials: ["Reboco branco", "Pedra irregular", "Ripado de madeira", "Pavimento de betão"],
-    cover: "/renders/brise-frente.webp",
+    cover: `/renders/${encodeURIComponent("WhatsApp Image 2026-10-21 at 20.36.44.jpeg")}`,
     images: [
-      shot("brise-frente", "Fachada frontal da Casa Brise com garagem para dois carros e palmeira"),
-      shot("brise-obliqua", "Vista oblíqua com piso molhado, ripado e volume branco"),
-      shot("brise-rua", "Vista da rua com laje contínua e jardim lateral"),
-      shot("brise-patio", "Pátio lateral com pedra irregular e volume escuro"),
-      shot("brise-entrada", "Entrada coberta com painel de madeira e jardim"),
+      media(
+        "WhatsApp Image 2026-10-21 at 20.36.44.jpeg",
+        "Fachada frontal da Casa Brise com garagem para dois carros e palmeira",
+      ),
+      media(
+        "WhatsApp Image 2026-10-21 at 20.36.45 (1).jpeg",
+        "Vista oblíqua com piso molhado, ripado e volume branco",
+      ),
+      media(
+        "WhatsApp Image 2026-10-21 at 20.36.45.jpeg",
+        "Vista da rua com laje contínua e jardim lateral",
+      ),
+      media(
+        "WhatsApp Image 2026-10-21 at 20.36.46 (1).jpeg",
+        "Pátio lateral com pedra irregular e volume escuro",
+      ),
+      media(
+        "WhatsApp Image 2026-10-21 at 20.36.46.jpeg",
+        "Entrada coberta com painel de madeira e jardim",
+      ),
     ],
   },
   {
