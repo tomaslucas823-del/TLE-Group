@@ -18,17 +18,19 @@ export const Route = createFileRoute("/_site/portfolio/$slug")({
 
 function ProjectPage() {
   const project = Route.useLoaderData();
+  const [hero, ...rest] = project.images;
 
   return (
     <main className="pt-14">
       <img
         src={project.cover}
-        alt={project.images[0]?.alt ?? project.title}
+        alt={hero?.alt ?? project.title}
         width={1600}
         height={900}
         className="aspect-[16/10] w-full object-cover md:aspect-[16/8]"
       />
-      <article className="mx-auto grid max-w-6xl gap-10 px-5 py-10 md:grid-cols-12 md:py-14">
+
+      <article className="mx-auto grid max-w-6xl gap-8 px-5 py-8 md:grid-cols-12 md:py-10">
         <header className="md:col-span-7">
           <p className="text-sm text-mute">
             {project.place}
@@ -37,38 +39,43 @@ function ProjectPage() {
             <span className="px-1.5">·</span>
             {project.area}
           </p>
-          <h1 className="mt-3 font-display text-5xl leading-none font-normal md:text-7xl">{project.title}</h1>
-          <p className="mt-6 max-w-lg text-charcoal">{project.summary}</p>
-          <p className="mt-4 max-w-lg text-sm text-mute">{project.concept}</p>
+          <h1 className="mt-2 font-display text-4xl leading-none font-normal md:text-6xl">{project.title}</h1>
+          <p className="mt-4 max-w-lg text-charcoal">{project.summary}</p>
+          <p className="mt-3 max-w-lg text-sm text-mute">{project.concept}</p>
         </header>
         <div className="md:col-span-4 md:col-start-9">
           <p className="text-sm text-mute">Materiais</p>
           <ul className="mt-2">
             {project.materials.map((item) => (
-              <li key={item} className="border-t border-line py-3 text-sm">
+              <li key={item} className="border-t border-line py-2.5 text-sm">
                 {item}
               </li>
             ))}
           </ul>
-          <Link to="/" hash="orcamento" className="mt-6 inline-flex text-sm underline underline-offset-4">
+          <Link to="/" hash="orcamento" className="mt-5 inline-flex text-sm underline underline-offset-4">
             Pedir uma casa neste partido
           </Link>
         </div>
       </article>
-      <section>
-        {project.images.map((image) => (
-          <figure key={image.src}>
-            <img
-              src={image.src}
-              alt={image.alt}
-              width={1600}
-              height={900}
-              loading="lazy"
-              decoding="async"
-              className="w-full object-cover"
-            />
-          </figure>
-        ))}
+
+      {/* Galeria: pares lado a lado com espaçamento — sem imagens coladas */}
+      <section className="mx-auto max-w-6xl px-5 pb-12 md:pb-16">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
+          {rest.map((image) => (
+            <figure key={image.src} className="overflow-hidden bg-stone">
+              <img
+                src={image.src}
+                alt={image.alt}
+                width={1200}
+                height={800}
+                loading="lazy"
+                decoding="async"
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </figure>
+          ))}
+        </div>
+        {/* Se só houver 1 imagem além da capa, ou número ímpar, a última fica sozinha sem esticar */}
       </section>
     </main>
   );
