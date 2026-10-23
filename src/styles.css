@@ -40,8 +40,8 @@ html.dark {
     line-height: 1.5;
     text-rendering: optimizeLegibility;
     transition:
-      background-color 0.25s ease,
-      color 0.25s ease;
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
   button:not(:disabled),
@@ -78,7 +78,6 @@ html.dark {
   transform-origin: left center;
   transform: scaleX(0);
   background: var(--color-ink);
-  transition: transform 0.05s linear;
 }
 
 html.dark .scroll-progress__bar {
@@ -91,13 +90,13 @@ html.dark .scroll-progress__bar {
 }
 
 .page-transition--in {
-  animation: page-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: page-in 0.35s ease forwards;
 }
 
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 4px, 0);
   }
   to {
     opacity: 1;
@@ -105,39 +104,38 @@ html.dark .scroll-progress__bar {
   }
 }
 
-/* —— Scroll reveals —— */
+/* —— Scroll reveals (lighter) —— */
 .reveal {
   --reveal-delay: 0ms;
-  --reveal-duration: 0.85s;
+  --reveal-duration: 0.5s;
   opacity: 0;
   transition:
-    opacity var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
-    transform var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
-  will-change: opacity, transform;
+    opacity var(--reveal-duration) ease var(--reveal-delay),
+    transform var(--reveal-duration) ease var(--reveal-delay);
 }
 
 .reveal--slow {
-  --reveal-duration: 1.15s;
+  --reveal-duration: 0.65s;
 }
 
 .reveal--up {
-  transform: translate3d(0, 40px, 0);
+  transform: translate3d(0, 14px, 0);
 }
 
 .reveal--down {
-  transform: translate3d(0, -24px, 0);
+  transform: translate3d(0, -10px, 0);
 }
 
 .reveal--left {
-  transform: translate3d(-32px, 0, 0);
+  transform: translate3d(-12px, 0, 0);
 }
 
 .reveal--right {
-  transform: translate3d(32px, 0, 0);
+  transform: translate3d(12px, 0, 0);
 }
 
 .reveal--zoom {
-  transform: scale(0.94);
+  transform: scale(0.985);
 }
 
 .reveal--fade {
@@ -157,7 +155,7 @@ html.dark .scroll-progress__bar {
   opacity: 0.55;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+  transition: transform 0.5s ease 0.08s;
 }
 
 .reveal.is-in .accent-line {
@@ -167,29 +165,29 @@ html.dark .scroll-progress__bar {
 /* —— Hero entrance —— */
 .hero-enter {
   opacity: 0;
-  animation: hero-enter 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: hero-enter 0.55s ease forwards;
 }
 
 .hero-enter-delay-1 {
-  animation-delay: 0.1s;
+  animation-delay: 0.06s;
 }
 .hero-enter-delay-2 {
-  animation-delay: 0.22s;
+  animation-delay: 0.12s;
 }
 .hero-enter-delay-3 {
-  animation-delay: 0.36s;
+  animation-delay: 0.2s;
 }
 .hero-enter-delay-4 {
-  animation-delay: 0.48s;
+  animation-delay: 0.26s;
 }
 .hero-enter-delay-5 {
-  animation-delay: 0.58s;
+  animation-delay: 0.32s;
 }
 
 @keyframes hero-enter {
   from {
     opacity: 0;
-    transform: translate3d(0, 22px, 0);
+    transform: translate3d(0, 10px, 0);
   }
   to {
     opacity: 1;
@@ -204,26 +202,25 @@ html.dark .scroll-progress__bar {
 
 .media-zoom img,
 .media-zoom video {
-  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
+  transition: transform 0.45s ease;
 }
 
 .group:hover .media-zoom img,
 .group:hover .media-zoom video,
 .media-zoom:hover img {
-  transform: scale(1.06);
+  transform: scale(1.03);
 }
 
 .project-card {
   isolation: isolate;
   transition:
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.5s ease;
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .group:hover .project-card {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 40px rgb(0 0 0 / 0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.08);
 }
 
 .project-card__caption {
@@ -231,13 +228,13 @@ html.dark .scroll-progress__bar {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  padding: 1.35rem 1.1rem 1.1rem;
-  background: linear-gradient(to top, rgb(12 12 12 / 0.78), rgb(12 12 12 / 0.25), transparent);
-  transform: translateY(12px);
+  padding: 1.2rem 1rem 1rem;
+  background: linear-gradient(to top, rgb(12 12 12 / 0.7), transparent);
+  transform: translateY(6px);
   opacity: 0;
   transition:
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s ease;
+    transform 0.3s ease,
+    opacity 0.25s ease;
 }
 
 .group:hover .project-card__caption {
@@ -245,17 +242,17 @@ html.dark .scroll-progress__bar {
   opacity: 1;
 }
 
-/* —— Infinite image strip —— */
+/* —— Image strip (slower, smaller) —— */
 .marquee {
   overflow: hidden;
-  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
 
 .marquee__track {
   display: flex;
   width: max-content;
-  gap: 0.75rem;
-  animation: marquee 48s linear infinite;
+  gap: 0.5rem;
+  animation: marquee 70s linear infinite;
 }
 
 .marquee:hover .marquee__track {
@@ -264,7 +261,7 @@ html.dark .scroll-progress__bar {
 
 .marquee__item {
   flex: 0 0 auto;
-  width: min(72vw, 28rem);
+  width: min(60vw, 20rem);
   aspect-ratio: 16 / 10;
   overflow: hidden;
   background: var(--color-stone);
@@ -274,11 +271,6 @@ html.dark .scroll-progress__bar {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.marquee__item:hover img {
-  transform: scale(1.04);
 }
 
 @keyframes marquee {
@@ -290,28 +282,25 @@ html.dark .scroll-progress__bar {
   }
 }
 
-/* —— Buttons (square) —— */
+/* —— Buttons —— */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 0;
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    opacity 0.2s ease,
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .btn:hover {
-  opacity: 0.94;
-  transform: translateY(-1px);
+  opacity: 0.92;
 }
 
 .btn:active {
-  opacity: 0.84;
-  transform: translateY(1px);
+  opacity: 0.82;
 }
 
 .btn-solid {
@@ -357,15 +346,14 @@ html.dark .scroll-progress__bar {
 }
 
 .float-in {
-  animation: float-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  box-shadow: 0 10px 28px rgb(0 0 0 / 0.1);
-  backdrop-filter: blur(10px);
+  animation: float-in 0.35s ease both;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.08);
 }
 
 @keyframes float-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 14px, 0);
+    transform: translate3d(0, 8px, 0);
   }
   to {
     opacity: 1;
@@ -374,7 +362,6 @@ html.dark .scroll-progress__bar {
 }
 
 .parallax-layer {
-  will-change: transform, opacity;
   transform-origin: center center;
 }
 
@@ -383,22 +370,19 @@ html.dark .scroll-progress__bar {
   background-position: 0 100%;
   background-repeat: no-repeat;
   background-size: 0 1px;
-  transition: background-size 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: background-size 0.25s ease;
 }
 
 .link-underline:hover {
   background-size: 100% 1px;
 }
 
-/* Method step hover */
 .step-card {
-  transition:
-    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 0.3s ease;
+  transition: transform 0.25s ease;
 }
 
 .step-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
 }
 
 input[type="range"].meter {
@@ -436,7 +420,7 @@ input[type="range"].meter::-moz-range-thumb {
   padding: 0.55rem 0;
   color: var(--color-ink);
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.15s ease;
 }
 
 .field:focus {
@@ -495,7 +479,7 @@ input[type="range"].meter::-moz-range-thumb {
   }
 
   .marquee__track {
-    animation-duration: 70s;
+    animation-duration: 90s;
   }
 }
 
