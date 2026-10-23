@@ -21,6 +21,27 @@ const shot = (name: string, alt: string): Shot => ({
 
 export const projects: Project[] = [
   {
+    slug: "casa-brise",
+    title: "Casa Brise",
+    place: "Maputo",
+    area: "220 m²",
+    year: "2026",
+    kind: "Residencial",
+    summary:
+      "Volumes brancos, garagem para dois carros sob laje contínua e um plano de ripado de madeira. Pedra na parede e jardim tropical na chegada.",
+    concept:
+      "Dados provisórios até confirmação do cliente. A casa organiza a chegada pela garagem coberta, o ripado filtra a luz e a pedra marca o volume de estar. Nome, local e metragem serão actualizados quando o estúdio fechar a ficha.",
+    materials: ["Reboco branco", "Pedra irregular", "Ripado de madeira", "Pavimento de betão"],
+    cover: "/renders/brise-frente.webp",
+    images: [
+      shot("brise-frente", "Fachada frontal da Casa Brise com garagem para dois carros e palmeira"),
+      shot("brise-obliqua", "Vista oblíqua com piso molhado, ripado e volume branco"),
+      shot("brise-rua", "Vista da rua com laje contínua e jardim lateral"),
+      shot("brise-patio", "Pátio lateral com pedra irregular e volume escuro"),
+      shot("brise-entrada", "Entrada coberta com painel de madeira e jardim"),
+    ],
+  },
+  {
     slug: "casa-veu",
     title: "Casa Véu",
     place: "Matola",
@@ -30,7 +51,7 @@ export const projects: Project[] = [
     summary:
       "Volumes brancos, um plano de pedra e a garagem como pórtico. A casa se fecha para a rua e se abre para o pátio.",
     concept:
-      "O véu de pedra protege a chegada sem transformar a fachada num muro. Madeira, reboco e concreto se encontram em juntas secas — a família vê a casa inteira antes de escolher um único revestimento.",
+      "O véu de pedra protege a chegada sem transformar a fachada num muro. Madeira, reboco e concreto se encontram em juntas secas.",
     materials: ["Reboco branco", "Pedra irregular", "Madeira natural", "Concreto aparente"],
     cover: "/renders/veu-frente.webp",
     images: [
@@ -73,7 +94,7 @@ export const projects: Project[] = [
     summary:
       "Uma laje longa, ripado de madeira e pedra no fundo da garagem. Duas vagas e a sala no mesmo gesto.",
     concept:
-      "A casa é uma linha. O ripado filtra o sol da tarde, a pedra esquenta a garagem à noite e a piscina fica no eixo do estar — decisão tomada na imagem, não na obra.",
+      "A casa é uma linha. O ripado filtra o sol da tarde, a pedra esquenta a garagem à noite e a piscina fica no eixo do estar.",
     materials: ["Ripado de freijó", "Pedra moledo", "Laje branca", "Vidro piso-teto"],
     cover: "/renders/linear-dia.webp",
     images: [
@@ -115,7 +136,7 @@ export const projects: Project[] = [
     summary:
       "Uma caixa branca pousada no gramado, com uma janela baixa e o jardim tropical entrando na foto.",
     concept:
-      "Menos fachada, mais sombra. O volume de serviço fica à esquerda, a janela da sala no centro e uma fresta alta no quarto — três decisões, nenhuma surpresa na obra.",
+      "Menos fachada, mais sombra. O volume de serviço fica à esquerda, a janela da sala no centro e uma fresta alta no quarto.",
     materials: ["Reboco branco", "Madeira na esquadria", "Concreto da cobertura", "Estrelítzia"],
     cover: "/renders/jardim-estrelitzia.webp",
     images: [
