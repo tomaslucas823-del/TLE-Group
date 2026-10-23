@@ -133,8 +133,11 @@ export function QuoteForm({ draft }: { draft: Draft }) {
           suppressHydrationWarning
         />
       </label>
-      <button type="submit" disabled={pending} className="mt-2 min-h-11 w-fit bg-ink px-6 text-sm text-paper">
+      <button type="submit" disabled={pending} className="btn-cta btn-cta--dark mt-2 w-fit disabled:opacity-60">
         {pending ? t.quote.sending : t.quote.send}
+        <span className="btn-cta__icon" aria-hidden>
+          →
+        </span>
       </button>
     </form>
   );
