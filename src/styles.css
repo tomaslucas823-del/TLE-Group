@@ -61,7 +61,6 @@ html.dark {
   }
 }
 
-/* —— Scroll progress —— */
 .scroll-progress {
   position: fixed;
   inset-inline: 0;
@@ -84,7 +83,6 @@ html.dark .scroll-progress__bar {
   background: var(--color-timber);
 }
 
-/* —— Page route fade —— */
 .page-transition {
   opacity: 0;
 }
@@ -104,7 +102,6 @@ html.dark .scroll-progress__bar {
   }
 }
 
-/* —— Scroll reveals (lighter) —— */
 .reveal {
   --reveal-delay: 0ms;
   --reveal-duration: 0.5s;
@@ -162,7 +159,6 @@ html.dark .scroll-progress__bar {
   transform: scaleX(1);
 }
 
-/* —— Hero entrance —— */
 .hero-enter {
   opacity: 0;
   animation: hero-enter 0.55s ease forwards;
@@ -195,7 +191,6 @@ html.dark .scroll-progress__bar {
   }
 }
 
-/* —— Media / project hover —— */
 .media-zoom {
   overflow: hidden;
 }
@@ -242,7 +237,6 @@ html.dark .scroll-progress__bar {
   opacity: 1;
 }
 
-/* —— Image strip (slower, smaller) —— */
 .marquee {
   overflow: hidden;
   mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
@@ -282,25 +276,30 @@ html.dark .scroll-progress__bar {
   }
 }
 
-/* —— Buttons —— */
+/* —— Buttons (pill + circular arrow, inspired by reference) —— */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0;
+  gap: 0.5rem;
+  border-radius: 999px;
+  font-weight: 500;
   transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease,
-    opacity 0.15s ease;
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .btn:hover {
-  opacity: 0.92;
+  transform: translateY(-1px);
 }
 
 .btn:active {
-  opacity: 0.82;
+  transform: translateY(0);
+  opacity: 0.9;
 }
 
 .btn-solid {
@@ -310,6 +309,7 @@ html.dark .scroll-progress__bar {
 
 .btn-solid:hover {
   background: var(--color-charcoal);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.12);
 }
 
 .btn-solid-invert {
@@ -318,27 +318,162 @@ html.dark .scroll-progress__bar {
 }
 
 .btn-solid-invert:hover {
-  background: var(--color-stone);
+  background: #fff;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
 }
 
 .btn-outline {
-  border: 1px solid currentColor;
+  border: 1px solid rgb(255 255 255 / 0.35);
   background: transparent;
+  color: inherit;
 }
 
 .btn-outline:hover {
   background: rgb(255 255 255 / 0.08);
+  border-color: rgb(255 255 255 / 0.55);
 }
 
 .btn-outline-ink {
-  border: 1px solid var(--color-ink);
+  border: 1px solid var(--color-line);
   background: transparent;
   color: var(--color-ink);
 }
 
 .btn-outline-ink:hover {
+  border-color: var(--color-ink);
   background: var(--color-ink);
   color: var(--color-paper);
+}
+
+/* Primary CTA: text + circular arrow badge */
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.4rem 0.35rem 1.15rem;
+  border-radius: 999px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.btn-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.12);
+  background: #fff;
+}
+
+.btn-cta__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--color-timber);
+  color: #fff;
+  font-size: 0.85rem;
+  transition: transform 0.25s ease, background-color 0.2s ease;
+}
+
+.btn-cta:hover .btn-cta__icon {
+  transform: translateX(2px);
+  background: var(--color-timber-deep);
+}
+
+.btn-cta--dark {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.btn-cta--dark:hover {
+  background: var(--color-charcoal);
+}
+
+.btn-cta--dark .btn-cta__icon {
+  background: var(--color-timber);
+  color: #fff;
+}
+
+/* Nav pill cluster (reference-style) */
+.nav-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 0.1);
+}
+
+.nav-pills--solid {
+  background: rgb(22 22 22 / 0.04);
+  border-color: var(--color-line);
+}
+
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: inherit;
+  opacity: 0.75;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.nav-pill:hover {
+  opacity: 1;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.nav-pills--solid .nav-pill:hover {
+  background: rgb(22 22 22 / 0.06);
+}
+
+.nav-pill--active {
+  opacity: 1;
+  background: #fff;
+  color: #161616;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+}
+
+.nav-pills--solid .nav-pill--active {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* Floating bar like reference */
+.float-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 0.45rem 0.4rem 0.9rem;
+  border-radius: 999px;
+  background: rgb(18 17 16 / 0.82);
+  color: #f4f1ec;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.22);
+}
+
+.float-bar__mark {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  opacity: 0.9;
 }
 
 .btn-shine::after {
@@ -347,7 +482,6 @@ html.dark .scroll-progress__bar {
 
 .float-in {
   animation: float-in 0.35s ease both;
-  box-shadow: 0 6px 18px rgb(0 0 0 / 0.08);
 }
 
 @keyframes float-in {
@@ -457,6 +591,8 @@ input[type="range"].meter::-moz-range-thumb {
   .project-card,
   .project-card__caption,
   .btn,
+  .btn-cta,
+  .btn-cta__icon,
   .link-underline,
   .step-card {
     transition: none !important;
