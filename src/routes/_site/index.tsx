@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_site/")({
       {
         name: "description",
         content:
-          "Visualização residencial em Maputo. Estudo visual, projeto executivo e imagens finais em meticais, antes da obra.",
+          "Visualização residencial em Maputo. Estudo visual, projecto executivo e imagens finais em meticais, antes da obra.",
       },
     ],
   }),
@@ -36,6 +36,9 @@ export const Route = createFileRoute("/_site/")({
 
 const featured = projects.slice(0, 3);
 const [featuredMain, ...featuredSide] = featured;
+
+/** Covers for the infinite strip (duplicated in render for seamless loop). */
+const stripImages = projects.flatMap((p) => [{ src: p.cover, alt: p.title, slug: p.slug }]).slice(0, 8);
 
 function HomePage() {
   const { t } = useI18n();
@@ -101,7 +104,7 @@ function HomePage() {
             </a>
             <Link
               to="/portfolio"
-              className="text-sm tracking-wide text-paper/80 underline-offset-4 transition hover:text-paper hover:underline"
+              className="link-underline text-sm tracking-wide text-paper/80"
             >
               {t.hero.projects}
             </Link>
@@ -111,28 +114,26 @@ function HomePage() {
 
       <section className="bg-paper">
         <div className="mx-auto max-w-6xl px-5 py-12 md:py-16">
-          <Reveal className="flex flex-wrap items-end justify-between gap-4">
+          <Reveal variant="up" className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.featured.kicker}</p>
               <h2 className="mt-2 max-w-md font-display text-3xl leading-[1.05] font-normal md:text-4xl">
                 {t.featured.title}
               </h2>
+              <span className="accent-line mt-4" />
             </div>
-            <Link
-              to="/portfolio"
-              className="text-sm text-mute underline-offset-4 transition hover:text-ink hover:underline"
-            >
+            <Link to="/portfolio" className="link-underline text-sm text-mute">
               {t.featured.all}
             </Link>
           </Reveal>
 
           {featuredMain ? (
-            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-3">
-              <Reveal as="div" variant="up" className="sm:col-span-2 lg:col-span-1">
+            <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
+              <Reveal as="div" variant="up" delay={40} className="sm:col-span-2 lg:col-span-1">
                 <ProjectCard project={featuredMain} aspect="aspect-[4/3]" />
               </Reveal>
               {featuredSide.map((project, i) => (
-                <Reveal key={project.slug} variant="up" delay={(i + 1) * 60}>
+                <Reveal key={project.slug} variant="up" delay={(i + 1) * 90}>
                   <ProjectCard project={project} aspect="aspect-[4/3]" />
                 </Reveal>
               ))}
@@ -141,34 +142,49 @@ function HomePage() {
         </div>
       </section>
 
+      {stripImages.length > 0 ? (
+        <section className="border-y border-line bg-stone py-6 md:py-8" aria-hidden>
+          <div className="marquee">
+            <div className="marquee__track">
+              {[...stripImages, ...stripImages].map((item, i) => (
+                <Link
+                  key={`${item.slug}-${i}`}
+                  to="/portfolio/$slug"
+                  params={{ slug: item.slug }}
+                  className="marquee__item"
+                  tabIndex={i >= stripImages.length ? -1 : undefined}
+                >
+                  <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section id="servicos" className="bg-ink text-paper">
-        <div className="mx-auto max-w-6xl px-5 py-12 md:py-16">
-          <Reveal variant="fade">
+        <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
+          <Reveal variant="up">
             <p className="text-[11px] tracking-[0.18em] text-paper/45 uppercase">{t.services.kicker}</p>
             <h2 className="mt-2 max-w-lg font-display text-3xl leading-[1.05] font-normal text-balance md:text-4xl">
               {t.services.title}
             </h2>
+            <span className="accent-line mt-4 bg-paper" />
           </Reveal>
-          <ul className="mt-8 grid gap-6 border-t border-paper/15 pt-8 md:grid-cols-3 md:gap-8">
+          <ul className="mt-10 grid gap-8 border-t border-paper/15 pt-10 md:grid-cols-3 md:gap-10">
             {PATHS.map((path, i) => (
-              <Reveal key={path.title} as="li" variant="up" delay={i * 50} className="flex flex-col">
+              <Reveal key={path.title} as="li" variant="up" delay={i * 80} className="step-card flex flex-col">
                 <span className="font-display text-sm italic text-paper/40">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-3 font-display text-xl font-normal md:text-2xl">{path.title}</h3>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-paper/60">{path.text}</p>
                 {path.href.startsWith("/#") ? (
-                  <a
-                    href={path.href}
-                    className="mt-5 text-sm text-paper/80 underline-offset-4 transition hover:text-paper hover:underline"
-                  >
+                  <a href={path.href} className="link-underline mt-5 text-sm text-paper/80">
                     {path.cta}
                   </a>
                 ) : (
-                  <Link
-                    to={path.href}
-                    className="mt-5 text-sm text-paper/80 underline-offset-4 transition hover:text-paper hover:underline"
-                  >
+                  <Link to={path.href} className="link-underline mt-5 text-sm text-paper/80">
                     {path.cta}
                   </Link>
                 )}
@@ -179,14 +195,15 @@ function HomePage() {
       </section>
 
       <section id="metodo" className="bg-paper">
-        <div className="mx-auto max-w-6xl px-5 py-12 md:py-16">
-          <Reveal className="max-w-xl">
+        <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
+          <Reveal variant="up" className="max-w-xl">
             <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.method.kicker}</p>
             <h2 className="mt-2 font-display text-3xl leading-[1.05] font-normal md:text-4xl">{t.method.title}</h2>
+            <span className="accent-line mt-4" />
           </Reveal>
-          <ol className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             {t.method.steps.map((step, i) => (
-              <Reveal key={step.n} as="li" delay={i * 40}>
+              <Reveal key={step.n} as="li" variant="up" delay={i * 70} className="step-card">
                 <p className="font-display text-sm italic text-mute">{step.n}</p>
                 <h3 className="mt-2 font-display text-xl font-normal">{step.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-mute">{step.text}</p>
@@ -197,7 +214,7 @@ function HomePage() {
       </section>
 
       <section className="overflow-hidden bg-ink">
-        <Reveal variant="fade">
+        <Reveal variant="zoom" slow>
           <img
             src="/renders/pavilhao-dia.webp"
             alt=""
@@ -210,46 +227,51 @@ function HomePage() {
       </section>
 
       <section className="bg-stone">
-        <div className="mx-auto max-w-6xl px-5 py-12 md:py-16">
-          <Reveal className="max-w-xl">
+        <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
+          <Reveal variant="up" className="max-w-xl">
             <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.estimate.kicker}</p>
             <h2 className="mt-2 font-display text-3xl leading-[1.05] font-normal md:text-4xl">{t.estimate.title}</h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-mute">{t.estimate.lead}</p>
           </Reveal>
-          <Reveal className="mt-8" delay={60}>
+          <Reveal className="mt-10" variant="up" delay={80}>
             <Simulator draft={draft} onChange={setDraft} />
           </Reveal>
         </div>
       </section>
 
       <section id="duvidas" className="bg-paper">
-        <div className="mx-auto max-w-2xl px-5 py-12 md:py-16">
-          <Reveal>
+        <div className="mx-auto max-w-2xl px-5 py-14 md:py-20">
+          <Reveal variant="up">
             <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.faq.kicker}</p>
             <h2 className="mt-2 font-display text-3xl font-normal md:text-4xl">{t.faq.title}</h2>
+            <span className="accent-line mt-4" />
           </Reveal>
-          <ul className="mt-8 border-t border-line">
+          <ul className="mt-10 border-t border-line">
             {t.faq.items.map((item, index) => {
               const open = openFaq === index;
               return (
                 <li key={item.q} className="border-b border-line">
                   <button
                     type="button"
-                    className="flex w-full items-start justify-between gap-6 py-4 text-left"
+                    className="flex w-full items-start justify-between gap-6 py-5 text-left transition-colors hover:text-timber"
                     aria-expanded={open}
                     onClick={() => setOpenFaq(open ? null : index)}
                   >
                     <span className="font-display text-lg font-normal md:text-xl">{item.q}</span>
-                    <span className="mt-1 shrink-0 text-mute" aria-hidden>
-                      {open ? "−" : "+"}
+                    <span
+                      className="mt-1 shrink-0 text-mute transition-transform duration-300"
+                      style={{ transform: open ? "rotate(45deg)" : "none" }}
+                      aria-hidden
+                    >
+                      +
                     </span>
                   </button>
                   <div
-                    className="grid transition-[grid-template-rows] duration-300 ease-out"
+                    className="grid transition-[grid-template-rows] duration-400 ease-out"
                     style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
                   >
                     <div className="overflow-hidden">
-                      <p className="pb-4 text-sm leading-relaxed text-mute">{item.a}</p>
+                      <p className="pb-5 text-sm leading-relaxed text-mute">{item.a}</p>
                     </div>
                   </div>
                 </li>
@@ -260,8 +282,8 @@ function HomePage() {
       </section>
 
       <section id="orcamento" className="border-t border-line bg-paper">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-2 md:gap-14 md:py-16">
-          <Reveal variant="fade">
+        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-2 md:gap-14 md:py-20">
+          <Reveal variant="left">
             <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.quote.kicker}</p>
             <h2 className="mt-2 font-display text-3xl leading-[1.05] font-normal md:text-4xl">{t.quote.title}</h2>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-mute">{t.quote.lead}</p>
@@ -288,7 +310,7 @@ function HomePage() {
               </div>
             </dl>
           </Reveal>
-          <Reveal variant="fade" delay={40}>
+          <Reveal variant="right" delay={80}>
             <QuoteForm draft={draft} />
           </Reveal>
         </div>
