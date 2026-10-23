@@ -1,54 +1,39 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useI18n } from "@/components/i18n-provider";
 import type { Draft } from "@/components/simulator";
-import { estimateCents, styleLabel, tierLabel } from "@/lib/estimate";
+import { estimateCents } from "@/lib/estimate";
 import { brlFromCents } from "@/lib/format";
 import { pushLocalLead } from "@/lib/local-leads";
-import { getCaptchaChallenge, submitPublicLead } from "@/lib/studio.functions";
+import { submitPublicLead } from "@/lib/studio.functions";
 
-type FieldErrors = { nome?: string; email?: string; telefone?: string; captcha?: string };
-
-function validate(nome: string, email: string, telefone: string, captchaAnswer: string): FieldErrors {
-  const errors: FieldErrors = {};
-  if (nome.trim().length < 2) errors.nome = "Indique o seu nome.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errors.email = "Indique um e-mail válido.";
-  const digits = telefone.replace(/\D/g, "");
-  if (digits.length < 9 || digits.length > 13) errors.telefone = "Indique um telefone válido.";
-  if (!captchaAnswer.trim()) errors.captcha = "Resolva a verificação de segurança.";
-  return errors;
-}
+type FieldErrors = { nome?: string; email?: string; telefone?: string };
 
 export function QuoteForm({ draft }: { draft: Draft }) {
+  const { t } = useI18n();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [company, setCompany] = useState("");
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaQuestion, setCaptchaQuestion] = useState("");
-  const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<"cloud" | "local" | null>(null);
   const total = estimateCents(draft.area, draft.style, draft.tier);
+  const styleLabel = t.styles[draft.style].label;
+  const tierLabel = t.tiers[draft.tier].label;
 
-  async function loadCaptcha() {
-    try {
-      const challenge = await getCaptchaChallenge();
-      setCaptchaToken(challenge.token);
-      setCaptchaQuestion(challenge.question);
-      setCaptchaAnswer("");
-    } catch {
-      setCaptchaQuestion("Verificação indisponível — actualize a página.");
-    }
+  function validate(nomeVal: string, emailVal: string, telefoneVal: string): FieldErrors {
+    const next: FieldErrors = {};
+    if (nomeVal.trim().length < 2) next.nome = t.quote.errName;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal.trim())) next.email = t.quote.errEmail;
+    const digits = telefoneVal.replace(/\D/g, "");
+    if (digits.length < 9 || digits.length > 13) next.telefone = t.quote.errPhone;
+    return next;
   }
-
-  useEffect(() => {
-    void loadCaptcha();
-  }, []);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const next = validate(nome, email, telefone, captchaAnswer);
+    const next = validate(nome, email, telefone);
     setErrors(next);
     if (Object.keys(next).length) return;
 
@@ -61,21 +46,12 @@ export function QuoteForm({ draft }: { draft: Draft }) {
       complexity: draft.tier,
       message: mensagem.trim(),
       company: company.trim(),
-      captchaToken,
-      captchaAnswer: captchaAnswer.trim(),
     };
     setPending(true);
     try {
       await submitPublicLead({ data: payload });
       setResult("cloud");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "";
-      if (/verificação|desafio|incorrecta|expirado|captcha/i.test(message)) {
-        setErrors({ captcha: message || "Verificação falhou. Tente de novo." });
-        void loadCaptcha();
-        setPending(false);
-        return;
-      }
+    } catch {
       if (!company.trim()) {
         pushLocalLead({
           name: payload.name,
@@ -98,14 +74,12 @@ export function QuoteForm({ draft }: { draft: Draft }) {
   if (result) {
     return (
       <div role="status">
-        <p className="font-display text-4xl font-normal">Pedido recebido.</p>
+        <p className="font-display text-4xl font-normal">{t.quote.received}</p>
         <p className="mt-4 text-sm text-mute">
-          {result === "cloud"
-            ? "Entrou na mesa do estúdio. Resposta em um dia útil."
-            : "Ficou guardado neste aparelho e passa para o estúdio no próximo acesso."}
+          {result === "cloud" ? t.quote.receivedCloud : t.quote.receivedLocal}
         </p>
         <p className="mt-6 text-sm">
-          {brlFromCents(total)} · {draft.area} m² · {styleLabel(draft.style)} · {tierLabel(draft.tier)}
+          {brlFromCents(total)} · {draft.area} m² · {styleLabel} · {tierLabel}
         </p>
       </div>
     );
@@ -114,10 +88,10 @@ export function QuoteForm({ draft }: { draft: Draft }) {
   return (
     <form noValidate onSubmit={onSubmit} className="grid gap-5">
       <p className="text-sm text-mute">
-        {brlFromCents(total)} · {draft.area} m² · {styleLabel(draft.style)} · {tierLabel(draft.tier)}
+        {brlFromCents(total)} · {draft.area} m² · {styleLabel} · {tierLabel}
       </p>
       <div className="hidden" aria-hidden="true">
-        <label htmlFor="empresa">Empresa</label>
+        <label htmlFor="empresa">Company</label>
         <input
           id="empresa"
           name="company"
@@ -128,10 +102,10 @@ export function QuoteForm({ draft }: { draft: Draft }) {
           suppressHydrationWarning
         />
       </div>
-      <Field id="nome" label="Nome" value={nome} onChange={setNome} error={errors.nome} autoComplete="name" />
+      <Field id="nome" label={t.quote.name} value={nome} onChange={setNome} error={errors.nome} autoComplete="name" />
       <Field
         id="email"
-        label="E-mail"
+        label={t.quote.email}
         value={email}
         onChange={setEmail}
         error={errors.email}
@@ -140,7 +114,7 @@ export function QuoteForm({ draft }: { draft: Draft }) {
       />
       <Field
         id="telefone"
-        label="Telefone"
+        label={t.quote.phone}
         value={telefone}
         onChange={setTelefone}
         error={errors.telefone}
@@ -148,7 +122,7 @@ export function QuoteForm({ draft }: { draft: Draft }) {
         autoComplete="tel"
       />
       <label className="block text-sm text-mute" htmlFor="mensagem">
-        Mensagem
+        {t.quote.message}
         <textarea
           id="mensagem"
           value={mensagem}
@@ -159,28 +133,8 @@ export function QuoteForm({ draft }: { draft: Draft }) {
           suppressHydrationWarning
         />
       </label>
-      <label className="block text-sm text-mute" htmlFor="captcha">
-        Segurança — {captchaQuestion || "A carregar…"}
-        <input
-          id="captcha"
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          value={captchaAnswer}
-          onChange={(event) => setCaptchaAnswer(event.target.value)}
-          aria-invalid={Boolean(errors.captcha)}
-          aria-describedby={errors.captcha ? "captcha-erro" : undefined}
-          className="field"
-          suppressHydrationWarning
-        />
-        {errors.captcha ? (
-          <span id="captcha-erro" className="mt-1 block text-timber-deep">
-            {errors.captcha}
-          </span>
-        ) : null}
-      </label>
-      <button type="submit" disabled={pending || !captchaToken} className="mt-2 min-h-11 w-fit bg-ink px-6 text-sm text-paper">
-        {pending ? "A enviar…" : "Enviar"}
+      <button type="submit" disabled={pending} className="mt-2 min-h-11 w-fit bg-ink px-6 text-sm text-paper">
+        {pending ? t.quote.sending : t.quote.send}
       </button>
     </form>
   );

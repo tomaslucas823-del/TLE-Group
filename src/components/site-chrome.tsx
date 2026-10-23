@@ -1,20 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/components/i18n-provider";
+import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/cn";
 import { UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { site, waHref } from "@/lib/site";
 
-const NAV = [
-  { to: "/portfolio", label: "Projetos", hash: undefined },
-  { to: "/", label: "Serviços", hash: "servicos" },
-  { to: "/", label: "Método", hash: "metodo" },
-  { to: "/simulador", label: "Estimativa", hash: undefined },
-  { to: "/portal", label: "Portal", hash: undefined },
-] as const;
-
 function AuthSlot({ light }: { light: boolean }) {
+  const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
   const { user, isPending } = useCurrentUserState();
   useEffect(() => setMounted(true), []);
@@ -22,7 +17,7 @@ function AuthSlot({ light }: { light: boolean }) {
   if (!user) {
     return (
       <Link to="/login" className={cn("text-sm transition-colors", light ? "text-paper" : "text-ink")}>
-        Entrar
+        {t.nav.login}
       </Link>
     );
   }
@@ -30,9 +25,18 @@ function AuthSlot({ light }: { light: boolean }) {
 }
 
 export function SiteHeader() {
+  const { t } = useI18n();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const NAV = [
+    { to: "/portfolio" as const, label: t.nav.projects, hash: undefined },
+    { to: "/" as const, label: t.nav.services, hash: "servicos" },
+    { to: "/" as const, label: t.nav.method, hash: "metodo" },
+    { to: "/simulador" as const, label: t.nav.estimate, hash: undefined },
+    { to: "/portal" as const, label: t.nav.portal, hash: undefined },
+  ];
 
   useEffect(() => {
     setOpen(false);
@@ -83,7 +87,8 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
+          <LangToggle light={light} />
           <ThemeToggle light={light} />
           <AuthSlot light={light} />
           <Link
@@ -94,19 +99,20 @@ export function SiteHeader() {
               light ? "btn-solid-invert" : "btn-solid",
             )}
           >
-            Pedir cotação
+            {t.nav.quote}
           </Link>
         </div>
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
+          <LangToggle light={light} />
           <ThemeToggle light={light} />
           <button
             type="button"
             className="text-sm"
             aria-expanded={open}
-            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            aria-label={open ? t.nav.close : t.nav.menu}
             onClick={() => setOpen((value) => !value)}
           >
-            {open ? "Fechar" : "Menu"}
+            {open ? t.nav.close : t.nav.menu}
           </button>
         </div>
       </div>
@@ -129,7 +135,7 @@ export function SiteHeader() {
               className="flex min-h-12 items-center font-display text-3xl font-normal"
               onClick={() => setOpen(false)}
             >
-              Estúdio
+              {t.nav.studio}
             </Link>
             <Link
               to="/"
@@ -137,7 +143,7 @@ export function SiteHeader() {
               className="btn btn-solid mt-4 inline-flex min-h-12 items-center justify-center px-4 text-sm"
               onClick={() => setOpen(false)}
             >
-              Pedir cotação
+              {t.nav.quote}
             </Link>
           </nav>
           <div className="mt-8">
@@ -150,6 +156,7 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const { t } = useI18n();
   return (
     <footer className="no-print border-t border-line bg-paper text-ink">
       <div className="mx-auto max-w-6xl px-5 py-12">
@@ -163,7 +170,7 @@ export function SiteFooter() {
         </div>
         <div className="mt-10 grid gap-10 text-sm md:grid-cols-4">
           <div>
-            <p className="text-mute">Contacto</p>
+            <p className="text-mute">{t.footer.contact}</p>
             <ul className="mt-3 space-y-2">
               <li>{site.phoneDisplay}</li>
               <li>
@@ -179,56 +186,56 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <p className="text-mute">Projetos e serviços</p>
+            <p className="text-mute">{t.footer.projectsServices}</p>
             <ul className="mt-3 space-y-2">
               <li>
                 <Link to="/portfolio" className="hover:underline">
-                  Projetos
+                  {t.nav.projects}
                 </Link>
               </li>
               <li>
                 <Link to="/" hash="servicos" className="hover:underline">
-                  Serviços
+                  {t.nav.services}
                 </Link>
               </li>
               <li>
                 <Link to="/simulador" className="hover:underline">
-                  Estimativa
+                  {t.nav.estimate}
                 </Link>
               </li>
               <li>
                 <Link to="/" hash="duvidas" className="hover:underline">
-                  Dúvidas
+                  {t.footer.faq}
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <p className="text-mute">Estúdio</p>
+            <p className="text-mute">{t.footer.studio}</p>
             <ul className="mt-3 space-y-2">
               <li>
                 <Link to="/portal" className="hover:underline">
-                  Portal do cliente
+                  {t.footer.clientPortal}
                 </Link>
               </li>
               <li>
                 <Link to="/estudio" className="hover:underline">
-                  Área do estúdio
+                  {t.footer.studioArea}
                 </Link>
               </li>
               <li>
                 <Link to="/privacidade" className="hover:underline">
-                  Privacidade
+                  {t.footer.privacy}
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <p className="text-mute">Redes</p>
+            <p className="text-mute">{t.footer.social}</p>
             <ul className="mt-3 space-y-2">
-              <li>{site.instagram ? <a href={site.instagram}>Instagram</a> : "Instagram — a indicar"}</li>
-              <li>{site.facebook ? <a href={site.facebook}>Facebook</a> : "Facebook — a indicar"}</li>
-              <li>{site.linkedin ? <a href={site.linkedin}>LinkedIn</a> : "LinkedIn — a indicar"}</li>
+              <li>{site.instagram ? <a href={site.instagram}>Instagram</a> : t.footer.igPending}</li>
+              <li>{site.facebook ? <a href={site.facebook}>Facebook</a> : t.footer.fbPending}</li>
+              <li>{site.linkedin ? <a href={site.linkedin}>LinkedIn</a> : t.footer.liPending}</li>
             </ul>
           </div>
         </div>
@@ -246,7 +253,7 @@ export function WhatsAppButton() {
     <a
       href={waHref}
       className="no-print float-in btn btn-outline-ink fixed right-5 bottom-5 z-40 px-3 py-2 text-sm"
-      aria-label="Falar no WhatsApp"
+      aria-label="WhatsApp"
     >
       WhatsApp
     </a>
@@ -254,6 +261,7 @@ export function WhatsAppButton() {
 }
 
 export function ScrollTopButton() {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -273,7 +281,7 @@ export function ScrollTopButton() {
         waHref ? "bottom-20" : "bottom-5",
         "md:bottom-5",
       )}
-      aria-label="Voltar ao topo"
+      aria-label={t.a11y.backTop}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
     >
       ↑
@@ -282,6 +290,7 @@ export function ScrollTopButton() {
 }
 
 export function CookieBanner() {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -313,18 +322,18 @@ export function CookieBanner() {
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <p className="max-w-xl text-[13px] text-charcoal">
-          Cookies só para medir o acesso, e apenas com o seu aceite.{" "}
+          {t.cookies.text}{" "}
           <Link to="/privacidade" className="underline">
-            Privacidade
+            {t.cookies.privacy}
           </Link>
           .
         </p>
         <div className="flex gap-4 text-sm">
           <button type="button" className="underline underline-offset-4" onClick={() => choose("accepted")}>
-            Aceitar
+            {t.cookies.accept}
           </button>
           <button type="button" className="text-mute underline underline-offset-4" onClick={() => choose("rejected")}>
-            Recusar
+            {t.cookies.reject}
           </button>
         </div>
       </div>
