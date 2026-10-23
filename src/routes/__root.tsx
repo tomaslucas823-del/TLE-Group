@@ -1,6 +1,7 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AuthProvider } from "@/lib/auth/provider";
+import { LOCALE_BOOT_SCRIPT } from "@/lib/i18n";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import { site } from "@/lib/site";
 import appCss from "../styles.css?url";
@@ -41,6 +42,7 @@ function RootDocument() {
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }} />
       </head>
       <body>
         <PreviewHostBridge />
