@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { GROK_PROVIDERS, authEnabled, signIn } from "@/lib/auth/client";
 
 function GoogleMark() {
@@ -23,6 +24,37 @@ function GoogleMark() {
   );
 }
 
+function GoogleSignInButton({ callbackURL }: { callbackURL: string }) {
+  const [busy, setBusy] = useState(false);
+  const [pressed, setPressed] = useState(false);
+
+  async function onClick() {
+    if (busy) return;
+    setPressed(true);
+    setBusy(true);
+    window.setTimeout(() => setPressed(false), 220);
+    try {
+      await signIn("google", { callbackURL });
+    } catch {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      className="google-btn group relative inline-flex min-h-12 w-full items-center justify-center gap-3 overflow-hidden rounded-full border border-line bg-paper px-5 text-sm font-medium text-ink shadow-[0_1px_2px_rgb(0_0_0/0.04)] transition-[transform,box-shadow,background-color,border-color] duration-200 hover:-translate-y-px hover:border-ink/20 hover:bg-white hover:shadow-[0_8px_24px_rgb(0_0_0/0.08)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-80"
+      style={pressed ? { transform: "scale(0.96)" } : undefined}
+    >
+      <span className="google-btn__ripple" aria-hidden />
+      <GoogleMark />
+      <span>{busy ? "A abrir Google…" : "Continuar com Google"}</span>
+    </button>
+  );
+}
+
 export function AccessPanel({ title, callbackURL }: { title: string; callbackURL: string }) {
   return (
     <main className="mx-auto flex min-h-[calc(100svh-8rem)] max-w-md flex-col items-center justify-center px-5 py-24 text-center">
@@ -34,20 +66,12 @@ export function AccessPanel({ title, callbackURL }: { title: string; callbackURL
         {authEnabled ? (
           GROK_PROVIDERS.map((provider) =>
             provider.providerId === "google" ? (
-              <button
-                key={provider.providerId}
-                type="button"
-                onClick={() => signIn(provider.providerId, { callbackURL })}
-                className="group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-line bg-paper px-5 text-sm font-medium text-ink shadow-[0_1px_2px_rgb(0_0_0/0.04)] transition hover:-translate-y-px hover:border-ink/20 hover:bg-white hover:shadow-[0_8px_24px_rgb(0_0_0/0.08)] active:translate-y-0"
-              >
-                <GoogleMark />
-                <span>Continuar com Google</span>
-              </button>
+              <GoogleSignInButton key={provider.providerId} callbackURL={callbackURL} />
             ) : (
               <button
                 key={provider.providerId}
                 type="button"
-                className="btn btn-outline-ink min-h-11 w-full px-5 text-sm"
+                className="btn btn-outline-ink min-h-11 w-full px-5 text-sm active:scale-[0.97]"
                 onClick={() => signIn(provider.providerId, { callbackURL })}
               >
                 Continuar com {provider.label}
@@ -58,6 +82,32 @@ export function AccessPanel({ title, callbackURL }: { title: string; callbackURL
           <p className="text-sm text-mute">O acesso por conta está desligado neste ambiente.</p>
         )}
       </div>
+      <style>{`
+        .google-btn__ripple {
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          pointer-events: none;
+          background: radial-gradient(circle at center, rgb(22 22 22 / 0.08) 0%, transparent 65%);
+          opacity: 0;
+          transform: scale(0.6);
+          transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+        .google-btn:active .google-btn__ripple {
+          opacity: 1;
+          transform: scale(1.15);
+          transition-duration: 0.12s;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .google-btn,
+          .google-btn__ripple {
+            transition: none !important;
+          }
+          .google-btn:active {
+            transform: none !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
