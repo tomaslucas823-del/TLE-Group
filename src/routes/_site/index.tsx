@@ -37,7 +37,6 @@ export const Route = createFileRoute("/_site/")({
 const featured = projects.slice(0, 3);
 const [featuredMain, ...featuredSide] = featured;
 
-/** Covers for the infinite strip (duplicated in render for seamless loop). */
 const stripImages = projects.flatMap((p) => [{ src: p.cover, alt: p.title, slug: p.slug }]).slice(0, 8);
 
 function HomePage() {
@@ -98,14 +97,14 @@ function HomePage() {
           <h1 className="hero-enter hero-enter-delay-2 mt-4 max-w-[16ch] font-display text-[2.75rem] leading-[0.92] font-normal tracking-tight text-balance sm:text-6xl md:text-7xl lg:text-[5rem]">
             {t.hero.title}
           </h1>
-          <div className="hero-enter hero-enter-delay-3 mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
-            <a href="#orcamento" className="btn btn-solid-invert min-h-11 px-7 text-sm font-medium">
+          <div className="hero-enter hero-enter-delay-3 mt-8 flex flex-wrap items-center gap-3">
+            <a href="#orcamento" className="btn-cta">
               {t.hero.cta}
+              <span className="btn-cta__icon" aria-hidden>
+                →
+              </span>
             </a>
-            <Link
-              to="/portfolio"
-              className="link-underline text-sm tracking-wide text-paper/80"
-            >
+            <Link to="/portfolio" className="btn btn-outline min-h-11 px-5 text-sm text-paper">
               {t.hero.projects}
             </Link>
           </div>
@@ -122,7 +121,7 @@ function HomePage() {
               </h2>
               <span className="accent-line mt-4" />
             </div>
-            <Link to="/portfolio" className="link-underline text-sm text-mute">
+            <Link to="/portfolio" className="btn btn-outline-ink min-h-10 px-4 text-sm">
               {t.featured.all}
             </Link>
           </Reveal>
