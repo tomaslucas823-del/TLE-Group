@@ -228,6 +228,11 @@ export function SiteFooter() {
                   {t.footer.privacy}
                 </Link>
               </li>
+              <li>
+                <Link to="/termos" className="hover:underline">
+                  {t.footer.terms}
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
