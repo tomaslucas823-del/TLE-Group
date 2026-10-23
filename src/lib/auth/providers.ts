@@ -1,9 +1,6 @@
 /**
  * Identity providers offered on the sign-in screen.
- *
- * On Vercel we use Better Auth built-in socialProviders (Google + X/Twitter)
- * with credentials from GOOGLE_* and TWITTER_* env vars. providerId matches
- * Better Auth's social id so the client can call signIn.social().
+ * Google only — X/Twitter removed from the UI.
  */
 export type GrokProvider = {
   /** Better Auth social provider id / callback path segment. */
@@ -16,5 +13,4 @@ export type GrokProvider = {
 
 export const GROK_PROVIDERS: readonly GrokProvider[] = [
   { providerId: "google", idp: "google", label: "Google" },
-  { providerId: "twitter", idp: "twitter", label: "X" },
 ];
