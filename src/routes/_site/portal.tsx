@@ -27,7 +27,12 @@ function PortalBody() {
   const [error, setError] = useState("");
 
   const reload = useCallback(async () => {
-    setData(await loadPortal());
+    try {
+      setError("");
+      setData(await loadPortal());
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Não foi possível actualizar o portal.");
+    }
   }, []);
 
   useEffect(() => {

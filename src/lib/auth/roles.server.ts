@@ -35,16 +35,27 @@ function studioEmails(): Set<string> {
   );
 }
 
+/**
+ * Papel por omissão para novos utilizadores.
+ * - studio só se estiver em TLE_STUDIO_EMAILS, for TLE_STUDIO_USER_ID, ou TLE_DEFAULT_ROLE=studio
+ * - em produção, sem lista de estúdio, novos logins são "client" (mais seguro)
+ * - em desenvolvimento, sem config, mantém studio para facilitar testes locais
+ */
 function defaultRoleFor(userId: string, email: string | null): AppRole {
   if (userId === "dev-user") return "studio";
   const configuredOwner = process.env.TLE_STUDIO_USER_ID?.trim();
   if (configuredOwner && userId === configuredOwner) return "studio";
   if (email && studioEmails().has(email.toLowerCase())) return "studio";
-  // Sem lista de e-mails: o primeiro utilizador autenticado em preview continua studio
-  // se TLE_DEFAULT_ROLE=studio (omissão). Em produção defina TLE_STUDIO_EMAILS.
+
   const fallback = process.env.TLE_DEFAULT_ROLE?.trim().toLowerCase();
+  if (fallback === "studio") return "studio";
   if (fallback === "client") return "client";
-  return "studio";
+
+  const hasStudioConfig = Boolean(configuredOwner) || studioEmails().size > 0;
+  if (!hasStudioConfig && process.env.NODE_ENV !== "production") {
+    return "studio";
+  }
+  return "client";
 }
 
 /** Garante linha em profiles e devolve o perfil. */
@@ -108,8 +119,6 @@ export async function resolvePortalScope(userId: string): Promise<PortalScope> {
       "Conta de cliente sem projeto associado. Peça ao estúdio para vincular o acesso.",
     );
   }
-  // O workspace dos dados é o user_id dono das linhas clients/projects (estúdio).
-  // Guardamos o client_id; o workspace vem do registo do cliente.
   const sql = await getSql();
   const rows = await sql<{ user_id: string }>`
     select user_id from clients where id = ${profile.clientId} limit 1
