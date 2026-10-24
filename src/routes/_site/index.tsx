@@ -4,6 +4,7 @@ import { useI18n } from "@/components/i18n-provider";
 import { ProjectCard } from "@/components/project-card";
 import { QuoteForm } from "@/components/quote-form";
 import { Reveal, useHeroParallax } from "@/components/reveal";
+import type { Draft } from "@/components/simulator";
 import { projects } from "@/data/projects";
 import { site } from "@/lib/site";
 
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/_site/")({
 });
 
 const featured = projects.slice(0, 3);
+const defaultDraft: Draft = { area: 180, style: "pedra", tier: "estudo" };
 
 function HomePage() {
   const { t } = useI18n();
@@ -34,7 +36,6 @@ function HomePage() {
 
   return (
     <main>
-      {/* Hero — centered, Apple-like */}
       <section className="relative flex min-h-[92svh] items-center justify-center overflow-hidden bg-ink text-paper">
         <div ref={parallaxRef} className="parallax-layer absolute inset-0">
           <img
@@ -79,7 +80,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Projects — simple grid */}
       <section className="bg-paper">
         <div className="mx-auto max-w-5xl px-6 py-20 md:py-28">
           <Reveal variant="up" className="text-center">
@@ -102,7 +102,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Services — three lines only */}
       <section id="servicos" className="bg-stone">
         <div className="mx-auto max-w-5xl px-6 py-20 md:py-28">
           <Reveal variant="up" className="text-center">
@@ -121,7 +120,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Full-bleed image */}
       <section className="overflow-hidden bg-ink">
         <img
           src="/renders/pavilhao-dia.webp"
@@ -133,7 +131,6 @@ function HomePage() {
         />
       </section>
 
-      {/* Contact */}
       <section id="contacto" className="bg-paper">
         <div className="mx-auto grid max-w-5xl gap-14 px-6 py-20 md:grid-cols-2 md:gap-16 md:py-28">
           <Reveal variant="up">
@@ -154,7 +151,7 @@ function HomePage() {
             </div>
           </Reveal>
           <Reveal variant="up" delay={60}>
-            <QuoteForm />
+            <QuoteForm draft={defaultDraft} />
           </Reveal>
         </div>
       </section>
