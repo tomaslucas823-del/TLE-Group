@@ -6,22 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/cn";
 import { UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
-import { TLE_LOGO_SRC } from "@/lib/logo";
 import { site, waHref } from "@/lib/site";
-
-function BrandLogo({ className, size = 36 }: { className?: string; size?: number }) {
-  return (
-    <img
-      src={TLE_LOGO_SRC}
-      alt="TLE Arquitetura"
-      width={size}
-      height={size}
-      className={cn("h-auto w-auto object-contain", className)}
-      style={{ height: size, width: size }}
-      decoding="async"
-    />
-  );
-}
 
 function AuthSlot({ light }: { light: boolean }) {
   const { t } = useI18n();
@@ -164,11 +149,13 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
         <Link
           to="/"
-          className="relative z-10 flex items-center rounded-full py-1"
+          className={cn(
+            "relative z-10 flex items-center rounded-full px-1 py-1 transition-colors",
+            light ? "text-paper" : "text-ink",
+          )}
           onClick={() => selectNav({ id: "home", to: "/", label: "Início", home: true })}
-          aria-label="TLE Arquitetura — início"
         >
-          <BrandLogo size={40} className={cn(light && "brightness-110")} />
+          <span className="font-display text-[1.2rem] leading-none font-medium tracking-[0.16em]">TLE</span>
         </Link>
 
         <nav
@@ -292,7 +279,7 @@ export function SiteFooter() {
     <footer className="no-print border-t border-line bg-paper text-ink">
       <div className="mx-auto max-w-6xl px-5 py-12">
         <div className="flex items-end justify-between gap-6">
-          <BrandLogo size={56} />
+          <p className="font-display text-4xl leading-none font-normal">TLE</p>
           <p className="text-sm text-mute">
             {site.city}
             <span className="text-line"> · </span>
@@ -394,9 +381,7 @@ export function WhatsAppButton() {
       className="no-print float-in float-bar fixed right-5 bottom-5 z-40"
       aria-label="WhatsApp"
     >
-      <span className="float-bar__mark flex items-center justify-center p-0.5">
-        <BrandLogo size={28} />
-      </span>
+      <span className="float-bar__mark">TLE</span>
       <span className="btn-cta" style={{ padding: "0.3rem 0.35rem 0.3rem 0.95rem" }}>
         {t.nav.quote}
         <CtaArrow />
