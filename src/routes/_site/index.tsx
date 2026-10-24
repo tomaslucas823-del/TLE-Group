@@ -86,23 +86,23 @@ function HomePage() {
           ) : null}
         </div>
         <div className="pointer-events-none absolute inset-0 bg-ink/40" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-[linear-gradient(to_top,rgb(12,12,12,0.85),transparent)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-[linear-gradient(to_top,rgb(0,0,0,0.85),transparent)]" />
 
-        <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-5 pb-16 md:pb-20">
-          <p className="hero-enter hero-enter-delay-1 text-[11px] tracking-[0.2em] text-paper/70 uppercase">
+        <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-5 pb-16 md:pb-24">
+          <p className="hero-enter hero-enter-delay-1 text-[12px] font-medium tracking-[0.14em] text-paper/65 uppercase">
             {t.hero.kicker}
           </p>
-          <h1 className="hero-enter hero-enter-delay-2 mt-4 max-w-[16ch] font-display text-[2.75rem] leading-[0.92] font-normal tracking-tight text-balance sm:text-6xl md:text-7xl lg:text-[5rem]">
+          <h1 className="hero-enter hero-enter-delay-2 mt-3 max-w-[15ch] font-display text-[2.85rem] leading-[1.02] font-semibold tracking-[-0.035em] text-balance sm:text-6xl md:text-7xl lg:text-[5.25rem]">
             {t.hero.title}
           </h1>
-          <div className="hero-enter hero-enter-delay-3 mt-8 flex flex-wrap items-center gap-3">
+          <div className="hero-enter hero-enter-delay-3 mt-9 flex flex-wrap items-center gap-3">
             <a href="#orcamento" className="btn-cta">
               {t.hero.cta}
               <span className="btn-cta__icon" aria-hidden>
                 →
               </span>
             </a>
-            <Link to="/portfolio" className="btn btn-outline min-h-11 px-5 text-sm text-paper">
+            <Link to="/portfolio" className="btn btn-outline min-h-11 px-5 text-[15px] text-paper">
               {t.hero.projects}
             </Link>
           </div>
@@ -110,22 +110,22 @@ function HomePage() {
       </section>
 
       <section className="bg-paper">
-        <div className="mx-auto max-w-6xl px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-6xl px-5 py-16 md:py-24">
           <Reveal variant="up" className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.featured.kicker}</p>
-              <h2 className="mt-2 max-w-md font-display text-3xl leading-[1.05] font-normal md:text-4xl">
+              <p className="text-[12px] font-medium tracking-[0.14em] text-mute uppercase">{t.featured.kicker}</p>
+              <h2 className="mt-3 max-w-xl font-display text-[2rem] leading-[1.08] font-semibold tracking-[-0.03em] md:text-[2.75rem]">
                 {t.featured.title}
               </h2>
-              <span className="accent-line mt-4" />
+              <span className="accent-line mt-5" />
             </div>
-            <Link to="/portfolio" className="btn btn-outline-ink min-h-10 px-4 text-sm">
+            <Link to="/portfolio" className="btn btn-outline-ink min-h-10 px-4 text-[15px]">
               {t.featured.all}
             </Link>
           </Reveal>
 
           {featuredMain ? (
-            <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
+            <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
               <Reveal as="div" variant="up" delay={40} className="sm:col-span-2 lg:col-span-1">
                 <ProjectCard project={featuredMain} aspect="aspect-[4/3]" />
               </Reveal>
@@ -140,28 +140,30 @@ function HomePage() {
       </section>
 
       <section id="servicos" className="bg-ink text-paper">
-        <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
+        <div className="mx-auto max-w-6xl px-5 py-16 md:py-24">
           <Reveal variant="up">
-            <p className="text-[11px] tracking-[0.18em] text-paper/45 uppercase">{t.services.kicker}</p>
-            <h2 className="mt-2 max-w-lg font-display text-3xl leading-[1.05] font-normal text-balance md:text-4xl">
+            <p className="text-[12px] font-medium tracking-[0.14em] text-paper/45 uppercase">{t.services.kicker}</p>
+            <h2 className="mt-3 max-w-2xl font-display text-[2rem] leading-[1.08] font-semibold tracking-[-0.03em] text-balance md:text-[2.75rem]">
               {t.services.title}
             </h2>
-            <span className="accent-line mt-4 bg-paper" />
+            <span className="accent-line mt-5 bg-paper" />
           </Reveal>
-          <ul className="mt-10 grid gap-8 border-t border-paper/15 pt-10 md:grid-cols-3 md:gap-10">
+          <ul className="mt-12 grid gap-10 border-t border-paper/15 pt-12 md:grid-cols-3 md:gap-12">
             {PATHS.map((path, i) => (
               <Reveal key={path.title} as="li" variant="up" delay={i * 80} className="step-card flex flex-col">
-                <span className="font-display text-sm italic text-paper/40">
+                <span className="text-[13px] font-medium tracking-[0.08em] text-paper/40">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="mt-3 font-display text-xl font-normal md:text-2xl">{path.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-paper/60">{path.text}</p>
+                <h3 className="mt-4 font-display text-[1.35rem] font-semibold tracking-[-0.02em] md:text-[1.5rem]">
+                  {path.title}
+                </h3>
+                <p className="mt-3 flex-1 text-[15px] leading-[1.55] text-paper/60">{path.text}</p>
                 {path.href.startsWith("/#") ? (
-                  <a href={path.href} className="link-underline mt-5 text-sm text-paper/80">
+                  <a href={path.href} className="link-underline mt-6 text-[15px] text-paper/80">
                     {path.cta}
                   </a>
                 ) : (
-                  <Link to={path.href} className="link-underline mt-5 text-sm text-paper/80">
+                  <Link to={path.href} className="link-underline mt-6 text-[15px] text-paper/80">
                     {path.cta}
                   </Link>
                 )}
@@ -172,18 +174,20 @@ function HomePage() {
       </section>
 
       <section id="metodo" className="bg-paper">
-        <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
-          <Reveal variant="up" className="max-w-xl">
-            <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.method.kicker}</p>
-            <h2 className="mt-2 font-display text-3xl leading-[1.05] font-normal md:text-4xl">{t.method.title}</h2>
-            <span className="accent-line mt-4" />
+        <div className="mx-auto max-w-6xl px-5 py-16 md:py-24">
+          <Reveal variant="up" className="max-w-2xl">
+            <p className="text-[12px] font-medium tracking-[0.14em] text-mute uppercase">{t.method.kicker}</p>
+            <h2 className="mt-3 font-display text-[2rem] leading-[1.08] font-semibold tracking-[-0.03em] md:text-[2.75rem]">
+              {t.method.title}
+            </h2>
+            <span className="accent-line mt-5" />
           </Reveal>
-          <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
             {t.method.steps.map((step, i) => (
               <Reveal key={step.n} as="li" variant="up" delay={i * 70} className="step-card">
-                <p className="font-display text-sm italic text-mute">{step.n}</p>
-                <h3 className="mt-2 font-display text-xl font-normal">{step.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-mute">{step.text}</p>
+                <p className="text-[13px] font-medium tracking-[0.08em] text-mute">{step.n}</p>
+                <h3 className="mt-3 font-display text-[1.25rem] font-semibold tracking-[-0.02em]">{step.title}</h3>
+                <p className="mt-2 text-[15px] leading-[1.55] text-mute">{step.text}</p>
               </Reveal>
             ))}
           </ol>
@@ -204,37 +208,43 @@ function HomePage() {
       </section>
 
       <section className="bg-stone">
-        <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
-          <Reveal variant="up" className="max-w-xl">
-            <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.estimate.kicker}</p>
-            <h2 className="mt-2 font-display text-3xl leading-[1.05] font-normal md:text-4xl">{t.estimate.title}</h2>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-mute">{t.estimate.lead}</p>
+        <div className="mx-auto max-w-6xl px-5 py-16 md:py-24">
+          <Reveal variant="up" className="max-w-2xl">
+            <p className="text-[12px] font-medium tracking-[0.14em] text-mute uppercase">{t.estimate.kicker}</p>
+            <h2 className="mt-3 font-display text-[2rem] leading-[1.08] font-semibold tracking-[-0.03em] md:text-[2.75rem]">
+              {t.estimate.title}
+            </h2>
+            <p className="mt-4 max-w-lg text-[17px] leading-[1.5] text-mute">{t.estimate.lead}</p>
           </Reveal>
-          <Reveal className="mt-10" variant="up" delay={80}>
+          <Reveal className="mt-12" variant="up" delay={80}>
             <Simulator draft={draft} onChange={setDraft} />
           </Reveal>
         </div>
       </section>
 
       <section id="duvidas" className="bg-paper">
-        <div className="mx-auto max-w-2xl px-5 py-14 md:py-20">
+        <div className="mx-auto max-w-2xl px-5 py-16 md:py-24">
           <Reveal variant="up">
-            <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.faq.kicker}</p>
-            <h2 className="mt-2 font-display text-3xl font-normal md:text-4xl">{t.faq.title}</h2>
-            <span className="accent-line mt-4" />
+            <p className="text-[12px] font-medium tracking-[0.14em] text-mute uppercase">{t.faq.kicker}</p>
+            <h2 className="mt-3 font-display text-[2rem] font-semibold tracking-[-0.03em] md:text-[2.75rem]">
+              {t.faq.title}
+            </h2>
+            <span className="accent-line mt-5" />
           </Reveal>
-          <ul className="mt-10 border-t border-line">
+          <ul className="mt-12 border-t border-line">
             {t.faq.items.map((item, index) => {
               const open = openFaq === index;
               return (
                 <li key={item.q} className="border-b border-line">
                   <button
                     type="button"
-                    className="flex w-full items-start justify-between gap-6 py-5 text-left transition-colors hover:text-timber"
+                    className="flex w-full items-start justify-between gap-6 py-6 text-left transition-opacity hover:opacity-70"
                     aria-expanded={open}
                     onClick={() => setOpenFaq(open ? null : index)}
                   >
-                    <span className="font-display text-lg font-normal md:text-xl">{item.q}</span>
+                    <span className="font-display text-[1.15rem] font-semibold tracking-[-0.02em] md:text-[1.3rem]">
+                      {item.q}
+                    </span>
                     <span
                       className="mt-1 shrink-0 text-mute transition-transform duration-300"
                       style={{ transform: open ? "rotate(45deg)" : "none" }}
@@ -248,7 +258,7 @@ function HomePage() {
                     style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
                   >
                     <div className="overflow-hidden">
-                      <p className="pb-5 text-sm leading-relaxed text-mute">{item.a}</p>
+                      <p className="pb-6 text-[15px] leading-[1.55] text-mute">{item.a}</p>
                     </div>
                   </div>
                 </li>
@@ -259,27 +269,29 @@ function HomePage() {
       </section>
 
       <section id="orcamento" className="border-t border-line bg-paper">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-2 md:gap-14 md:py-20">
+        <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 md:grid-cols-2 md:gap-16 md:py-24">
           <Reveal variant="left">
-            <p className="text-[11px] tracking-[0.18em] text-mute uppercase">{t.quote.kicker}</p>
-            <h2 className="mt-2 font-display text-3xl leading-[1.05] font-normal md:text-4xl">{t.quote.title}</h2>
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-mute">{t.quote.lead}</p>
-            <dl className="mt-8 max-w-sm space-y-0 text-sm">
-              <div className="border-t border-line py-3">
-                <dt className="text-[11px] tracking-[0.12em] text-mute uppercase">{t.quote.phone}</dt>
-                <dd className="mt-1">{site.phoneDisplay}</dd>
+            <p className="text-[12px] font-medium tracking-[0.14em] text-mute uppercase">{t.quote.kicker}</p>
+            <h2 className="mt-3 font-display text-[2rem] leading-[1.08] font-semibold tracking-[-0.03em] md:text-[2.75rem]">
+              {t.quote.title}
+            </h2>
+            <p className="mt-4 max-w-md text-[17px] leading-[1.5] text-mute">{t.quote.lead}</p>
+            <dl className="mt-10 max-w-sm space-y-0 text-[15px]">
+              <div className="border-t border-line py-4">
+                <dt className="text-[12px] font-medium tracking-[0.1em] text-mute uppercase">{t.quote.phone}</dt>
+                <dd className="mt-1.5">{site.phoneDisplay}</dd>
               </div>
-              <div className="border-t border-line py-3">
-                <dt className="text-[11px] tracking-[0.12em] text-mute uppercase">{t.quote.email}</dt>
-                <dd className="mt-1">
+              <div className="border-t border-line py-4">
+                <dt className="text-[12px] font-medium tracking-[0.1em] text-mute uppercase">{t.quote.email}</dt>
+                <dd className="mt-1.5">
                   <a href={`mailto:${site.email}`} className="underline-offset-4 hover:underline">
                     {site.email}
                   </a>
                 </dd>
               </div>
-              <div className="border-t border-b border-line py-3">
-                <dt className="text-[11px] tracking-[0.12em] text-mute uppercase">{t.quote.address}</dt>
-                <dd className="mt-1">
+              <div className="border-t border-b border-line py-4">
+                <dt className="text-[12px] font-medium tracking-[0.1em] text-mute uppercase">{t.quote.address}</dt>
+                <dd className="mt-1.5">
                   {site.address}
                   <br />
                   {site.city}, {site.country}
