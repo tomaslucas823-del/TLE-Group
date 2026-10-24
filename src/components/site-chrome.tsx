@@ -6,12 +6,13 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/cn";
 import { UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { TLE_LOGO_SRC } from "@/lib/logo";
 import { site, waHref } from "@/lib/site";
 
 function BrandLogo({ className, size = 36 }: { className?: string; size?: number }) {
   return (
     <img
-      src="/tle-logo.svg"
+      src={TLE_LOGO_SRC}
       alt="TLE Arquitetura"
       width={size}
       height={size}
@@ -167,7 +168,7 @@ export function SiteHeader() {
           onClick={() => selectNav({ id: "home", to: "/", label: "Início", home: true })}
           aria-label="TLE Arquitetura — início"
         >
-          <BrandLogo size={40} className={cn(light && "brightness-110") } />
+          <BrandLogo size={40} className={cn(light && "brightness-110")} />
         </Link>
 
         <nav
