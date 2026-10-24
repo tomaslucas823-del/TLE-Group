@@ -155,13 +155,12 @@ export async function loadWorkspace(uid: string): Promise<StudioData> {
       sql<InstallmentRow>`select id, proposal_id, label, percent, amount_cents, due_label, status, method from installments where user_id = ${uid} order by id`,
     ]);
 
-  let publicInbox: LeadRow[] = [];
-  if (inbox === PUBLIC_LEAD_INBOX || uid === inbox) {
-    publicInbox = await sql<LeadRow>`
-      select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status
-      from leads where user_id = ${PUBLIC_LEAD_INBOX} order by id desc
-    `;
-  }
+  // Always surface the shared public inbox so studio users see form submissions
+  // even before TLE_STUDIO_USER_ID is configured.
+  const publicInbox = await sql<LeadRow>`
+    select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status
+    from leads where user_id = ${PUBLIC_LEAD_INBOX} order by id desc
+  `;
 
   const leads = [...ownLeads, ...inboxLeads, ...publicInbox].filter(
     (lead, index, arr) => arr.findIndex((l) => l.id === lead.id) === index,
