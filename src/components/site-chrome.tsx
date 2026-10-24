@@ -8,6 +8,20 @@ import { UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { site, waHref } from "@/lib/site";
 
+function BrandLogo({ className, size = 36 }: { className?: string; size?: number }) {
+  return (
+    <img
+      src="/tle-logo.svg"
+      alt="TLE Arquitetura"
+      width={size}
+      height={size}
+      className={cn("h-auto w-auto object-contain", className)}
+      style={{ height: size, width: size }}
+      decoding="async"
+    />
+  );
+}
+
 function AuthSlot({ light }: { light: boolean }) {
   const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
@@ -66,7 +80,6 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeId, setActiveId] = useState("home");
-  /** When true, location-sync effect must not overwrite a fresh click. */
   const lockActive = useRef(false);
 
   const NAV: NavItem[] = [
@@ -77,7 +90,6 @@ export function SiteHeader() {
     { id: "estimate", to: "/simulador", label: t.nav.estimate },
   ];
 
-  // Sync from URL only when not locked by a click
   useEffect(() => {
     if (lockActive.current) return;
     setActiveId(resolveActiveId(pathname));
@@ -116,7 +128,6 @@ export function SiteHeader() {
     lockActive.current = true;
     setActiveId(item.id);
     setOpen(false);
-    // Release lock after navigation/hash settles
     window.setTimeout(() => {
       lockActive.current = false;
     }, 400);
@@ -127,7 +138,6 @@ export function SiteHeader() {
     selectNav(item);
 
     if (item.hash) {
-      // Always update the real URL hash so resolveActiveId stays correct
       if (pathname === "/") {
         window.history.pushState(null, "", `/#${item.hash}`);
         scrollToId(item.hash);
@@ -153,13 +163,11 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
         <Link
           to="/"
-          className={cn(
-            "relative z-10 flex items-center rounded-full px-1 py-1 transition-colors",
-            light ? "text-paper" : "text-ink",
-          )}
+          className="relative z-10 flex items-center rounded-full py-1"
           onClick={() => selectNav({ id: "home", to: "/", label: "Início", home: true })}
+          aria-label="TLE Arquitetura — início"
         >
-          <span className="font-display text-[1.2rem] leading-none font-medium tracking-[0.16em]">TLE</span>
+          <BrandLogo size={40} className={cn(light && "brightness-110") } />
         </Link>
 
         <nav
@@ -283,7 +291,7 @@ export function SiteFooter() {
     <footer className="no-print border-t border-line bg-paper text-ink">
       <div className="mx-auto max-w-6xl px-5 py-12">
         <div className="flex items-end justify-between gap-6">
-          <p className="font-display text-4xl leading-none font-normal">TLE</p>
+          <BrandLogo size={56} />
           <p className="text-sm text-mute">
             {site.city}
             <span className="text-line"> · </span>
@@ -385,7 +393,9 @@ export function WhatsAppButton() {
       className="no-print float-in float-bar fixed right-5 bottom-5 z-40"
       aria-label="WhatsApp"
     >
-      <span className="float-bar__mark">TLE</span>
+      <span className="float-bar__mark flex items-center justify-center p-0.5">
+        <BrandLogo size={28} />
+      </span>
       <span className="btn-cta" style={{ padding: "0.3rem 0.35rem 0.3rem 0.95rem" }}>
         {t.nav.quote}
         <CtaArrow />
