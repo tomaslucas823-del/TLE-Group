@@ -17,18 +17,12 @@ export const Route = createRootRoute({
         content:
           "Estúdio de visualização residencial em Maputo. A casa desenhada antes da primeira parede, com cotação em meticais.",
       },
-      { name: "theme-color", content: "#f4f1ec" },
+      { name: "theme-color", content: "#ffffff" },
       { name: "color-scheme", content: "light dark" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;1,400&display=swap",
-      },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
     ],
