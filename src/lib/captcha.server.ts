@@ -4,17 +4,18 @@
  * 1) Always available: signed arithmetic challenge (HMAC with BETTER_AUTH_SECRET).
  * 2) Optional: Cloudflare Turnstile when TURNSTILE_SECRET_KEY is set.
  *
- * Tokens are single-use and short-lived. In production the HMAC secret MUST be
- * configured — the dev default is rejected.
+ * Tokens are single-use and short-lived. Used-token registry uses Upstash when
+ * configured so multiple Vercel instances share state.
  */
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { env } from "@/lib/env.server";
+import { redisSetNx } from "@/lib/upstash.server";
 
 const CHALLENGE_TTL_MS = 10 * 60 * 1000;
-const USED_TOKEN_TTL_MS = CHALLENGE_TTL_MS + 60_000;
+const USED_TOKEN_TTL_SEC = Math.ceil((CHALLENGE_TTL_MS + 60_000) / 1000);
 const DEV_FALLBACK = "tle-dev-captcha-secret-change-me";
 
-/** In-memory single-use registry (per process). */
+/** In-memory single-use registry (fallback when Redis is offline). */
 const usedTokens = new Map<string, number>();
 
 function pruneUsedTokens(now = Date.now()) {
@@ -51,15 +52,11 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export type CaptchaChallenge = {
-  /** Opaque token the client must return with the answer. */
   token: string;
-  /** Human-readable question, e.g. "Quanto é 4 + 7?". */
   question: string;
-  /** Site key for Turnstile widget when configured (public). */
   turnstileSiteKey?: string;
 };
 
-/** Create a short-lived math challenge. */
 export function createMathChallenge(): CaptchaChallenge {
   const a = randomInt(2, 12);
   const b = randomInt(2, 12);
@@ -83,15 +80,29 @@ export class CaptchaError extends Error {
   }
 }
 
-/** Verify the math challenge answer (single-use). */
-export function verifyMathChallenge(token: string, answerRaw: string | number): void {
-  if (!token || typeof token !== "string") throw new CaptchaError("Desafio em falta.");
-  if (token.length > 2000) throw new CaptchaError();
-
-  pruneUsedTokens();
-  if (usedTokens.has(token)) {
+async function markTokenUsed(token: string): Promise<void> {
+  const key = `captcha:used:${token.slice(0, 80)}`;
+  const nx = await redisSetNx(key, "1", USED_TOKEN_TTL_SEC);
+  if (nx === false) {
     throw new CaptchaError("Desafio já utilizado. Actualize e tente de novo.");
   }
+  // nx === null → Redis offline; use memory fallback
+  if (nx === null) {
+    pruneUsedTokens();
+    if (usedTokens.has(token)) {
+      throw new CaptchaError("Desafio já utilizado. Actualize e tente de novo.");
+    }
+    usedTokens.set(token, Date.now() + USED_TOKEN_TTL_SEC * 1000);
+  }
+}
+
+/** Verify the math challenge answer (single-use). */
+export async function verifyMathChallenge(
+  token: string,
+  answerRaw: string | number,
+): Promise<void> {
+  if (!token || typeof token !== "string") throw new CaptchaError("Desafio em falta.");
+  if (token.length > 2000) throw new CaptchaError();
 
   const [payloadB64, sig] = token.split(".");
   if (!payloadB64 || !sig) throw new CaptchaError();
@@ -116,14 +127,12 @@ export function verifyMathChallenge(token: string, answerRaw: string | number): 
     throw new CaptchaError("Resposta incorrecta.");
   }
 
-  // Mark consumed only after a correct answer (failed guesses can retry until expiry).
-  usedTokens.set(token, Date.now() + USED_TOKEN_TTL_MS);
+  await markTokenUsed(token);
 }
 
-/** Verify Cloudflare Turnstile token when secret is configured. */
 export async function verifyTurnstile(responseToken: string, ip?: string): Promise<void> {
   const secretKey = env("TURNSTILE_SECRET_KEY");
-  if (!secretKey) return; // optional — skip if not configured
+  if (!secretKey) return;
   if (!responseToken?.trim()) throw new CaptchaError("Complete a verificação Turnstile.");
 
   const form = new URLSearchParams();
@@ -141,16 +150,13 @@ export async function verifyTurnstile(responseToken: string, ip?: string): Promi
   if (!data.success) throw new CaptchaError("Verificação Turnstile rejeitada.");
 }
 
-/**
- * Full public-form check: math always required; Turnstile if configured.
- */
 export async function assertCaptcha(input: {
   captchaToken?: string;
   captchaAnswer?: string | number;
   turnstileToken?: string;
   ip?: string;
 }): Promise<void> {
-  verifyMathChallenge(String(input.captchaToken ?? ""), input.captchaAnswer ?? "");
+  await verifyMathChallenge(String(input.captchaToken ?? ""), input.captchaAnswer ?? "");
   if (env("TURNSTILE_SECRET_KEY")) {
     await verifyTurnstile(String(input.turnstileToken ?? ""), input.ip);
   }
