@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_site/portfolio/$slug")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.title ?? "Projeto"} - TLE Arquitetura` },
+      { title: `${loaderData?.title ?? "Projeto"} - TLE Group` },
       { name: "description", content: loaderData?.summary ?? "" },
     ],
   }),
@@ -52,13 +52,12 @@ function ProjectPage() {
               </li>
             ))}
           </ul>
-          <Link to="/" hash="orcamento" className="mt-5 inline-flex text-sm underline underline-offset-4">
-            Pedir uma casa neste partido
+          <Link to="/" hash="contacto" className="mt-5 inline-flex text-sm underline underline-offset-4">
+            Pedir cotação neste projecto
           </Link>
         </div>
       </article>
 
-      {/* Galeria: pares lado a lado com espaçamento — sem imagens coladas */}
       <section className="mx-auto max-w-6xl px-5 pb-12 md:pb-16">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
           {rest.map((image) => (
@@ -75,7 +74,6 @@ function ProjectPage() {
             </figure>
           ))}
         </div>
-        {/* Se só houver 1 imagem além da capa, ou número ímpar, a última fica sozinha sem esticar */}
       </section>
     </main>
   );
