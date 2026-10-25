@@ -15,8 +15,8 @@ export type DeliveryCategory = {
 
 /**
  * Samples of real TLE delivery quality.
- * High-definition renders and technical framing from studio packages.
- * Client PII removed; only design quality is shown.
+ * Dense grid of renders + technical framing (plans / elevations).
+ * Client PII removed.
  */
 export const deliveryCategories: DeliveryCategory[] = [
   {
@@ -24,9 +24,9 @@ export const deliveryCategories: DeliveryCategory[] = [
     label: "Renderizações",
     labelEn: "Renders",
     description:
-      "Imagens exteriores de alta definição. O volume, a luz e os materiais antes da primeira parede.",
+      "Volume, luz e materiais — a imagem que fecha o partido antes da obra.",
     descriptionEn:
-      "High-definition exterior images. Volume, light and materials before the first wall.",
+      "Volume, light and materials — the image that locks the massing before construction.",
     images: [
       {
         src: "/renders/veu-frente.webp",
@@ -46,7 +46,17 @@ export const deliveryCategories: DeliveryCategory[] = [
       {
         src: "/renders/pavilhao-dia.webp",
         alt: "Pavilhão aberto e laje em balanço",
-        caption: "Pavilhão de chegada",
+        caption: "Pavilhão",
+      },
+      {
+        src: "/renders/oculus-jardim.webp",
+        alt: "Relação do volume com o jardim",
+        caption: "Jardim",
+      },
+      {
+        src: "/renders/linear-piscina.webp",
+        alt: "Fachada linear e área exterior",
+        caption: "Exterior",
       },
     ],
   },
@@ -55,24 +65,39 @@ export const deliveryCategories: DeliveryCategory[] = [
     label: "Plantas",
     labelEn: "Floor plans",
     description:
-      "Plantas cotadas, zoneamento e implantação. A distribuição que a obra vai executar.",
+      "Plantas de piso, zoneamento e relação com o terreno. A distribuição que a obra executa.",
     descriptionEn:
-      "Dimensioned plans, zoning and site layout. The distribution the build will execute.",
+      "Floor plans, zoning and site relationship. The distribution the build will execute.",
     images: [
       {
-        src: "/renders/oculus-jardim.webp",
-        alt: "Representação de volume e relação com o jardim",
-        caption: "Volume · jardim",
-      },
-      {
         src: "/renders/linear-garagem.webp",
-        alt: "Relação da fachada linear com a garagem",
-        caption: "Chegada e garagem",
+        alt: "Organização de chegada e garagem",
+        caption: "Chegada · garagem",
       },
       {
         src: "/renders/pavilhao-aberto.webp",
         alt: "Espaço de chegada sob cobertura",
-        caption: "Pórtico e chegada",
+        caption: "Pórtico",
+      },
+      {
+        src: "/renders/oculus-fundo.webp",
+        alt: "Volume posterior e abertura",
+        caption: "Fundo",
+      },
+      {
+        src: "/renders/jardim-estrelitzia.webp",
+        alt: "Relação com o jardim e limites",
+        caption: "Implantação · jardim",
+      },
+      {
+        src: "/renders/veu-entrada.webp",
+        alt: "Entrada e sequência de espaços",
+        caption: "Entrada",
+      },
+      {
+        src: "/renders/linear-detalhe.webp",
+        alt: "Detalhe de partido linear",
+        caption: "Detalhe",
       },
     ],
   },
@@ -81,24 +106,39 @@ export const deliveryCategories: DeliveryCategory[] = [
     label: "Cortes e elevações",
     labelEn: "Sections & elevations",
     description:
-      "Cortes técnicos, alturas e relações entre espaços. O que a secção mostra e a elevação confirma.",
+      "Alturas, cortes e elevações. O que a secção mostra e a fachada confirma.",
     descriptionEn:
-      "Technical sections, heights and spatial relationships. What the cut shows and the elevation confirms.",
+      "Heights, sections and elevations. What the cut shows and the façade confirms.",
     images: [
       {
         src: "/renders/veu-lateral.webp",
-        alt: "Elevação lateral com ripado e proporções",
+        alt: "Elevação lateral com ripado",
         caption: "Elevação lateral",
       },
       {
         src: "/renders/linear-ripado.webp",
         alt: "Detalhe de elevação com ripado e vãos",
-        caption: "Detalhe de elevação",
+        caption: "Ripado",
       },
       {
         src: "/renders/oculus-lateral.webp",
         alt: "Elevação com óculo e massa",
         caption: "Elevação · óculo",
+      },
+      {
+        src: "/renders/pavilhao-coluna.webp",
+        alt: "Corte e coluna do pavilhão",
+        caption: "Corte · coluna",
+      },
+      {
+        src: "/renders/veu-azul.webp",
+        alt: "Elevação com luz e volume",
+        caption: "Elevação",
+      },
+      {
+        src: "/renders/oculus-rua.webp",
+        alt: "Vista da rua e proporções",
+        caption: "Vista da rua",
       },
     ],
   },
