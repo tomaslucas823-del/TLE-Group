@@ -6,7 +6,7 @@ import { projects } from "@/data/projects";
 export const Route = createFileRoute("/_site/portfolio/")({
   head: () => ({
     meta: [
-      { title: "Trabalho — TLE Arquitetura" },
+      { title: "Trabalho - TLE Arquitetura" },
       {
         name: "description",
         content: "Casas desenhadas em imagem, antes da obra. Maputo e arredores.",
