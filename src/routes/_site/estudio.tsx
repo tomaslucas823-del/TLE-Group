@@ -8,8 +8,8 @@ import { importLocalLeads, loadStudio, type StudioData } from "@/lib/studio.func
 export const Route = createFileRoute("/_site/estudio")({
   head: () => ({
     meta: [
-      { title: "Estúdio - TLE Arquitetura" },
-      { name: "description", content: "CRM, propostas, agenda e parcelas da TLE Arquitetura." },
+      { title: "Estúdio - TLE Group" },
+      { name: "description", content: "CRM, propostas, agenda e parcelas da TLE Group." },
     ],
   }),
   component: EstudioPage,
