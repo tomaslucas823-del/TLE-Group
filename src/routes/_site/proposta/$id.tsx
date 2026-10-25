@@ -9,7 +9,7 @@ import { loadStudio, type InstallmentRow, type ProposalRow } from "@/lib/studio.
 export const Route = createFileRoute("/_site/proposta/$id")({
   head: () => ({
     meta: [
-      { title: "Proposta - TLE Arquitetura" },
+      { title: "Proposta - TLE Group" },
       { name: "description", content: "Proposta com escopo e cronograma de pagamento." },
     ],
   }),
@@ -87,10 +87,13 @@ function ProposalSheet({ id }: { id: string }) {
         </button>
       </div>
       <article className="mt-6 border border-line p-6 md:p-10">
-        <p className="font-display text-2xl font-normal">TLE</p>
-        <h1 className="mt-6 font-display text-3xl font-semibold">Proposta de visualização</h1>
+        <p className="font-display text-2xl font-normal">TLE Group</p>
+        <h1 className="mt-6 font-display text-3xl font-semibold">Proposta</h1>
         <p className="mt-2 text-sm text-mute">
           {site.legalName} · NUIT {site.nuit} · {site.city}
+        </p>
+        <p className="mt-1 text-sm text-mute">
+          {site.phoneDisplay} · WhatsApp · e-Mola
         </p>
         <dl className="mt-8 grid gap-4 text-sm sm:grid-cols-2">
           <div>
@@ -130,9 +133,8 @@ function ProposalSheet({ id }: { id: string }) {
         </table>
         <p className="mt-8 text-sm text-mute">
           M-Pesa, e-Mola, cartão e transferência ficam registados aqui como controlo interno, sempre em
-          meticais. A cobrança no operador ou no banco só acontece depois de ligar o gateway. Nenhum
-          valor desta página é debitado automaticamente. Cartão internacional, quando existir, é
-          convertido para MZN.
+          meticais. Contacto e-Mola / WhatsApp: {site.phoneDisplay}. Nenhum valor desta página é
+          debitado automaticamente.
         </p>
       </article>
     </main>
