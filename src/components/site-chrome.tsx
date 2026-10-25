@@ -52,98 +52,93 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
-  const onHero = pathname === "/" && !scrolled && !open;
-  const bar = onHero
-    ? "bg-black/40 text-paper backdrop-blur-xl"
-    : "border-b border-line/80 bg-paper/85 text-ink backdrop-blur-xl";
-
-  async function go(href: string) {
-    setOpen(false);
-    if (href.startsWith("/#")) {
-      const id = href.slice(2);
-      if (pathname === "/") {
-        window.history.pushState(null, "", href);
-        scrollToId(id);
-      } else {
-        await navigate({ to: "/", hash: id });
-        window.setTimeout(() => scrollToId(id), 120);
-      }
-      return;
-    }
-    await navigate({ to: href as "/portfolio" });
-  }
+  const onHome = pathname === "/" || pathname === "";
+  const light = onHome && !scrolled && !open;
 
   return (
-    <header className={cn("no-print fixed inset-x-0 top-0 z-50 transition-colors", bar)}>
+    <header
+      className={cn(
+        "no-print fixed inset-x-0 top-0 z-50 transition-colors duration-300",
+        light ? "bg-transparent text-paper" : "border-b border-line bg-paper/95 text-ink backdrop-blur-md",
+      )}
+    >
       <div className="mx-auto flex h-12 max-w-5xl items-center justify-between gap-4 px-5 md:h-11">
         <Link to="/" className="text-[15px] font-semibold tracking-[0.04em]" onClick={() => setOpen(false)}>
-          TLE
+          TLE Group
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Principal">
-          {NAV.map((item) => (
-            <a
-              key={item.id}
-              href={item.href}
-              className="text-[12px] opacity-80 transition-opacity hover:opacity-100"
-              onClick={(e) => {
-                e.preventDefault();
-                void go(item.href);
-              }}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-
-        <div className="hidden items-center gap-4 md:flex">
-          <LangToggle light={onHero} />
-          <ThemeToggle light={onHero} />
-          <AuthSlot light={onHero} />
-        </div>
-
-        <div className="flex items-center gap-2 md:hidden">
-          <LangToggle light={onHero} />
-          <ThemeToggle light={onHero} />
-          <button
-            type="button"
-            className="px-1 text-[12px] opacity-90"
-            aria-expanded={open}
-            aria-label={open ? t.nav.close : t.nav.menu}
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? t.nav.close : t.nav.menu}
-          </button>
-        </div>
-      </div>
-
-      {open ? (
-        <div className="border-t border-line bg-paper px-5 py-6 text-ink md:hidden">
-          <nav className="flex flex-col gap-1" aria-label="Mobile">
-            {NAV.map((item) => (
+        <nav className="hidden items-center gap-7 md:flex">
+          {NAV.map((item) =>
+            item.href.startsWith("/#") ? (
               <a
                 key={item.id}
                 href={item.href}
-                className="flex min-h-11 items-center text-[17px]"
-                onClick={(e) => {
-                  e.preventDefault();
-                  void go(item.href);
+                className="text-[13px] transition-opacity hover:opacity-70"
+                onClick={(event) => {
+                  if (onHome) {
+                    event.preventDefault();
+                    scrollToId(item.href.slice(2));
+                  }
                 }}
               >
                 {item.label}
               </a>
-            ))}
-            <Link to="/login" className="flex min-h-11 items-center text-[17px]" onClick={() => setOpen(false)}>
-              {t.nav.login}
-            </Link>
+            ) : (
+              <Link key={item.id} to={item.href} className="text-[13px] transition-opacity hover:opacity-70">
+                {item.label}
+              </Link>
+            ),
+          )}
+        </nav>
+
+        <div className="hidden items-center gap-4 md:flex">
+          <LangToggle />
+          <ThemeToggle />
+          <AuthSlot light={light} />
+        </div>
+
+        <button
+          type="button"
+          className="text-[13px] md:hidden"
+          aria-expanded={open}
+          aria-label={open ? t.nav.close : t.nav.menu}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? t.nav.close : t.nav.menu}
+        </button>
+      </div>
+
+      {open ? (
+        <div className="border-t border-line bg-paper px-5 py-6 text-ink md:hidden">
+          <nav className="flex flex-col gap-4">
+            {NAV.map((item) =>
+              item.href.startsWith("/#") ? (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  className="text-[15px]"
+                  onClick={(event) => {
+                    setOpen(false);
+                    if (onHome) {
+                      event.preventDefault();
+                      scrollToId(item.href.slice(2));
+                    }
+                  }}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link key={item.id} to={item.href} className="text-[15px]" onClick={() => setOpen(false)}>
+                  {item.label}
+                </Link>
+              ),
+            )}
           </nav>
+          <div className="mt-6 flex items-center gap-4">
+            <LangToggle />
+            <ThemeToggle />
+            <AuthSlot light={false} />
+          </div>
         </div>
       ) : null}
     </header>
@@ -157,10 +152,31 @@ export function SiteFooter() {
       <div className="mx-auto max-w-5xl px-5 py-12 md:py-16">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div>
-            <p className="text-[15px] font-semibold tracking-[0.04em]">TLE</p>
+            <p className="text-[15px] font-semibold tracking-[0.04em]">TLE Group</p>
+            <p className="mt-2 max-w-xs text-[13px] text-mute">
+              Total Link Engenharia & Construções
+            </p>
             <p className="mt-2 text-[13px] text-mute">
               {site.city}, {site.country}
             </p>
+            <div className="mt-4 space-y-1 text-[13px]">
+              <p>
+                <a href={`tel:${site.phoneDisplay.replace(/\s/g, "")}`} className="hover:underline">
+                  {site.phoneDisplay}
+                </a>
+              </p>
+              {waHref ? (
+                <p>
+                  <a href={waHref} target="_blank" rel="noreferrer" className="hover:underline">
+                    WhatsApp
+                  </a>
+                  <span className="text-mute"> · </span>
+                  <span className="text-mute">e-Mola {site.emolaDisplay}</span>
+                </p>
+              ) : (
+                <p className="text-mute">e-Mola {site.emolaDisplay}</p>
+              )}
+            </div>
           </div>
           <div className="flex flex-wrap gap-x-8 gap-y-3 text-[13px]">
             <Link to="/portfolio" className="hover:underline">
@@ -188,7 +204,7 @@ export function SiteFooter() {
   );
 }
 
-/** Simple discreet WhatsApp link — no heavy floating bar */
+/** Floating WhatsApp — visível com phoneWa configurado */
 export function WhatsAppButton() {
   if (!waHref) return null;
   return (
@@ -196,8 +212,9 @@ export function WhatsAppButton() {
       href={waHref}
       target="_blank"
       rel="noreferrer"
-      className="no-print fixed right-4 bottom-4 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-ink text-[13px] font-medium text-paper shadow-lg transition hover:opacity-90"
-      aria-label="WhatsApp"
+      className="no-print fixed right-4 bottom-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-[13px] font-semibold text-white shadow-lg transition hover:opacity-90"
+      aria-label="WhatsApp TLE Group"
+      title="WhatsApp"
     >
       WA
     </a>
@@ -233,24 +250,18 @@ export function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <aside className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-5 py-3 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <p className="max-w-xl text-[12px] text-mute">
-          {t.cookies.text}{" "}
-          <Link to="/privacidade" className="underline">
-            {t.cookies.privacy}
-          </Link>
-          .
-        </p>
-        <div className="flex gap-4 text-[13px]">
-          <button type="button" className="underline underline-offset-4" onClick={() => choose("accepted")}>
-            {t.cookies.accept}
-          </button>
-          <button type="button" className="text-mute underline underline-offset-4" onClick={() => choose("rejected")}>
+    <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-line bg-paper px-5 py-4 text-ink shadow-lg">
+      <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[13px] text-mute">{t.cookies.text}</p>
+        <div className="flex gap-3">
+          <button type="button" className="text-[13px] underline" onClick={() => choose("rejected")}>
             {t.cookies.reject}
+          </button>
+          <button type="button" className="text-[13px] font-medium" onClick={() => choose("accepted")}>
+            {t.cookies.accept}
           </button>
         </div>
       </div>
-    </aside>
+    </div>
   );
 }
