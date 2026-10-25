@@ -40,134 +40,127 @@ function HomePage() {
         <div className="absolute inset-0">
           {playHero ? (
             <video
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
               autoPlay
               muted
               loop
               playsInline
+              poster="/hero-poster.webp"
               preload="metadata"
-              poster="/media/hero-poster.jpg"
             >
-              <source src="/media/hero.mp4" type="video/mp4" />
+              <source src="/hero.mp4" type="video/mp4" />
             </video>
           ) : (
             <img
-              src="/media/hero-poster.jpg"
+              src="/hero-poster.webp"
               alt=""
-              className="h-full w-full object-cover"
-              width={1920}
-              height={1080}
+              width={1600}
+              height={900}
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/20" />
+          <div className="pointer-events-none absolute inset-0 bg-black/30" />
         </div>
-        <div className="relative z-10 mx-auto max-w-4xl px-5 text-center">
-          <p className="text-sm tracking-[0.2em] text-white/70 uppercase">{t.hero.kicker}</p>
-          <h1 className="mt-4 font-display text-5xl leading-[1.05] font-normal text-balance md:text-7xl">
+
+        <div className="relative z-10 mx-auto max-w-[680px] px-4 text-center">
+          <h1 className="hero-enter font-display text-[2.4rem] leading-[1.08] font-semibold tracking-[-0.035em] text-balance sm:text-5xl md:text-[3.5rem]">
             {t.hero.title}
           </h1>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Link to="/simulador" className="btn-cta">
+          <p className="hero-enter hero-enter-delay-1 mx-auto mt-3 max-w-sm text-[17px] leading-snug text-white/75">
+            {t.hero.kicker}
+          </p>
+          <div className="hero-enter hero-enter-delay-2 mt-6 flex flex-wrap items-center justify-center gap-5">
+            <a href="#contacto" className="btn btn-solid-invert min-h-10 px-5 text-[14px]">
               {t.hero.cta}
-              <span className="btn-cta__icon" aria-hidden>
-                →
-              </span>
-            </Link>
-            <Link to="/portfolio" className="text-sm text-white/80 underline-offset-4 hover:underline">
+            </a>
+            <Link to="/portfolio" className="text-[14px] text-white/85 underline-offset-4 hover:underline">
               {t.hero.projects}
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-20 md:py-28">
-        <Reveal>
-          <p className="text-sm text-mute">{t.featured.kicker}</p>
-          <h2 className="mt-2 font-display text-4xl font-normal md:text-5xl">{t.featured.title}</h2>
-        </Reveal>
-        <div className="mt-12 grid gap-8 md:grid-cols-3">
-          {featured.map((project, i) => (
-            <Reveal key={project.slug} delay={i * 80}>
-              <ProjectCard project={project} />
-            </Reveal>
-          ))}
-        </div>
-        <div className="mt-12">
-          <Link to="/portfolio" className="text-sm underline-offset-4 hover:underline">
-            {t.featured.all}
-          </Link>
-        </div>
-      </section>
-
-      <section className="border-y border-line bg-stone py-20 md:py-28">
-        <div className="mx-auto max-w-6xl px-5">
-          <Reveal>
-            <p className="text-sm text-mute">{t.services.kicker}</p>
-            <h2 className="mt-2 font-display text-4xl font-normal md:text-5xl">{t.services.title}</h2>
+      {/* Projects — Apple module spacing */}
+      <section className="bg-paper">
+        <div className="mx-auto max-w-[980px] px-4 py-12 md:py-16">
+          <Reveal variant="up" className="text-center">
+            <h2 className="font-display text-[1.75rem] font-semibold tracking-[-0.03em] md:text-[2.25rem]">
+              {t.featured.title}
+            </h2>
           </Reveal>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {t.services.paths.map((path, i) => (
-              <Reveal key={path.title} delay={i * 60}>
-                <article className="border border-line bg-paper p-6">
-                  <h3 className="font-display text-2xl font-semibold">{path.title}</h3>
-                  <p className="mt-3 text-sm text-mute">{path.text}</p>
-                  <Link to="/simulador" className="mt-6 inline-block text-sm underline-offset-4 hover:underline">
-                    {path.cta}
-                  </Link>
-                </article>
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-3">
+            {featured.map((project, i) => (
+              <Reveal key={project.slug} variant="up" delay={i * 50}>
+                <ProjectCard project={project} aspect="aspect-[4/3]" />
               </Reveal>
             ))}
           </div>
+          <Reveal variant="up" className="mt-8 text-center">
+            <Link to="/portfolio" className="text-[14px] text-ink underline-offset-4 hover:underline">
+              {t.featured.all}
+            </Link>
+          </Reveal>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-20 md:py-28">
-        <Reveal>
-          <p className="text-sm text-mute">{t.method.kicker}</p>
-          <h2 className="mt-2 max-w-xl font-display text-4xl font-normal md:text-5xl">{t.method.title}</h2>
-        </Reveal>
-        <ol className="mt-12 grid gap-6 md:grid-cols-4">
-          {t.method.steps.map((step, i) => (
-            <Reveal key={step.n} delay={i * 50}>
-              <li>
-                <p className="text-sm text-mute">{step.n}</p>
-                <h3 className="mt-2 font-display text-xl font-semibold">{step.title}</h3>
-                <p className="mt-2 text-sm text-mute">{step.text}</p>
-              </li>
-            </Reveal>
-          ))}
-        </ol>
+      {/* Services */}
+      <section id="servicos" className="bg-stone">
+        <div className="mx-auto max-w-[980px] px-4 py-12 md:py-16">
+          <Reveal variant="up" className="text-center">
+            <h2 className="font-display text-[1.75rem] font-semibold tracking-[-0.03em] md:text-[2.25rem]">
+              {t.services.title}
+            </h2>
+          </Reveal>
+          <ul className="mt-10 grid gap-8 md:grid-cols-3 md:gap-6">
+            {t.services.paths.map((path, i) => (
+              <Reveal key={path.title} as="li" variant="up" delay={i * 40} className="text-center">
+                <h3 className="font-display text-[1.15rem] font-semibold tracking-[-0.02em]">{path.title}</h3>
+                <p className="mx-auto mt-2 max-w-[22ch] text-[14px] leading-relaxed text-mute md:max-w-none">
+                  {path.text}
+                </p>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
       </section>
 
-      <section id="cotacao" className="border-t border-line bg-stone py-20 md:py-28">
-        <div className="mx-auto grid max-w-6xl gap-12 px-5 md:grid-cols-2 md:items-start">
-          <Reveal>
-            <p className="text-sm text-mute">{t.quote.kicker}</p>
-            <h2 className="mt-2 font-display text-4xl font-normal md:text-5xl">{t.quote.title}</h2>
-            <p className="mt-4 max-w-md text-mute">{t.quote.lead}</p>
-            <p className="mt-8 text-sm text-mute">
-              {site.city} · {site.email}
-            </p>
+      {/* Full-bleed image — edge to edge, no side padding */}
+      <section className="overflow-hidden bg-black">
+        <img
+          src="/renders/pavilhao-dia.webp"
+          alt=""
+          width={1600}
+          height={900}
+          loading="lazy"
+          className="aspect-[16/9] w-full object-cover md:aspect-[2.5/1]"
+        />
+      </section>
+
+      {/* Contact */}
+      <section id="contacto" className="bg-paper">
+        <div className="mx-auto grid max-w-[980px] gap-10 px-4 py-12 md:grid-cols-2 md:gap-12 md:py-16">
+          <Reveal variant="up">
+            <h2 className="font-display text-[1.75rem] font-semibold tracking-[-0.03em] md:text-[2.25rem]">
+              {t.quote.title}
+            </h2>
+            <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-mute">{t.quote.lead}</p>
+            <div className="mt-8 space-y-3 text-[14px]">
+              <p>{site.phoneDisplay}</p>
+              <p>
+                <a href={`mailto:${site.email}`} className="underline-offset-4 hover:underline">
+                  {site.email}
+                </a>
+              </p>
+              <p className="text-mute">
+                {site.city}, {site.country}
+              </p>
+            </div>
           </Reveal>
-          <Reveal delay={80}>
+          <Reveal variant="up" delay={40}>
             <QuoteForm draft={defaultDraft} />
           </Reveal>
         </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 py-20 md:py-28">
-        <Reveal>
-          <p className="text-sm text-mute">{t.faq.kicker}</p>
-          <h2 className="mt-2 font-display text-4xl font-normal md:text-5xl">{t.faq.title}</h2>
-        </Reveal>
-        <dl className="mt-12 divide-y divide-line border-t border-line">
-          {t.faq.items.map((item) => (
-            <div key={item.q} className="py-6 md:grid md:grid-cols-[1fr_1.4fr] md:gap-8">
-              <dt className="font-medium">{item.q}</dt>
-              <dd className="mt-2 text-sm text-mute md:mt-0">{item.a}</dd>
-            </div>
-          ))}
-        </dl>
       </section>
     </main>
   );
