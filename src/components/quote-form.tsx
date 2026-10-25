@@ -224,7 +224,7 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
       <div role="status" className="rounded-2xl border border-line bg-stone/40 px-6 py-8 text-center">
         <p className="font-display text-[1.5rem] font-semibold tracking-[-0.03em]">{t.quote.received}</p>
         <p className="mx-auto mt-2 max-w-sm text-[14px] leading-relaxed text-mute">{t.quote.receivedCloud}</p>
-        <div className="mx-auto mt-6 max-w-xs space-y-1 border-t border-line pt-5 text-[13px] text-mute">
+        <div className="mx-auto mt-6 max-w-xs space-y-1 pt-5 text-[13px] text-mute">
           <p className="text-[1.15rem] font-medium text-ink">{totalLabel}</p>
           <p>
             {draft.area} m² · {styleLabel} · {tierLabel}
@@ -339,13 +339,13 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
               rows={3}
               maxLength={800}
               placeholder={t.quote.messagePlaceholder}
-              className="field mt-2 min-h-[4.5rem] w-full resize-y text-[15px]"
+              className="field mt-2 w-full text-[15px]"
               suppressHydrationWarning
             />
           </label>
         </div>
 
-        <div className="mt-5 flex flex-wrap items-end justify-between gap-4 border-t border-line pt-5">
+        <div className="mt-6 flex flex-wrap items-end justify-between gap-4 pt-1">
           <div>
             <p className="text-[11px] font-medium tracking-[0.06em] text-mute uppercase">{t.estimate.ref}</p>
             <p className="mt-1 font-display text-[1.65rem] leading-none font-semibold tracking-[-0.03em]">
@@ -384,7 +384,7 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
             />
           </div>
 
-          <div className="flex flex-col items-center gap-4 border-t border-line pt-5 text-center">
+          <div className="flex flex-col items-center gap-4 pt-4 text-center">
             {challenge ? (
               <label
                 className="flex w-full max-w-[12rem] flex-col items-center text-[11px] font-medium tracking-[0.04em] text-mute uppercase"
