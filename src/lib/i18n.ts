@@ -7,7 +7,7 @@ export const messages = {
     nav: {
       projects: "Projetos",
       services: "Serviços",
-      method: "Método",
+      method: "Entrega",
       estimate: "Estimativa",
       portal: "Portal",
       studio: "Estúdio",
@@ -175,7 +175,7 @@ export const messages = {
     nav: {
       projects: "Projects",
       services: "Services",
-      method: "Method",
+      method: "Delivery",
       estimate: "Estimate",
       portal: "Portal",
       studio: "Studio",
