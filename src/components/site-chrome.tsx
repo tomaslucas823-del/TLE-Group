@@ -36,6 +36,7 @@ export function SiteHeader() {
 
   const NAV = [
     { id: "projects", label: t.nav.projects, href: "/portfolio" },
+    { id: "entrega", label: t.nav.method ?? "Entrega", href: "/entrega" },
     { id: "services", label: t.nav.services, href: "/#servicos" },
     { id: "contact", label: t.quote.kicker, href: "/#contacto" },
   ];
@@ -159,6 +160,11 @@ export function SiteFooter() {
               <li>
                 <Link to="/portfolio" className="hover:text-ink hover:underline">
                   {t.nav.projects}
+                </Link>
+              </li>
+              <li>
+                <Link to="/entrega" className="hover:text-ink hover:underline">
+                  {t.nav.method ?? "Entrega"}
                 </Link>
               </li>
               <li>
