@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import type { Draft } from "@/components/simulator";
-import { estimateCents } from "@/lib/estimate";
+import { STYLES, TIERS, clampArea, estimateCents, type StyleId, type TierId } from "@/lib/estimate";
 import { mznFromCents } from "@/lib/format";
 import { pushLocalLead } from "@/lib/local-leads";
 import { getCaptchaChallenge, submitPublicLead } from "@/lib/studio.functions";
@@ -14,8 +14,11 @@ type Challenge = {
   turnstileSiteKey?: string;
 };
 
-export function QuoteForm({ draft }: { draft: Draft }) {
+const defaultDraft: Draft = { area: 180, style: "pedra", tier: "estudo" };
+
+export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
   const { t } = useI18n();
+  const [draft, setDraft] = useState<Draft>(initialDraft ?? defaultDraft);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -124,9 +127,83 @@ export function QuoteForm({ draft }: { draft: Draft }) {
 
   return (
     <form noValidate onSubmit={onSubmit} className="grid gap-5">
-      <p className="text-sm text-mute">
-        {mznFromCents(total)} · {draft.area} m² · {styleLabel} · {tierLabel}
-      </p>
+      {/* Ideias do projeto */}
+      <div className="grid gap-4 rounded-lg border border-line p-4">
+        <p className="text-[13px] font-medium text-ink">{t.quote.projectIdeas}</p>
+
+        <label className="block text-sm text-mute" htmlFor="area">
+          {t.estimate.area}
+          <div className="mt-1 flex items-center gap-2">
+            <input
+              id="area"
+              type="number"
+              min={40}
+              max={800}
+              step={10}
+              value={draft.area}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, area: clampArea(Number(e.target.value)) }))
+              }
+              className="field w-28"
+              suppressHydrationWarning
+            />
+            <span className="text-sm text-mute">m²</span>
+          </div>
+        </label>
+
+        <label className="block text-sm text-mute" htmlFor="style">
+          {t.estimate.style}
+          <select
+            id="style"
+            value={draft.style}
+            onChange={(e) => setDraft((d) => ({ ...d, style: e.target.value as StyleId }))}
+            className="field mt-1"
+            suppressHydrationWarning
+          >
+            {STYLES.map((s) => (
+              <option key={s.id} value={s.id}>
+                {t.styles[s.id].label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block text-sm text-mute" htmlFor="tier">
+          {t.estimate.tier}
+          <select
+            id="tier"
+            value={draft.tier}
+            onChange={(e) => setDraft((d) => ({ ...d, tier: e.target.value as TierId }))}
+            className="field mt-1"
+            suppressHydrationWarning
+          >
+            {TIERS.map((tier) => (
+              <option key={tier.id} value={tier.id}>
+                {t.tiers[tier.id].label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block text-sm text-mute" htmlFor="mensagem">
+          {t.quote.message}
+          <textarea
+            id="mensagem"
+            value={mensagem}
+            onChange={(event) => setMensagem(event.target.value)}
+            rows={5}
+            maxLength={1200}
+            placeholder={t.quote.messagePlaceholder}
+            className="field mt-1 min-h-[7rem] resize-y"
+            suppressHydrationWarning
+          />
+        </label>
+
+        <p className="text-[12px] text-mute">
+          {mznFromCents(total)} · {draft.area} m² · {styleLabel} · {tierLabel}
+        </p>
+      </div>
+
       <div className="hidden" aria-hidden="true">
         <label htmlFor="empresa">Company</label>
         <input
@@ -139,6 +216,7 @@ export function QuoteForm({ draft }: { draft: Draft }) {
           suppressHydrationWarning
         />
       </div>
+
       <Field id="nome" label={t.quote.name} value={nome} onChange={setNome} error={errors.nome} autoComplete="name" />
       <Field
         id="email"
@@ -158,18 +236,7 @@ export function QuoteForm({ draft }: { draft: Draft }) {
         type="tel"
         autoComplete="tel"
       />
-      <label className="block text-sm text-mute" htmlFor="mensagem">
-        {t.quote.message}
-        <textarea
-          id="mensagem"
-          value={mensagem}
-          onChange={(event) => setMensagem(event.target.value)}
-          rows={2}
-          maxLength={800}
-          className="field mt-1 h-14 resize-none"
-          suppressHydrationWarning
-        />
-      </label>
+
       {challenge ? (
         <label className="block text-sm text-mute" htmlFor="captcha">
           {challenge.question}
