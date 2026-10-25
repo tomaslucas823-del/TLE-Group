@@ -90,7 +90,6 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
     void loadChallenge();
   }, []);
 
-  // Load Cloudflare Turnstile script + render widget when site key exists
   useEffect(() => {
     const siteKey = challenge?.turnstileSiteKey;
     if (!siteKey || !turnstileRef.current) return;
@@ -222,20 +221,20 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
       : "";
 
     return (
-      <div role="status" className="space-y-4">
-        <p className="font-display text-[1.75rem] font-semibold tracking-[-0.03em]">{t.quote.received}</p>
-        <p className="text-[14px] text-mute">{t.quote.receivedCloud}</p>
-        <div className="border-t border-line pt-4 text-[13px] text-mute">
-          <p>{totalLabel}</p>
-          <p className="mt-1">
+      <div role="status" className="rounded-2xl border border-line bg-stone/40 px-6 py-8">
+        <p className="font-display text-[1.5rem] font-semibold tracking-[-0.03em]">{t.quote.received}</p>
+        <p className="mt-2 text-[14px] leading-relaxed text-mute">{t.quote.receivedCloud}</p>
+        <div className="mt-6 space-y-1 border-t border-line pt-5 text-[13px] text-mute">
+          <p className="text-[1.15rem] font-medium text-ink">{totalLabel}</p>
+          <p>
             {draft.area} m² · {styleLabel} · {tierLabel}
           </p>
-          <p className="mt-1">
+          <p>
             {t.quote.delivery}: {prazo}
           </p>
         </div>
         {waUrl ? (
-          <a href={waUrl} target="_blank" rel="noreferrer" className="btn-cta btn-cta--dark inline-flex">
+          <a href={waUrl} target="_blank" rel="noreferrer" className="btn-cta btn-cta--dark mt-6 inline-flex">
             {t.quote.sendWhatsApp}
             <span className="btn-cta__icon" aria-hidden>
               →
@@ -247,7 +246,7 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
   }
 
   return (
-    <form noValidate onSubmit={onSubmit} className="space-y-8">
+    <form noValidate onSubmit={onSubmit} className="space-y-6">
       <div className="hidden" aria-hidden="true">
         <label htmlFor="empresa">Company</label>
         <input
@@ -260,11 +259,12 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
         />
       </div>
 
-      <div className="space-y-5">
-        <div className="grid grid-cols-2 gap-4">
-          <label className="block text-[12px] text-mute" htmlFor="area">
+      {/* Project parameters */}
+      <div className="rounded-2xl border border-line px-5 py-5">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+          <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor="area">
             {t.estimate.area}
-            <div className="mt-1.5 flex items-baseline gap-1.5">
+            <div className="mt-2 flex items-baseline gap-1.5">
               <input
                 id="area"
                 type="number"
@@ -275,20 +275,20 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, area: clampArea(Number(e.target.value)) }))
                 }
-                className="field w-full"
+                className="field w-full text-[15px]"
                 suppressHydrationWarning
               />
               <span className="shrink-0 text-[13px] text-mute">m²</span>
             </div>
           </label>
 
-          <label className="block text-[12px] text-mute" htmlFor="tier">
+          <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor="tier">
             {t.estimate.tier}
             <select
               id="tier"
               value={draft.tier}
               onChange={(e) => setDraft((d) => ({ ...d, tier: e.target.value as TierId }))}
-              className="field mt-1.5 w-full"
+              className="field mt-2 w-full text-[15px]"
               suppressHydrationWarning
             >
               {TIERS.map((tier) => (
@@ -298,119 +298,128 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
               ))}
             </select>
           </label>
+
+          <label
+            className="col-span-2 block text-[11px] font-medium tracking-[0.04em] text-mute uppercase"
+            htmlFor="style"
+          >
+            {t.estimate.style}
+            <select
+              id="style"
+              value={draft.style}
+              onChange={(e) => setDraft((d) => ({ ...d, style: e.target.value as StyleId }))}
+              className="field mt-2 w-full text-[15px]"
+              suppressHydrationWarning
+            >
+              {STYLES.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {t.styles[s.id].label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label
+            className="col-span-2 block text-[11px] font-medium tracking-[0.04em] text-mute uppercase"
+            htmlFor="mensagem"
+          >
+            {t.quote.message}
+            <textarea
+              id="mensagem"
+              value={mensagem}
+              onChange={(event) => setMensagem(event.target.value)}
+              rows={3}
+              maxLength={800}
+              placeholder={t.quote.messagePlaceholder}
+              className="field mt-2 min-h-[4.5rem] w-full resize-y text-[15px]"
+              suppressHydrationWarning
+            />
+          </label>
         </div>
 
-        <label className="block text-[12px] text-mute" htmlFor="style">
-          {t.estimate.style}
-          <select
-            id="style"
-            value={draft.style}
-            onChange={(e) => setDraft((d) => ({ ...d, style: e.target.value as StyleId }))}
-            className="field mt-1.5 w-full"
-            suppressHydrationWarning
-          >
-            {STYLES.map((s) => (
-              <option key={s.id} value={s.id}>
-                {t.styles[s.id].label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="block text-[12px] text-mute" htmlFor="mensagem">
-          {t.quote.message}
-          <textarea
-            id="mensagem"
-            value={mensagem}
-            onChange={(event) => setMensagem(event.target.value)}
-            rows={4}
-            maxLength={800}
-            placeholder={t.quote.messagePlaceholder}
-            className="field mt-1.5 min-h-[5.5rem] w-full resize-y"
-            suppressHydrationWarning
-          />
-        </label>
-      </div>
-
-      <div className="border-y border-line py-5">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        {/* Estimate strip */}
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-4 border-t border-line pt-5">
           <div>
-            <p className="text-[11px] tracking-wide text-mute uppercase">{t.estimate.ref}</p>
-            <p className="mt-1 font-display text-[1.75rem] leading-none font-semibold tracking-[-0.03em]">
+            <p className="text-[11px] font-medium tracking-[0.06em] text-mute uppercase">{t.estimate.ref}</p>
+            <p className="mt-1 font-display text-[1.65rem] leading-none font-semibold tracking-[-0.03em]">
               {totalLabel}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[11px] tracking-wide text-mute uppercase">{t.quote.delivery}</p>
+            <p className="text-[11px] font-medium tracking-[0.06em] text-mute uppercase">{t.quote.delivery}</p>
             <p className="mt-1 text-[15px] font-medium">{prazo}</p>
           </div>
         </div>
-        <p className="mt-3 text-[12px] text-mute">{t.estimate.disclaimer}</p>
+        <p className="mt-3 text-[12px] leading-relaxed text-mute">{t.estimate.disclaimer}</p>
       </div>
 
-      <div className="space-y-4">
-        <Field id="nome" label={t.quote.name} value={nome} onChange={setNome} error={errors.nome} autoComplete="name" />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="telefone"
-            label={t.quote.phone}
-            value={telefone}
-            onChange={setTelefone}
-            error={errors.telefone}
-            type="tel"
-            autoComplete="tel"
-          />
-          <Field
-            id="email"
-            label={t.quote.email}
-            value={email}
-            onChange={setEmail}
-            error={errors.email}
-            type="email"
-            autoComplete="email"
-          />
-        </div>
-
-        {challenge ? (
-          <label className="block text-[12px] text-mute" htmlFor="captcha">
-            {challenge.question}
-            <input
-              id="captcha"
-              inputMode="numeric"
-              autoComplete="off"
-              value={captchaAnswer}
-              onChange={(e) => setCaptchaAnswer(e.target.value)}
-              aria-invalid={Boolean(errors.captcha)}
-              className="field mt-1.5 w-full max-w-[8rem]"
-              suppressHydrationWarning
+      {/* Contact + security */}
+      <div className="rounded-2xl border border-line px-5 py-5">
+        <div className="space-y-4">
+          <Field id="nome" label={t.quote.name} value={nome} onChange={setNome} error={errors.nome} autoComplete="name" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              id="telefone"
+              label={t.quote.phone}
+              value={telefone}
+              onChange={setTelefone}
+              error={errors.telefone}
+              type="tel"
+              autoComplete="tel"
             />
-            {errors.captcha ? (
-              <span className="mt-1 block text-[12px] text-timber-deep">{errors.captcha}</span>
-            ) : null}
-          </label>
-        ) : (
-          <p className="text-[12px] text-mute">{t.quote.captchaLoading}</p>
-        )}
+            <Field
+              id="email"
+              label={t.quote.email}
+              value={email}
+              onChange={setEmail}
+              error={errors.email}
+              type="email"
+              autoComplete="email"
+            />
+          </div>
 
-        {/* Cloudflare Turnstile */}
-        <div ref={turnstileRef} className="min-h-[65px]" />
+          {challenge ? (
+            <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor="captcha">
+              {challenge.question}
+              <input
+                id="captcha"
+                inputMode="numeric"
+                autoComplete="off"
+                value={captchaAnswer}
+                onChange={(e) => setCaptchaAnswer(e.target.value)}
+                aria-invalid={Boolean(errors.captcha)}
+                className="field mt-2 w-full max-w-[7rem] text-[15px]"
+                suppressHydrationWarning
+              />
+              {errors.captcha ? (
+                <span className="mt-1 block normal-case tracking-normal text-[12px] text-timber-deep">
+                  {errors.captcha}
+                </span>
+              ) : null}
+            </label>
+          ) : (
+            <p className="text-[12px] text-mute">{t.quote.captchaLoading}</p>
+          )}
 
-        {formError ? (
-          <p role="alert" className="text-[13px] text-timber-deep">
-            {formError}
-          </p>
-        ) : null}
+          <div ref={turnstileRef} className="pt-1" />
 
-        <button
-          type="submit"
-          disabled={pending || !challenge}
-          className="btn-cta btn-cta--dark mt-1 w-full disabled:opacity-60 sm:w-auto"
-        >
-          {pending ? t.quote.sending : t.quote.send}
-          <span className="btn-cta__icon" aria-hidden>
-            →
-          </span>
-        </button>
+          {formError ? (
+            <p role="alert" className="text-[13px] text-timber-deep">
+              {formError}
+            </p>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={pending || !challenge}
+            className="btn-cta btn-cta--dark mt-1 w-full disabled:opacity-60 sm:w-auto"
+          >
+            {pending ? t.quote.sending : t.quote.send}
+            <span className="btn-cta__icon" aria-hidden>
+              →
+            </span>
+          </button>
+        </div>
       </div>
     </form>
   );
@@ -434,7 +443,7 @@ function Field({
   autoComplete?: string;
 }) {
   return (
-    <label className="block text-[12px] text-mute" htmlFor={id}>
+    <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor={id}>
       {label}
       <input
         id={id}
@@ -444,11 +453,11 @@ function Field({
         onChange={(event) => onChange(event.target.value)}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-erro` : undefined}
-        className="field mt-1.5 w-full"
+        className="field mt-2 w-full text-[15px]"
         suppressHydrationWarning
       />
       {error ? (
-        <span id={`${id}-erro`} className="mt-1 block text-[12px] text-timber-deep">
+        <span id={`${id}-erro`} className="mt-1 block normal-case tracking-normal text-[12px] text-timber-deep">
           {error}
         </span>
       ) : null}
