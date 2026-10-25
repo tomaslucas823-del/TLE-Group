@@ -203,7 +203,7 @@ export function SiteFooter() {
   );
 }
 
-/** Floating WhatsApp — usa /brand/whatsapp.svg (ícone oficial já no repo) */
+/** Floating WhatsApp — imagem exacta do utilizador */
 export function WhatsAppButton() {
   if (!waHref) return null;
   return (
@@ -216,7 +216,7 @@ export function WhatsAppButton() {
       title="WhatsApp"
     >
       <img
-        src="/brand/whatsapp.svg"
+        src="/brand/whatsapp.png"
         alt=""
         width={56}
         height={56}
