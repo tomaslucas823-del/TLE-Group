@@ -13,20 +13,14 @@ export type DeliveryCategory = {
   images: DeliveryShot[];
 };
 
-/**
- * Samples of real TLE delivery quality.
- * Dense grid of renders + technical framing (plans / elevations).
- * Client PII removed.
- */
+/** Samples of real TLE delivery quality. Client PII removed. */
 export const deliveryCategories: DeliveryCategory[] = [
   {
     id: "renders",
     label: "Renderizações",
     labelEn: "Renders",
-    description:
-      "Volume, luz e materiais — a imagem que fecha o partido antes da obra.",
-    descriptionEn:
-      "Volume, light and materials — the image that locks the massing before construction.",
+    description: "Volume, luz e materiais.",
+    descriptionEn: "Volume, light and materials.",
     images: [
       {
         src: "/renders/veu-frente.webp",
@@ -64,15 +58,13 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "plantas",
     label: "Plantas",
     labelEn: "Floor plans",
-    description:
-      "Plantas de piso, zoneamento e relação com o terreno. A distribuição que a obra executa.",
-    descriptionEn:
-      "Floor plans, zoning and site relationship. The distribution the build will execute.",
+    description: "Plantas de piso e relação com o terreno.",
+    descriptionEn: "Floor plans and site relationship.",
     images: [
       {
         src: "/renders/linear-garagem.webp",
         alt: "Organização de chegada e garagem",
-        caption: "Chegada · garagem",
+        caption: "Chegada e garagem",
       },
       {
         src: "/renders/pavilhao-aberto.webp",
@@ -87,7 +79,7 @@ export const deliveryCategories: DeliveryCategory[] = [
       {
         src: "/renders/jardim-estrelitzia.webp",
         alt: "Relação com o jardim e limites",
-        caption: "Implantação · jardim",
+        caption: "Implantação",
       },
       {
         src: "/renders/veu-entrada.webp",
@@ -104,11 +96,9 @@ export const deliveryCategories: DeliveryCategory[] = [
   {
     id: "cortes",
     label: "Cortes e elevações",
-    labelEn: "Sections & elevations",
-    description:
-      "Alturas, cortes e elevações. O que a secção mostra e a fachada confirma.",
-    descriptionEn:
-      "Heights, sections and elevations. What the cut shows and the façade confirms.",
+    labelEn: "Sections",
+    description: "Alturas, cortes e elevações.",
+    descriptionEn: "Heights, sections and elevations.",
     images: [
       {
         src: "/renders/veu-lateral.webp",
@@ -123,17 +113,17 @@ export const deliveryCategories: DeliveryCategory[] = [
       {
         src: "/renders/oculus-lateral.webp",
         alt: "Elevação com óculo e massa",
-        caption: "Elevação · óculo",
+        caption: "Elevação",
       },
       {
         src: "/renders/pavilhao-coluna.webp",
         alt: "Corte e coluna do pavilhão",
-        caption: "Corte · coluna",
+        caption: "Corte",
       },
       {
         src: "/renders/veu-azul.webp",
         alt: "Elevação com luz e volume",
-        caption: "Elevação",
+        caption: "Volume",
       },
       {
         src: "/renders/oculus-rua.webp",
