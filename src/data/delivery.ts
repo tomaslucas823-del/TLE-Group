@@ -15,8 +15,7 @@ export type DeliveryCategory = {
 
 /**
  * Samples of real TLE delivery quality.
- * Renders use existing portfolio assets; technical sheets will be replaced
- * with anonymized pages from project PDFs (public/entrega/*).
+ * Anonymized technical sheets and selected renders from studio packages.
  */
 export const deliveryCategories: DeliveryCategory[] = [
   {
@@ -29,24 +28,19 @@ export const deliveryCategories: DeliveryCategory[] = [
       "High-definition exterior images. Volume, light and materials before the first wall.",
     images: [
       {
-        src: `/renders/${encodeURIComponent("WhatsApp Image 2026-10-21 at 20.36.44.jpeg")}`,
-        alt: "Fachada principal com garagem e volume branco",
+        src: "/entrega/render-01.webp",
+        alt: "Fachada principal com volume branco e elementos de pedra",
         caption: "Fachada principal",
       },
       {
-        src: `/renders/${encodeURIComponent("WhatsApp Image 2026-10-21 at 20.36.45.jpeg")}`,
-        alt: "Vista da rua com laje contínua",
-        caption: "Vista da rua",
+        src: "/entrega/render-02.webp",
+        alt: "Vista lateral com laje e integração com o terreno",
+        caption: "Vista lateral",
       },
       {
-        src: `/renders/${encodeURIComponent("WhatsApp Image 2026-10-21 at 20.36.46.jpeg")}`,
-        alt: "Entrada coberta com painel de madeira",
-        caption: "Entrada",
-      },
-      {
-        src: "/renders/veu-frente.webp",
-        alt: "Fachada com pórtico e pedra",
-        caption: "Volume e chegada",
+        src: "/entrega/render-03.webp",
+        alt: "Chegada coberta e pórtico",
+        caption: "Chegada e pórtico",
       },
     ],
   },
@@ -55,24 +49,29 @@ export const deliveryCategories: DeliveryCategory[] = [
     label: "Plantas",
     labelEn: "Floor plans",
     description:
-      "Plantas cotadas, zoneamento e implantação. A distribuição que a obra vai executar. Amostras técnicas do estúdio.",
+      "Plantas cotadas, zoneamento e implantação. A distribuição que a obra vai executar.",
     descriptionEn:
-      "Dimensioned plans, zoning and site layout. The distribution the build will execute. Studio technical samples.",
+      "Dimensioned plans, zoning and site layout. The distribution the build will execute.",
     images: [
       {
-        src: "/renders/oculus-jardim.webp",
-        alt: "Representação de volume e planta conceptual",
-        caption: "Conceito de planta · volume",
+        src: "/entrega/planta-01.webp",
+        alt: "Planta de implantação e zoneamento",
+        caption: "Implantação",
       },
       {
-        src: "/renders/linear-dia.webp",
-        alt: "Fachada linear correspondente a planta alongada",
-        caption: "Partido linear",
+        src: "/entrega/planta-02.webp",
+        alt: "Planta de distribuição interior cotada",
+        caption: "Planta cotada",
       },
       {
-        src: "/renders/pavilhao-dia.webp",
-        alt: "Pavilhão de chegada",
-        caption: "Chegada e pórtico",
+        src: "/entrega/situacao-01.webp",
+        alt: "Planta de situação e enquadramento no lote",
+        caption: "Situação",
+      },
+      {
+        src: "/entrega/localizacao-01.webp",
+        alt: "Localização e orientação no terreno",
+        caption: "Localização",
       },
     ],
   },
@@ -86,19 +85,9 @@ export const deliveryCategories: DeliveryCategory[] = [
       "Technical sections, heights and spatial relationships. What the cut shows and the elevation confirms.",
     images: [
       {
-        src: "/renders/oculus-fachada.webp",
-        alt: "Elevação com óculo e volumetria",
-        caption: "Elevação · óculo",
-      },
-      {
-        src: "/renders/veu-lateral.webp",
-        alt: "Elevação lateral com ripado",
-        caption: "Elevação lateral",
-      },
-      {
-        src: "/renders/linear-ripado.webp",
-        alt: "Detalhe de elevação com ripado",
-        caption: "Detalhe de elevação",
+        src: "/entrega/corte-01.webp",
+        alt: "Corte técnico longitudinal com alturas e relações de espaços",
+        caption: "Corte longitudinal",
       },
     ],
   },
