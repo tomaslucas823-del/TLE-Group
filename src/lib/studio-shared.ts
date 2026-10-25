@@ -43,12 +43,34 @@ export type MilestoneRow = {
   position: number;
 };
 
+/** Categorias alinhadas às folhas TLE (A01 renders, plantas, A03 estrutura). */
+export const PIECE_CATEGORIES = [
+  "aparencia",
+  "plantas",
+  "estrutura",
+  "documentos",
+] as const;
+
+export type PieceCategory = (typeof PIECE_CATEGORIES)[number];
+
+export const PIECE_KINDS = ["image", "pdf"] as const;
+export type PieceKind = (typeof PIECE_KINDS)[number];
+
+export const PIECE_CATEGORY_LABEL: Record<PieceCategory, string> = {
+  aparencia: "Aparência",
+  plantas: "Plantas e elevações",
+  estrutura: "Estrutura",
+  documentos: "Documentos",
+};
+
 export type ApprovalRow = {
   id: number;
   project_id: number;
   label: string;
   image: string;
   approved: boolean;
+  category: PieceCategory;
+  kind: PieceKind;
 };
 
 export type MeetingRow = {
@@ -107,6 +129,38 @@ export function clientIp(): string {
   return forwarded || h.get("x-real-ip") || "unknown";
 }
 
+export function normalizeCategory(value: unknown): PieceCategory {
+  const c = text(value, 40);
+  if (PIECE_CATEGORIES.includes(c as PieceCategory)) return c as PieceCategory;
+  return "aparencia";
+}
+
+export function normalizeKind(value: unknown): PieceKind {
+  const k = text(value, 20);
+  if (PIECE_KINDS.includes(k as PieceKind)) return k as PieceKind;
+  return "image";
+}
+
+function mapApproval(row: {
+  id: number;
+  project_id: number;
+  label: string;
+  image: string;
+  approved: boolean | number;
+  category?: string | null;
+  kind?: string | null;
+}): ApprovalRow {
+  return {
+    id: row.id,
+    project_id: row.project_id,
+    label: row.label,
+    image: row.image,
+    approved: Boolean(row.approved),
+    category: normalizeCategory(row.category),
+    kind: normalizeKind(row.kind),
+  };
+}
+
 export function normalizeLead(input: unknown) {
   const row = (input ?? {}) as Record<string, unknown>;
   const name = text(row.name, 80);
@@ -140,7 +194,7 @@ export async function loadWorkspace(uid: string): Promise<StudioData> {
   const inbox = publicLeadOwnerId();
   const leadOwnerFilter = uid === inbox || inbox === PUBLIC_LEAD_INBOX ? null : inbox;
 
-  const [clients, ownLeads, inboxLeads, projects, milestones, approvals, meetings, proposals, installments] =
+  const [clients, ownLeads, inboxLeads, projects, milestones, approvalsRaw, meetings, proposals, installments] =
     await Promise.all([
       sql<ClientRow>`select id, name, email, phone, city, notes from clients where user_id = ${uid} order by id`,
       sql<LeadRow>`select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status from leads where user_id = ${uid} order by id desc`,
@@ -149,14 +203,20 @@ export async function loadWorkspace(uid: string): Promise<StudioData> {
         : Promise.resolve([] as LeadRow[]),
       sql<ProjectRow>`select id, client_id, title, place, stage, cover, summary from projects where user_id = ${uid} order by id`,
       sql<MilestoneRow>`select id, project_id, label, status, position from milestones where user_id = ${uid} order by position`,
-      sql<ApprovalRow>`select id, project_id, label, image, approved from approvals where user_id = ${uid} order by id`,
+      sql<{
+        id: number;
+        project_id: number;
+        label: string;
+        image: string;
+        approved: boolean;
+        category: string;
+        kind: string;
+      }>`select id, project_id, label, image, approved, category, kind from approvals where user_id = ${uid} order by id`,
       sql<MeetingRow>`select id, client_name, title, starts_at, place, notes from meetings where user_id = ${uid} order by starts_at`,
       sql<ProposalRow>`select id, lead_id, client_name, project_title, total_cents, scope from proposals where user_id = ${uid} order by id desc`,
       sql<InstallmentRow>`select id, proposal_id, label, percent, amount_cents, due_label, status, method from installments where user_id = ${uid} order by id`,
     ]);
 
-  // Always surface the shared public inbox so studio users see form submissions
-  // even before TLE_STUDIO_USER_ID is configured.
   const publicInbox = await sql<LeadRow>`
     select id, name, email, phone, area_m2, style, complexity, estimate_cents, message, status
     from leads where user_id = ${PUBLIC_LEAD_INBOX} order by id desc
@@ -171,9 +231,27 @@ export async function loadWorkspace(uid: string): Promise<StudioData> {
     leads,
     projects,
     milestones,
-    approvals: approvals.map((row) => ({ ...row, approved: Boolean(row.approved) })),
+    approvals: approvalsRaw.map(mapApproval),
     meetings,
     proposals,
     installments,
   };
+}
+
+/** Checklist por projecto: quantas peças em cada categoria. */
+export function projectPieceChecklist(
+  projectId: number,
+  approvals: ApprovalRow[],
+): Record<PieceCategory, { count: number; approved: number }> {
+  const out = {} as Record<PieceCategory, { count: number; approved: number }>;
+  for (const cat of PIECE_CATEGORIES) {
+    out[cat] = { count: 0, approved: 0 };
+  }
+  for (const a of approvals) {
+    if (a.project_id !== projectId) continue;
+    const bucket = out[a.category] ?? out.aparencia;
+    bucket.count += 1;
+    if (a.approved) bucket.approved += 1;
+  }
+  return out;
 }
