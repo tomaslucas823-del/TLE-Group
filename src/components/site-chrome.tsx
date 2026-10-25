@@ -146,58 +146,95 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   const { t } = useI18n();
+
   return (
     <footer className="no-print border-t border-line bg-paper text-ink">
-      <div className="mx-auto max-w-5xl px-5 py-12 md:py-16">
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+      <div className="mx-auto max-w-5xl px-5 py-12 md:py-14">
+        {/* Colunas estilo Apple */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 md:grid-cols-4">
+          {/* Explorar */}
           <div>
-            <p className="text-[15px] font-semibold tracking-[0.04em]">TLE Group</p>
-            <p className="mt-2 max-w-xs text-[13px] text-mute">
-              Total Link Engenharia & Construções
-            </p>
-            <p className="mt-2 text-[13px] text-mute">
-              {site.city}, {site.country}
-            </p>
-            <div className="mt-4 space-y-1 text-[13px]">
-              <p>
-                <a href={`tel:${site.phoneDisplay.replace(/\s/g, "")}`} className="hover:underline">
+            <p className="text-[12px] font-semibold text-ink">{t.footer.projectsServices}</p>
+            <ul className="mt-3 space-y-2 text-[12px] text-mute">
+              <li>
+                <Link to="/portfolio" className="hover:text-ink hover:underline">
+                  {t.nav.projects}
+                </Link>
+              </li>
+              <li>
+                <a href="/#servicos" className="hover:text-ink hover:underline">
+                  {t.nav.services}
+                </a>
+              </li>
+              <li>
+                <a href="/#contacto" className="hover:text-ink hover:underline">
+                  {t.quote.kicker}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contacto */}
+          <div>
+            <p className="text-[12px] font-semibold text-ink">{t.footer.contact}</p>
+            <ul className="mt-3 space-y-2 text-[12px] text-mute">
+              <li>
+                <a
+                  href={`tel:${site.phoneDisplay.replace(/\s/g, "")}`}
+                  className="hover:text-ink hover:underline"
+                >
                   {site.phoneDisplay}
                 </a>
-              </p>
+              </li>
               {waHref ? (
-                <p>
-                  <a href={waHref} target="_blank" rel="noreferrer" className="hover:underline">
+                <li>
+                  <a href={waHref} target="_blank" rel="noreferrer" className="hover:text-ink hover:underline">
                     WhatsApp
                   </a>
-                  <span className="text-mute"> · </span>
-                  <span className="text-mute">e-Mola {site.emolaDisplay}</span>
-                </p>
-              ) : (
-                <p className="text-mute">e-Mola {site.emolaDisplay}</p>
-              )}
-            </div>
+                </li>
+              ) : null}
+              <li>e-Mola {site.emolaDisplay}</li>
+              <li>
+                {site.city}, {site.country}
+              </li>
+            </ul>
           </div>
-          <div className="flex flex-wrap gap-x-8 gap-y-3 text-[13px]">
-            <Link to="/portfolio" className="hover:underline">
-              {t.nav.projects}
-            </Link>
-            <a href="/#servicos" className="hover:underline">
-              {t.nav.services}
-            </a>
-            <a href="/#contacto" className="hover:underline">
-              {t.quote.kicker}
-            </a>
-            <Link to="/privacidade" className="hover:underline">
-              {t.footer.privacy}
-            </Link>
-            <Link to="/termos" className="hover:underline">
-              {t.footer.terms}
-            </Link>
+
+          {/* Empresa / legal */}
+          <div>
+            <p className="text-[12px] font-semibold text-ink">{t.footer.studio}</p>
+            <ul className="mt-3 space-y-2 text-[12px] text-mute">
+              <li>
+                <Link to="/privacidade" className="hover:text-ink hover:underline">
+                  {t.footer.privacy}
+                </Link>
+              </li>
+              <li>
+                <Link to="/termos" className="hover:text-ink hover:underline">
+                  {t.footer.terms}
+                </Link>
+              </li>
+              <li>
+                <Link to="/portal" className="hover:text-ink hover:underline">
+                  {t.footer.clientPortal}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Marca */}
+          <div className="col-span-2 sm:col-span-1">
+            <p className="text-[12px] font-semibold tracking-[0.04em] text-ink">TLE Group</p>
+            <p className="mt-2 text-[12px] text-mute">Total Link Engenharia & Construções</p>
+            <p className="mt-1 text-[12px] text-mute">{site.tagline}</p>
           </div>
         </div>
-        <p className="mt-10 text-[11px] text-mute">
-          {site.legalName}
-        </p>
+
+        {/* Barra legal inferior */}
+        <div className="mt-12 flex flex-col gap-2 border-t border-line pt-6 text-[11px] text-mute sm:flex-row sm:items-center sm:justify-between">
+          <p>Copyright © {new Date().getFullYear()} TLE Group. Todos os direitos reservados.</p>
+          <p>{site.country}</p>
+        </div>
       </div>
     </footer>
   );
