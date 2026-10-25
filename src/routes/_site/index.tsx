@@ -4,7 +4,6 @@ import { useI18n } from "@/components/i18n-provider";
 import { ProjectCard } from "@/components/project-card";
 import { QuoteForm } from "@/components/quote-form";
 import { Reveal } from "@/components/reveal";
-import type { Draft } from "@/components/simulator";
 import { projects } from "@/data/projects";
 import { site } from "@/lib/site";
 
@@ -23,7 +22,6 @@ export const Route = createFileRoute("/_site/")({
 });
 
 const featured = projects.slice(0, 3);
-const defaultDraft: Draft = { area: 180, style: "pedra", tier: "estudo" };
 
 function HomePage() {
   const { t } = useI18n();
@@ -163,7 +161,7 @@ function HomePage() {
             </div>
           </Reveal>
           <Reveal variant="up" delay={40}>
-            <QuoteForm draft={defaultDraft} />
+            <QuoteForm />
           </Reveal>
         </div>
       </section>
