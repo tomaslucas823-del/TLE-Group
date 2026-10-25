@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_site/entrega")({
       {
         name: "description",
         content:
-          "Qualidade da entrega TLE: renderizações, plantas, cortes e elevações.",
+          "Qualidade da entrega TLE: renderizações, plantas, cortes, elevações e estrutura.",
       },
     ],
   }),
@@ -24,10 +24,10 @@ function EntregaPage() {
   const isEn = locale === "en";
   const [active, setActive] = useState(deliveryCategories[0]?.id ?? "renders");
   const category = deliveryCategories.find((c) => c.id === active) ?? deliveryCategories[0];
+  const isTechnical = category.id !== "renders";
 
   return (
     <main className="pt-11">
-      {/* Header + tabs as one block */}
       <section className="border-b border-line">
         <div className="mx-auto max-w-[980px] px-4 pt-8 pb-5 md:pt-10 md:pb-6">
           <p className="text-[12px] font-medium tracking-[0.14em] text-mute uppercase">
@@ -36,10 +36,10 @@ function EntregaPage() {
           <h1 className="mt-2 font-display text-[1.75rem] font-semibold tracking-[-0.03em] md:text-[2.25rem]">
             {isEn ? "Studio package samples" : "Amostras do pacote do estúdio"}
           </h1>
-          <p className="mt-2 max-w-md text-[14px] leading-relaxed text-mute">
+          <p className="mt-2 max-w-lg text-[14px] leading-relaxed text-mute">
             {isEn
-              ? "Renders, plans and sections. No client data."
-              : "Renders, plantas e cortes. Sem dados de clientes."}
+              ? "Renders, floor plans, sections and structure. Anonymized samples."
+              : "Renders, plantas, cortes e estrutura. Amostras sem dados de clientes."}
           </p>
 
           <div className="mt-6 flex gap-0 overflow-x-auto scrollbar-none">
@@ -60,20 +60,25 @@ function EntregaPage() {
               </button>
             ))}
           </div>
+
+          {category.description ? (
+            <p className="mt-3 text-[13px] text-mute">
+              {isEn ? category.descriptionEn : category.description}
+            </p>
+          ) : null}
         </div>
       </section>
 
-      {/* Catalog grid */}
       <section className="mx-auto max-w-[980px] px-4 py-6 md:py-8">
-        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3 md:gap-3">
+        <div
+          className={cn(
+            "grid gap-2.5 md:gap-3",
+            isTechnical ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-2 md:grid-cols-3",
+          )}
+        >
           {category.images.map((img) => (
             <figure key={img.src} className="group">
-              <div
-                className={cn(
-                  "overflow-hidden bg-[#f5f5f3]",
-                  category.id === "renders" ? "aspect-[4/3]" : "aspect-[3/2]",
-                )}
-              >
+              <div className="aspect-[4/3] overflow-hidden bg-[#f5f5f3]">
                 <img
                   src={img.src}
                   alt={img.alt}
@@ -83,7 +88,7 @@ function EntregaPage() {
                   decoding="async"
                   className={cn(
                     "h-full w-full transition duration-300 group-hover:opacity-95",
-                    category.id === "renders" ? "object-cover" : "object-contain p-1.5",
+                    isTechnical ? "object-contain p-2" : "object-cover",
                   )}
                 />
               </div>
@@ -95,7 +100,6 @@ function EntregaPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="border-t border-line bg-stone">
         <div className="mx-auto flex max-w-[980px] flex-col items-start gap-4 px-4 py-10 md:flex-row md:items-center md:justify-between md:py-12">
           <div className="max-w-sm">
