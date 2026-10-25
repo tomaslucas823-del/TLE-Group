@@ -90,6 +90,15 @@ html:not(.dark) {
   button {
     accent-color: var(--color-ink);
   }
+
+  /* Prevent native double lines under inputs */
+  input,
+  textarea,
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    box-shadow: none;
+  }
 }
 
 .scroll-progress {
@@ -617,26 +626,50 @@ input[type="range"].meter::-moz-range-thumb {
   border-radius: 0;
 }
 
+/* Single underline field — no double bars */
 .field {
   width: 100%;
-  border: 0;
-  border-bottom: 1px solid var(--color-line);
+  margin: 0;
+  border: none;
   border-radius: 0;
+  border-bottom: 1px solid var(--color-line);
   background: transparent;
+  background-image: none;
   padding: 0.55rem 0;
   color: var(--color-ink);
   outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
   transition: border-color 0.15s ease;
-  /* Avoid blue autofill / system highlight where possible */
   color-scheme: inherit;
 }
 
-.field:focus {
-  border-bottom-color: var(--color-ink);
+.field:focus,
+.field:focus-visible {
+  border: none;
+  border-bottom: 1px solid var(--color-ink);
+  outline: none;
+  box-shadow: none;
+}
+
+.field:-webkit-autofill,
+.field:-webkit-autofill:hover,
+.field:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-ink);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-paper) inset;
+  box-shadow: 0 0 0 1000px var(--color-paper) inset;
+  border-bottom: 1px solid var(--color-line);
+  transition: background-color 9999s ease-out 0s;
+}
+
+textarea.field {
+  resize: vertical;
+  min-height: 4.5rem;
+  line-height: 1.45;
 }
 
 select.field {
-  appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, var(--color-mute) 50%),
     linear-gradient(135deg, var(--color-mute) 50%, transparent 50%);
   background-position:
