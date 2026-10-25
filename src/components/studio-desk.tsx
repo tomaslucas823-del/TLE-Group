@@ -29,6 +29,52 @@ const STATUS = [
   ["fechado", "Fechado"],
 ] as const;
 
+const STATUS_LABEL: Record<string, string> = Object.fromEntries(STATUS);
+
+function csvEscape(value: string | number | null | undefined): string {
+  const raw = value == null ? "" : String(value);
+  if (/[",\n\r]/.test(raw)) return `"${raw.replace(/"/g, '""')}"`;
+  return raw;
+}
+
+function exportLeadsExcel(leads: StudioData["leads"]) {
+  const headers = [
+    "ID",
+    "Nome",
+    "E-mail",
+    "Telefone",
+    "Metragem (m²)",
+    "Partido",
+    "Entrega",
+    "Estimativa (MZN)",
+    "Situação",
+    "Mensagem",
+  ];
+  const rows = leads.map((lead) => [
+    lead.id,
+    lead.name,
+    lead.email,
+    lead.phone,
+    lead.area_m2,
+    styleLabel(lead.style),
+    tierLabel(lead.complexity),
+    (lead.estimate_cents / 100).toFixed(2).replace(".", ","),
+    STATUS_LABEL[lead.status] ?? lead.status,
+    lead.message ?? "",
+  ]);
+  const lines = [headers, ...rows].map((row) => row.map(csvEscape).join(";"));
+  // BOM UTF-8 para o Excel abrir acentos corretamente; ; como separador (padrão PT)
+  const csv = `\uFEFF${lines.join("\r\n")}`;
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const date = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `tle-leads-${date}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () => void }) {
   const [tab, setTab] = useState<(typeof TABS)[number][0]>("resumo");
   const [error, setError] = useState("");
@@ -114,61 +160,77 @@ export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () 
             </p>
           </div>
         ) : (
-          <ul className="mt-6 divide-y divide-line border border-line">
-            {data.leads.map((lead) => (
-              <li key={lead.id} className="grid gap-4 p-4 md:grid-cols-[1.4fr_0.8fr_auto] md:items-center">
-                <div>
-                  <p className="font-medium">{lead.name}</p>
-                  <p className="text-sm text-mute">
-                    {lead.email} · {lead.phone}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    {lead.area_m2} m² · {styleLabel(lead.style)} · {tierLabel(lead.complexity)} ·{" "}
-                    {mznFromCents(lead.estimate_cents)}
-                  </p>
-                  {lead.message ? <p className="mt-2 text-sm text-mute">{lead.message}</p> : null}
-                </div>
-                <label className="text-sm">
-                  Situação
-                  <select
-                    className="mt-1 h-11 w-full border border-line bg-paper px-3"
-                    value={lead.status}
-                    disabled={busy}
-                    onChange={(event) =>
-                      run(() => setLeadStatus({ data: { id: lead.id, status: event.target.value } }))
-                    }
-                  >
-                    {STATUS.map(([id, label]) => (
-                      <option key={id} value={id}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={busy}
-                    className={cn(buttonVariants({ variant: "line" }), "disabled:opacity-60")}
-                    onClick={() => run(() => createProposal({ data: { leadId: lead.id } }))}
-                  >
-                    Gerar proposta
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    className={cn(
-                      buttonVariants({ variant: "line" }),
-                      "text-timber-deep disabled:opacity-60",
-                    )}
-                    onClick={() => confirmDeleteLead(lead)}
-                  >
-                    Apagar
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-6">
+            <div className="mb-3 flex justify-end">
+              <button
+                type="button"
+                className={buttonVariants({ variant: "line" })}
+                onClick={() => exportLeadsExcel(data.leads)}
+              >
+                Exportar Excel
+              </button>
+            </div>
+            <ul className="divide-y divide-line border border-line">
+              {data.leads.map((lead) => (
+                <li
+                  key={lead.id}
+                  className="grid gap-4 p-4 md:grid-cols-[1.4fr_0.8fr_auto] md:items-center"
+                >
+                  <div>
+                    <p className="font-medium">{lead.name}</p>
+                    <p className="text-sm text-mute">
+                      {lead.email} · {lead.phone}
+                    </p>
+                    <p className="mt-1 text-sm">
+                      {lead.area_m2} m² · {styleLabel(lead.style)} · {tierLabel(lead.complexity)} ·{" "}
+                      {mznFromCents(lead.estimate_cents)}
+                    </p>
+                    {lead.message ? <p className="mt-2 text-sm text-mute">{lead.message}</p> : null}
+                  </div>
+                  <label className="text-sm">
+                    Situação
+                    <select
+                      className="mt-1 h-11 w-full border border-line bg-paper px-3"
+                      value={lead.status}
+                      disabled={busy}
+                      onChange={(event) =>
+                        run(() =>
+                          setLeadStatus({ data: { id: lead.id, status: event.target.value } }),
+                        )
+                      }
+                    >
+                      {STATUS.map(([id, label]) => (
+                        <option key={id} value={id}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled={busy}
+                      className={cn(buttonVariants({ variant: "line" }), "disabled:opacity-60")}
+                      onClick={() => run(() => createProposal({ data: { leadId: lead.id } }))}
+                    >
+                      Gerar proposta
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      className={cn(
+                        buttonVariants({ variant: "line" }),
+                        "text-timber-deep disabled:opacity-60",
+                      )}
+                      onClick={() => confirmDeleteLead(lead)}
+                    >
+                      Apagar
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         )
       ) : null}
 
@@ -227,7 +289,9 @@ export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () 
                     <button
                       type="button"
                       className="underline"
-                      onClick={() => downloadIcs(meeting.title, meeting.starts_at, meeting.place, meeting.notes)}
+                      onClick={() =>
+                        downloadIcs(meeting.title, meeting.starts_at, meeting.place, meeting.notes)
+                      }
                     >
                       Descarregar .ics
                     </button>
@@ -258,7 +322,11 @@ export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () 
                       <p className="font-display text-xl font-semibold">{proposal.project_title}</p>
                       <p className="text-sm text-mute">{proposal.client_name}</p>
                     </div>
-                    <Link to="/proposta/$id" params={{ id: String(proposal.id) }} className={buttonVariants({ variant: "line" })}>
+                    <Link
+                      to="/proposta/$id"
+                      params={{ id: String(proposal.id) }}
+                      className={buttonVariants({ variant: "line" })}
+                    >
                       Abrir documento
                     </Link>
                   </div>
@@ -318,11 +386,38 @@ function ClientForm({
       }}
     >
       <p className="font-medium">Novo cliente</p>
-      <input className="h-11 w-full border border-line px-3" placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} required />
-      <input className="h-11 w-full border border-line px-3" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input className="h-11 w-full border border-line px-3" placeholder="Telefone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-      <input className="h-11 w-full border border-line px-3" placeholder="Cidade" value={city} onChange={(e) => setCity(e.target.value)} />
-      <textarea className="w-full border border-line px-3 py-2" rows={3} placeholder="Notas" value={notes} onChange={(e) => setNotes(e.target.value)} />
+      <input
+        className="h-11 w-full border border-line px-3"
+        placeholder="Nome"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+      <input
+        className="h-11 w-full border border-line px-3"
+        placeholder="E-mail"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        className="h-11 w-full border border-line px-3"
+        placeholder="Telefone"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+      />
+      <input
+        className="h-11 w-full border border-line px-3"
+        placeholder="Cidade"
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
+      />
+      <textarea
+        className="w-full border border-line px-3 py-2"
+        rows={3}
+        placeholder="Notas"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+      />
       <button type="submit" className={buttonVariants()}>
         Salvar cliente
       </button>
@@ -357,11 +452,39 @@ function MeetingForm({
       }}
     >
       <p className="font-medium">Nova reunião</p>
-      <input className="h-11 w-full border border-line px-3" placeholder="Cliente" value={clientName} onChange={(e) => setClientName(e.target.value)} />
-      <input className="h-11 w-full border border-line px-3" placeholder="Assunto" value={title} onChange={(e) => setTitle(e.target.value)} required />
-      <input className="h-11 w-full border border-line px-3" type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} required />
-      <input className="h-11 w-full border border-line px-3" placeholder="Local" value={place} onChange={(e) => setPlace(e.target.value)} />
-      <textarea className="w-full border border-line px-3 py-2" rows={3} placeholder="Pauta" value={notes} onChange={(e) => setNotes(e.target.value)} />
+      <input
+        className="h-11 w-full border border-line px-3"
+        placeholder="Cliente"
+        value={clientName}
+        onChange={(e) => setClientName(e.target.value)}
+      />
+      <input
+        className="h-11 w-full border border-line px-3"
+        placeholder="Assunto"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        required
+      />
+      <input
+        className="h-11 w-full border border-line px-3"
+        type="datetime-local"
+        value={startsAt}
+        onChange={(e) => setStartsAt(e.target.value)}
+        required
+      />
+      <input
+        className="h-11 w-full border border-line px-3"
+        placeholder="Local"
+        value={place}
+        onChange={(e) => setPlace(e.target.value)}
+      />
+      <textarea
+        className="w-full border border-line px-3 py-2"
+        rows={3}
+        placeholder="Pauta"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+      />
       <button type="submit" className={buttonVariants()}>
         Agendar
       </button>
@@ -391,16 +514,28 @@ function InstallmentLine({
       </div>
       {part.status !== "recebido" ? (
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <select className="h-11 border border-line bg-paper px-3" value={method} onChange={(e) => setMethod(e.target.value)}>
+          <select
+            className="h-11 border border-line bg-paper px-3"
+            value={method}
+            onChange={(e) => setMethod(e.target.value)}
+          >
             <option value="mpesa">M-Pesa</option>
             <option value="emola">e-Mola</option>
             <option value="cartao">Cartão (em MZN)</option>
             <option value="transferencia">Transferência</option>
           </select>
-          <button type="button" className={buttonVariants({ variant: "line" })} onClick={() => onSave("aguardando", method)}>
+          <button
+            type="button"
+            className={buttonVariants({ variant: "line" })}
+            onClick={() => onSave("aguardando", method)}
+          >
             Registar cobrança
           </button>
-          <button type="button" className={buttonVariants()} onClick={() => onSave("recebido", method || part.method || "mpesa")}>
+          <button
+            type="button"
+            className={buttonVariants()}
+            onClick={() => onSave("recebido", method || part.method || "mpesa")}
+          >
             Confirmar recebimento
           </button>
         </div>
