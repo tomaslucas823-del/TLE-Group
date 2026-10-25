@@ -5,7 +5,7 @@ import { Simulator, type Draft } from "@/components/simulator";
 export const Route = createFileRoute("/_site/simulador")({
   head: () => ({
     meta: [
-      { title: "Simulador — TLE Arquitetura" },
+      { title: "Simulador - TLE Arquitetura" },
       {
         name: "description",
         content: "Estime um estudo residencial pela metragem, pelo partido e pelo tipo de entrega.",
