@@ -27,12 +27,18 @@ import {
   type ProposalRow,
   type InstallmentRow,
   type StudioData,
+  type PieceCategory,
+  type PieceKind,
   LEAD_STATUS,
   PAY_STATUS,
   PAY_METHOD,
+  PIECE_CATEGORIES,
+  PIECE_KINDS,
   text,
   clientIp,
   normalizeLead,
+  normalizeCategory,
+  normalizeKind,
   seed,
   loadWorkspace,
 } from "@/lib/studio-shared";
@@ -47,10 +53,34 @@ export type {
   ProposalRow,
   InstallmentRow,
   StudioData,
+  PieceCategory,
+  PieceKind,
 };
+
+export { PIECE_CATEGORIES, PIECE_CATEGORY_LABEL, PIECE_KINDS, projectPieceChecklist } from "@/lib/studio-shared";
 
 async function rateStudioMutation(userId: string, action: string, limit = 60) {
   await assertRateLimit(`studio:${action}:${userId}`, limit, 10 * 60 * 1000);
+}
+
+function mapApprovalRow(row: {
+  id: number;
+  project_id: number;
+  label: string;
+  image: string;
+  approved: boolean | number;
+  category?: string | null;
+  kind?: string | null;
+}): ApprovalRow {
+  return {
+    id: row.id,
+    project_id: row.project_id,
+    label: row.label,
+    image: row.image,
+    approved: Boolean(row.approved),
+    category: normalizeCategory(row.category),
+    kind: normalizeKind(row.kind),
+  };
 }
 
 export const getCaptchaChallenge = createServerFn({ method: "GET" }).handler(async () => {
@@ -102,12 +132,22 @@ export const loadPortal = createServerFn({ method: "GET" })
       select id, project_id, label, status, position from milestones
       where user_id = ${workspaceId} order by position
     `;
-    const allApprovals = await sql<ApprovalRow>`
-      select id, project_id, label, image, approved from approvals
+    const allApprovals = await sql<{
+      id: number;
+      project_id: number;
+      label: string;
+      image: string;
+      approved: boolean;
+      category: string;
+      kind: string;
+    }>`
+      select id, project_id, label, image, approved, category, kind from approvals
       where user_id = ${workspaceId} order by id
     `;
     const milestones = allMilestones.filter((m) => projectIdSet.has(m.project_id));
-    const approvals = allApprovals.filter((a) => projectIdSet.has(a.project_id));
+    const approvals = allApprovals
+      .filter((a) => projectIdSet.has(a.project_id))
+      .map(mapApprovalRow);
     const clientName = clients[0]?.name ?? "";
     const proposals = clientName
       ? await sql<ProposalRow>`
@@ -129,7 +169,7 @@ export const loadPortal = createServerFn({ method: "GET" })
       leads: [],
       projects,
       milestones,
-      approvals: approvals.map((row) => ({ ...row, approved: Boolean(row.approved) })),
+      approvals,
       meetings: [],
       proposals,
       installments,
@@ -311,6 +351,61 @@ export const addMeeting = createServerFn({ method: "POST" })
     await sql`
       insert into meetings (user_id, client_name, title, starts_at, place, notes)
       values (${context.userId}, ${data.client_name}, ${data.title}, ${data.starts_at}, ${data.place}, ${data.notes})
+    `;
+    return { ok: true };
+  });
+
+/** Publicar peça do projecto (imagem ou PDF) numa categoria. */
+export const addProjectPiece = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: unknown) => {
+    const row = (input ?? {}) as Record<string, unknown>;
+    const projectId = Number(row.projectId ?? row.project_id);
+    const label = text(row.label, 160);
+    const url = text(row.url ?? row.image, 2000);
+    const category = normalizeCategory(row.category);
+    const kind = normalizeKind(row.kind);
+    if (!Number.isInteger(projectId) || projectId < 1) throw new Error("Projecto inválido.");
+    if (label.length < 2) throw new Error("Indique o título da peça (ex. A.03.2 Planta de fundação).");
+    if (!url || !/^https?:\/\//i.test(url)) {
+      throw new Error("Indique um URL válido (https://…) da imagem ou PDF.");
+    }
+    if (!PIECE_CATEGORIES.includes(category)) throw new Error("Categoria inválida.");
+    if (!PIECE_KINDS.includes(kind)) throw new Error("Tipo inválido.");
+    return { projectId, label, url, category, kind };
+  })
+  .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
+    await rateStudioMutation(context.userId, "add-piece", 40);
+    const sql = await getSql();
+    const owned = await sql<{ id: number }>`
+      select id from projects where id = ${data.projectId} and user_id = ${context.userId} limit 1
+    `;
+    if (!owned.length) throw new Error("Projecto não encontrado.");
+    await sql`
+      insert into approvals (user_id, project_id, label, image, approved, category, kind)
+      values (
+        ${context.userId}, ${data.projectId}, ${data.label}, ${data.url},
+        ${false}, ${data.category}, ${data.kind}
+      )
+    `;
+    return { ok: true };
+  });
+
+export const deleteProjectPiece = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: unknown) => {
+    const row = (input ?? {}) as Record<string, unknown>;
+    const id = Number(row.id);
+    if (!Number.isInteger(id) || id < 1) throw new Error("Peça inválida.");
+    return { id };
+  })
+  .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
+    await rateStudioMutation(context.userId, "delete-piece", 30);
+    const sql = await getSql();
+    await sql`
+      delete from approvals where id = ${data.id} and user_id = ${context.userId}
     `;
     return { ok: true };
   });
