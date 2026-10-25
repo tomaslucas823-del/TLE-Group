@@ -4,7 +4,7 @@ import { site } from "@/lib/site";
 export const Route = createFileRoute("/_site/privacidade")({
   head: () => ({
     meta: [
-      { title: "Política de Privacidade — TLE Arquitetura" },
+      { title: "Política de Privacidade - TLE Arquitetura" },
       {
         name: "description",
         content: "Como a TLE trata nome, contacto e dados de projeto.",
