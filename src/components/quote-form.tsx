@@ -221,10 +221,10 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
       : "";
 
     return (
-      <div role="status" className="rounded-2xl border border-line bg-stone/40 px-6 py-8">
+      <div role="status" className="rounded-2xl border border-line bg-stone/40 px-6 py-8 text-center">
         <p className="font-display text-[1.5rem] font-semibold tracking-[-0.03em]">{t.quote.received}</p>
-        <p className="mt-2 text-[14px] leading-relaxed text-mute">{t.quote.receivedCloud}</p>
-        <div className="mt-6 space-y-1 border-t border-line pt-5 text-[13px] text-mute">
+        <p className="mx-auto mt-2 max-w-sm text-[14px] leading-relaxed text-mute">{t.quote.receivedCloud}</p>
+        <div className="mx-auto mt-6 max-w-xs space-y-1 border-t border-line pt-5 text-[13px] text-mute">
           <p className="text-[1.15rem] font-medium text-ink">{totalLabel}</p>
           <p>
             {draft.area} m² · {styleLabel} · {tierLabel}
@@ -384,47 +384,52 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
             />
           </div>
 
-          {challenge ? (
-            <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor="captcha">
-              {challenge.question}
-              <input
-                id="captcha"
-                inputMode="numeric"
-                autoComplete="off"
-                value={captchaAnswer}
-                onChange={(e) => setCaptchaAnswer(e.target.value)}
-                aria-invalid={Boolean(errors.captcha)}
-                className="field mt-2 w-full max-w-[7rem] text-[15px]"
-                suppressHydrationWarning
-              />
-              {errors.captcha ? (
-                <span className="mt-1 block normal-case tracking-normal text-[12px] text-timber-deep">
-                  {errors.captcha}
-                </span>
-              ) : null}
-            </label>
-          ) : (
-            <p className="text-[12px] text-mute">{t.quote.captchaLoading}</p>
-          )}
+          <div className="flex flex-col items-center gap-4 border-t border-line pt-5 text-center">
+            {challenge ? (
+              <label
+                className="flex w-full max-w-[12rem] flex-col items-center text-[11px] font-medium tracking-[0.04em] text-mute uppercase"
+                htmlFor="captcha"
+              >
+                <span>{challenge.question}</span>
+                <input
+                  id="captcha"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={captchaAnswer}
+                  onChange={(e) => setCaptchaAnswer(e.target.value)}
+                  aria-invalid={Boolean(errors.captcha)}
+                  className="field mt-2 w-full text-center text-[15px]"
+                  suppressHydrationWarning
+                />
+                {errors.captcha ? (
+                  <span className="mt-1 block normal-case tracking-normal text-[12px] text-timber-deep">
+                    {errors.captcha}
+                  </span>
+                ) : null}
+              </label>
+            ) : (
+              <p className="text-[12px] text-mute">{t.quote.captchaLoading}</p>
+            )}
 
-          <div ref={turnstileRef} className="pt-1" />
+            <div ref={turnstileRef} className="flex justify-center" />
 
-          {formError ? (
-            <p role="alert" className="text-[13px] text-timber-deep">
-              {formError}
-            </p>
-          ) : null}
+            {formError ? (
+              <p role="alert" className="max-w-sm text-[13px] text-timber-deep">
+                {formError}
+              </p>
+            ) : null}
 
-          <button
-            type="submit"
-            disabled={pending || !challenge}
-            className="btn-cta btn-cta--dark mt-1 w-full disabled:opacity-60 sm:w-auto"
-          >
-            {pending ? t.quote.sending : t.quote.send}
-            <span className="btn-cta__icon" aria-hidden>
-              →
-            </span>
-          </button>
+            <button
+              type="submit"
+              disabled={pending || !challenge}
+              className="btn-cta btn-cta--dark disabled:opacity-60"
+            >
+              {pending ? t.quote.sending : t.quote.send}
+              <span className="btn-cta__icon" aria-hidden>
+                →
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </form>
