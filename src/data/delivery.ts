@@ -19,8 +19,8 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "renders",
     label: "Renderizações",
     labelEn: "Renders",
-    description: "Volume, luz e materiais.",
-    descriptionEn: "Volume, light and materials.",
+    description: "Fachadas e volumetrias finais.",
+    descriptionEn: "Final façades and massing.",
     images: [
       {
         src: "/renders/veu-frente.webp",
@@ -58,27 +58,27 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "plantas",
     label: "Plantas",
     labelEn: "Floor plans",
-    description: "Plantas de piso e relação com o terreno.",
-    descriptionEn: "Floor plans and site relationship.",
+    description: "Disposição dos quartos e tipologias (T2, T3).",
+    descriptionEn: "Room layout and typologies (T2, T3).",
     images: [
+      {
+        src: "/entrega/planta-t2.svg",
+        alt: "Planta esquemática tipologia T2 com dois quartos",
+        caption: "T2 · dois quartos",
+      },
+      {
+        src: "/entrega/planta-t3.svg",
+        alt: "Planta esquemática tipologia T3 com três quartos e suíte",
+        caption: "T3 · três quartos",
+      },
       {
         src: "/renders/linear-garagem.webp",
         alt: "Organização de chegada e garagem",
         caption: "Chegada e garagem",
       },
       {
-        src: "/renders/pavilhao-aberto.webp",
-        alt: "Espaço de chegada sob cobertura",
-        caption: "Pórtico",
-      },
-      {
-        src: "/renders/oculus-fundo.webp",
-        alt: "Volume posterior e abertura",
-        caption: "Fundo",
-      },
-      {
         src: "/renders/jardim-estrelitzia.webp",
-        alt: "Relação com o jardim e limites",
+        alt: "Relação com o jardim e limites do terreno",
         caption: "Implantação",
       },
       {
@@ -97,9 +97,19 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "cortes",
     label: "Cortes e elevações",
     labelEn: "Sections",
-    description: "Alturas, cortes e elevações.",
-    descriptionEn: "Heights, sections and elevations.",
+    description: "Cortes transversais e intermédios: paredes, materiais e volume interno.",
+    descriptionEn: "Transverse and intermediate sections: walls, materials, interior volume.",
     images: [
+      {
+        src: "/entrega/corte-transversal.svg",
+        alt: "Corte transversal com pisos e volumetria interna",
+        caption: "Corte transversal",
+      },
+      {
+        src: "/entrega/corte-intermedio.svg",
+        alt: "Corte intermédio com paredes, lajes e acabamentos",
+        caption: "Corte intermédio",
+      },
       {
         src: "/renders/veu-lateral.webp",
         alt: "Elevação lateral com ripado",
@@ -111,19 +121,9 @@ export const deliveryCategories: DeliveryCategory[] = [
         caption: "Ripado",
       },
       {
-        src: "/renders/oculus-lateral.webp",
-        alt: "Elevação com óculo e massa",
-        caption: "Elevação",
-      },
-      {
         src: "/renders/pavilhao-coluna.webp",
         alt: "Corte e coluna do pavilhão",
-        caption: "Corte",
-      },
-      {
-        src: "/renders/veu-azul.webp",
-        alt: "Elevação com luz e volume",
-        caption: "Volume",
+        caption: "Corte · coluna",
       },
       {
         src: "/renders/oculus-rua.webp",
