@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_site/")({
       {
         name: "description",
         content:
-          "TLE Group — Total Link Engenharia & Construções. Soluções técnicas em construção civil em Inhambane.",
+          "TLE Group - Total Link Engenharia & Construções. Soluções técnicas em construção civil em Inhambane.",
       },
     ],
   }),
