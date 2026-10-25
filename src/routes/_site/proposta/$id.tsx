@@ -9,7 +9,7 @@ import { loadStudio, type InstallmentRow, type ProposalRow } from "@/lib/studio.
 export const Route = createFileRoute("/_site/proposta/$id")({
   head: () => ({
     meta: [
-      { title: "Proposta — TLE Arquitetura" },
+      { title: "Proposta - TLE Arquitetura" },
       { name: "description", content: "Proposta com escopo e cronograma de pagamento." },
     ],
   }),
