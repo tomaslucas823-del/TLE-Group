@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Reveal } from "@/components/reveal";
 import { buttonVariants } from "@/components/ui/button";
 import { deliveryCategories } from "@/data/delivery";
 import { cn } from "@/lib/cn";
@@ -28,125 +27,107 @@ function EntregaPage() {
 
   return (
     <main className="pt-11">
-      {/* Hero — compact */}
-      <section className="border-b border-line bg-paper">
-        <div className="mx-auto max-w-6xl px-4 py-8 md:px-5 md:py-10">
-          <Reveal variant="up">
-            <p className="text-[11px] font-medium tracking-[0.18em] text-mute uppercase">
-              {isEn ? "Delivery quality" : "Qualidade da entrega"}
+      {/* Header strip */}
+      <section className="border-b border-line">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-3 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-4 sm:py-6">
+          <div className="min-w-0">
+            <p className="text-[10px] font-medium tracking-[0.16em] text-mute uppercase">
+              {isEn ? "Delivery" : "Entrega"}
             </p>
-          </Reveal>
-          <Reveal variant="up" delay={30}>
-            <h1 className="mt-2 max-w-2xl font-display text-[1.85rem] leading-[1.08] font-normal tracking-tight md:text-4xl">
-              {isEn
-                ? "What leaves the studio with every proposal."
-                : "O que sai do estúdio em cada proposta."}
+            <h1 className="mt-1 font-display text-[1.35rem] leading-tight font-normal tracking-tight sm:text-[1.6rem]">
+              {isEn ? "Studio package samples." : "Amostras do pacote do estúdio."}
             </h1>
-          </Reveal>
-          <Reveal variant="up" delay={60}>
-            <p className="mt-3 max-w-lg text-[13px] leading-relaxed text-mute md:text-[14px]">
-              {isEn
-                ? "Renders, floor plans, sections and elevations — samples from real packages, without client data."
-                : "Renderizações, plantas baixas, cortes e elevações — amostras de pacotes reais, sem dados de clientes."}
-            </p>
-          </Reveal>
+          </div>
+          <p className="max-w-[16rem] text-[11px] leading-snug text-mute sm:text-right">
+            {isEn
+              ? "Renders, plans, sections — no client data."
+              : "Renders, plantas, cortes — sem dados de clientes."}
+          </p>
         </div>
       </section>
 
-      {/* Tabs — compact sticky */}
+      {/* Category switcher */}
       <section className="sticky top-11 z-30 border-b border-line bg-paper/95 backdrop-blur-md">
-        <div className="mx-auto max-w-6xl px-4 md:px-5">
-          <div className="flex gap-0.5 overflow-x-auto py-2 scrollbar-none">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-3 sm:px-4">
+          <div className="flex min-w-0 flex-1 gap-0 overflow-x-auto scrollbar-none">
             {deliveryCategories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => setActive(cat.id)}
                 className={cn(
-                  "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] transition-colors",
-                  active === cat.id
-                    ? "bg-ink text-paper"
-                    : "text-mute hover:bg-stone hover:text-ink",
+                  "relative shrink-0 px-3 py-2.5 text-[12px] transition-colors",
+                  active === cat.id ? "text-ink" : "text-mute hover:text-ink",
                 )}
               >
                 {isEn ? cat.labelEn : cat.label}
+                {active === cat.id ? (
+                  <span className="absolute inset-x-3 bottom-0 h-px bg-ink" aria-hidden />
+                ) : null}
               </button>
             ))}
           </div>
+          <p className="hidden shrink-0 text-[10px] tabular-nums text-mute sm:block">
+            {category.images.length}
+          </p>
         </div>
       </section>
 
-      {/* Content — dense grid */}
-      <section className="mx-auto max-w-6xl px-4 py-6 md:px-5 md:py-8">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-          <div className="max-w-xl">
-            <h2 className="font-display text-lg font-normal md:text-xl">
-              {isEn ? category.labelEn : category.label}
-            </h2>
-            <p className="mt-1 text-[12px] leading-relaxed text-mute md:text-[13px]">
-              {isEn ? category.descriptionEn : category.description}
-            </p>
-          </div>
-          <p className="text-[11px] tabular-nums text-mute">
-            {category.images.length} {isEn ? "pieces" : "peças"}
-          </p>
-        </div>
+      {/* Catalog grid — hairline gaps */}
+      <section className="mx-auto max-w-5xl px-3 py-3 sm:px-4 sm:py-4">
+        <p className="mb-2 text-[11px] text-mute">
+          {isEn ? category.descriptionEn : category.description}
+        </p>
 
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-2.5">
-          {category.images.map((img, i) => (
-            <Reveal key={img.src} variant="up" delay={Math.min(i * 30, 120)}>
-              <figure className="group overflow-hidden border border-line bg-paper">
-                <div
+        <div className="grid grid-cols-2 gap-px bg-line md:grid-cols-3">
+          {category.images.map((img) => (
+            <figure key={img.src} className="group bg-paper">
+              <div
+                className={cn(
+                  "overflow-hidden bg-[#f5f5f3]",
+                  category.id === "renders" ? "aspect-[4/3]" : "aspect-[3/2]",
+                )}
+              >
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  width={800}
+                  height={600}
+                  loading="lazy"
+                  decoding="async"
                   className={cn(
-                    "overflow-hidden bg-[#f7f7f5]",
-                    category.id === "renders" ? "aspect-[4/3]" : "aspect-[3/2]",
+                    "h-full w-full transition duration-300 group-hover:opacity-95",
+                    category.id === "renders" ? "object-cover" : "object-contain p-1",
                   )}
-                >
-                  <img
-                    src={img.src}
-                    alt={img.alt}
-                    width={900}
-                    height={675}
-                    loading="lazy"
-                    decoding="async"
-                    className={cn(
-                      "h-full w-full transition duration-400 group-hover:scale-[1.015]",
-                      category.id === "renders" ? "object-cover" : "object-contain p-1.5",
-                    )}
-                  />
-                </div>
-                {img.caption ? (
-                  <figcaption className="border-t border-line px-2.5 py-1.5 text-[11px] leading-snug text-mute">
-                    {img.caption}
-                  </figcaption>
-                ) : null}
-              </figure>
-            </Reveal>
+                />
+              </div>
+              {img.caption ? (
+                <figcaption className="px-2 py-1.5 text-[10px] leading-none tracking-wide text-mute">
+                  {img.caption}
+                </figcaption>
+              ) : null}
+            </figure>
           ))}
         </div>
       </section>
 
-      {/* CTA — compact */}
-      <section className="border-t border-line bg-stone">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-5 md:py-10">
-          <div className="max-w-md">
-            <h2 className="font-display text-lg font-normal md:text-xl">
-              {isEn
-                ? "Want this level of detail on your project?"
-                : "Quer este nível de detalhe no seu projecto?"}
-            </h2>
-            <p className="mt-1.5 text-[12px] leading-relaxed text-mute md:text-[13px]">
-              {isEn
-                ? "Area, site and idea. We reply with a reference and the path to the full package."
-                : "Metragem, terreno e ideia. Respondemos com referência e o caminho até ao pacote completo."}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link to="/" hash="contacto" className={cn(buttonVariants())}>
+      {/* CTA strip */}
+      <section className="border-t border-line">
+        <div className="mx-auto flex max-w-5xl flex-col items-start gap-3 px-3 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-6">
+          <p className="text-[12px] text-mute">
+            {isEn
+              ? "Same level of detail on your project."
+              : "O mesmo nível de detalhe no seu projecto."}
+          </p>
+          <div className="flex gap-2">
+            <Link to="/" hash="contacto" className={cn(buttonVariants(), "!h-9 !px-4 !text-[12px]")}>
               {isEn ? "Request a quote" : "Pedir cotação"}
             </Link>
-            <Link to="/portfolio" className={cn(buttonVariants({ variant: "line" }))}>
-              {isEn ? "View projects" : "Ver projectos"}
+            <Link
+              to="/portfolio"
+              className={cn(buttonVariants({ variant: "line" }), "!h-9 !px-4 !text-[12px]")}
+            >
+              {isEn ? "Projects" : "Projectos"}
             </Link>
           </div>
         </div>
