@@ -7,7 +7,7 @@ import { loadPortal, type StudioData } from "@/lib/studio.functions";
 export const Route = createFileRoute("/_site/portal")({
   head: () => ({
     meta: [
-      { title: "Portal do cliente — TLE Arquitetura" },
+      { title: "Portal do cliente - TLE Arquitetura" },
       { name: "description", content: "Acompanhe etapas, aprove imagens e baixe a proposta." },
     ],
   }),
