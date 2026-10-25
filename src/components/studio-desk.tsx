@@ -7,17 +7,25 @@ import { mznFromCents, formatWhen, googleCalendarUrl, meetingIcs } from "@/lib/f
 import {
   addClient,
   addMeeting,
+  addProjectPiece,
   createProposal,
   deleteLead,
+  deleteProjectPiece,
   setInstallment,
   setLeadStatus,
   type StudioData,
+  type PieceCategory,
+  type PieceKind,
+  PIECE_CATEGORIES,
+  PIECE_CATEGORY_LABEL,
+  projectPieceChecklist,
 } from "@/lib/studio.functions";
 
 const TABS = [
   ["resumo", "Resumo"],
   ["leads", "Leads"],
   ["clientes", "Clientes"],
+  ["pecas", "Peças"],
   ["agenda", "Agenda"],
   ["propostas", "Propostas"],
 ] as const;
@@ -63,7 +71,6 @@ function exportLeadsExcel(leads: StudioData["leads"]) {
     lead.message ?? "",
   ]);
   const lines = [headers, ...rows].map((row) => row.map(csvEscape).join(";"));
-  // BOM UTF-8 para o Excel abrir acentos corretamente; ; como separador (padrão PT)
   const csv = `\uFEFF${lines.join("\r\n")}`;
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -94,9 +101,7 @@ export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () 
   }
 
   function confirmDeleteLead(lead: StudioData["leads"][number]) {
-    const ok = window.confirm(
-      `Apagar o lead de ${lead.name}? Esta ação não pode ser desfeita.`,
-    );
+    const ok = window.confirm(`Apagar o lead de ${lead.name}? Esta ação não pode ser desfeita.`);
     if (!ok) return;
     void run(() => deleteLead({ data: { id: lead.id } }));
   }
@@ -260,6 +265,18 @@ export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () 
         </div>
       ) : null}
 
+      {tab === "pecas" ? (
+        <PiecesPanel
+          data={data}
+          busy={busy}
+          onPublish={(input) => run(() => addProjectPiece({ data: input }))}
+          onDelete={(id) => {
+            if (!window.confirm("Apagar esta peça do portal do cliente?")) return;
+            void run(() => deleteProjectPiece({ data: { id } }));
+          }}
+        />
+      ) : null}
+
       {tab === "agenda" ? (
         <div className="mt-6 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
           <MeetingForm onCreate={(input) => run(() => addMeeting({ data: input }))} />
@@ -350,6 +367,217 @@ export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () 
         )
       ) : null}
     </div>
+  );
+}
+
+function PiecesPanel({
+  data,
+  busy,
+  onPublish,
+  onDelete,
+}: {
+  data: StudioData;
+  busy: boolean;
+  onPublish: (input: {
+    projectId: number;
+    label: string;
+    url: string;
+    category: PieceCategory;
+    kind: PieceKind;
+  }) => void;
+  onDelete: (id: number) => void;
+}) {
+  if (data.projects.length === 0) {
+    return (
+      <div className="mt-6 border border-line p-6">
+        <p className="font-medium">Sem projectos ainda.</p>
+        <p className="mt-2 text-sm text-mute">
+          Crie um projecto (via dados do estúdio) para publicar renders, plantas e estrutura no portal
+          do cliente.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 space-y-10">
+      {data.projects.map((project) => {
+        const checklist = projectPieceChecklist(project.id, data.approvals);
+        const pieces = data.approvals.filter((a) => a.project_id === project.id);
+        return (
+          <section key={project.id} className="border border-line p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="font-display text-xl font-semibold">{project.title}</h3>
+                <p className="mt-1 text-sm text-mute">{project.place}</p>
+              </div>
+            </div>
+
+            {/* Fase 3 — checklist */}
+            <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {PIECE_CATEGORIES.map((cat) => {
+                const info = checklist[cat];
+                const ok = info.count > 0;
+                return (
+                  <div
+                    key={cat}
+                    className={cn(
+                      "border border-line px-3 py-2 text-sm",
+                      ok ? "bg-stone" : "bg-paper",
+                    )}
+                  >
+                    <span className="font-medium">{ok ? "✓ " : "○ "}</span>
+                    {PIECE_CATEGORY_LABEL[cat]}
+                    <span className="ml-1 text-mute">
+                      ({info.count}
+                      {info.approved ? ` · ${info.approved} ok` : ""})
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <PieceForm
+              projectId={project.id}
+              disabled={busy}
+              onPublish={onPublish}
+            />
+
+            {pieces.length === 0 ? (
+              <p className="mt-4 text-sm text-mute">Nenhuma peça publicada neste projecto.</p>
+            ) : (
+              <ul className="mt-4 divide-y divide-line border border-line">
+                {pieces.map((piece) => (
+                  <li
+                    key={piece.id}
+                    className="flex flex-wrap items-center justify-between gap-3 p-3 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium">{piece.label}</p>
+                      <p className="text-mute">
+                        {PIECE_CATEGORY_LABEL[piece.category]} ·{" "}
+                        {piece.kind === "pdf" ? "PDF" : "Imagem"}
+                        {piece.approved ? " · Aprovada pelo cliente" : ""}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={piece.image}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={buttonVariants({ variant: "line" })}
+                      >
+                        Abrir
+                      </a>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        className={cn(
+                          buttonVariants({ variant: "line" }),
+                          "text-timber-deep disabled:opacity-60",
+                        )}
+                        onClick={() => onDelete(piece.id)}
+                      >
+                        Apagar
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function PieceForm({
+  projectId,
+  disabled,
+  onPublish,
+}: {
+  projectId: number;
+  disabled: boolean;
+  onPublish: (input: {
+    projectId: number;
+    label: string;
+    url: string;
+    category: PieceCategory;
+    kind: PieceKind;
+  }) => void;
+}) {
+  const [label, setLabel] = useState("");
+  const [url, setUrl] = useState("");
+  const [category, setCategory] = useState<PieceCategory>("aparencia");
+  const [kind, setKind] = useState<PieceKind>("image");
+
+  return (
+    <form
+      className="mt-5 grid gap-3 border border-line p-4 md:grid-cols-2"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onPublish({ projectId, label, url, category, kind });
+        setLabel("");
+        setUrl("");
+      }}
+    >
+      <p className="font-medium md:col-span-2">Publicar peça no portal</p>
+      <label className="text-sm">
+        Título
+        <input
+          className="mt-1 h-11 w-full border border-line px-3"
+          placeholder="Ex. A.03.2 Planta de fundação"
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          required
+        />
+      </label>
+      <label className="text-sm">
+        URL (imagem ou PDF)
+        <input
+          className="mt-1 h-11 w-full border border-line px-3"
+          placeholder="https://…"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          required
+        />
+      </label>
+      <label className="text-sm">
+        Categoria
+        <select
+          className="mt-1 h-11 w-full border border-line bg-paper px-3"
+          value={category}
+          onChange={(e) => setCategory(e.target.value as PieceCategory)}
+        >
+          {PIECE_CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {PIECE_CATEGORY_LABEL[cat]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="text-sm">
+        Tipo
+        <select
+          className="mt-1 h-11 w-full border border-line bg-paper px-3"
+          value={kind}
+          onChange={(e) => setKind(e.target.value as PieceKind)}
+        >
+          <option value="image">Imagem</option>
+          <option value="pdf">PDF</option>
+        </select>
+      </label>
+      <div className="md:col-span-2">
+        <button type="submit" disabled={disabled} className={cn(buttonVariants(), "disabled:opacity-60")}>
+          Publicar no portal
+        </button>
+        <p className="mt-2 text-xs text-mute">
+          Hospede o ficheiro (Drive, Dropbox, CDN) e cole o link público. O cliente vê na secção certa
+          e pode aprovar.
+        </p>
+      </div>
+    </form>
   );
 }
 
@@ -542,18 +770,12 @@ function InstallmentLine({
       ) : null}
       {part.status === "aguardando" && (part.method || method) === "mpesa" ? (
         <p className="mt-3 text-mute">
-          Referência demonstrativa M-Pesa, sem débito: TLE-MPESA-{part.id}-{part.amount_cents}. A
-          cobrança real entra quando a conta M-Pesa do estúdio estiver ligada.
+          Referência demonstrativa M-Pesa, sem débito: TLE-MPESA-{part.id}-{part.amount_cents}.
         </p>
       ) : null}
       {part.status === "aguardando" && (part.method || method) === "emola" ? (
         <p className="mt-3 text-mute">
           Referência demonstrativa e-Mola, sem débito: TLE-EMOLA-{part.id}-{part.amount_cents}.
-        </p>
-      ) : null}
-      {part.status === "aguardando" && (part.method || method) === "cartao" ? (
-        <p className="mt-3 text-mute">
-          Cartão internacional fica registado em meticais. Nenhum valor é debitado nesta página.
         </p>
       ) : null}
     </li>
