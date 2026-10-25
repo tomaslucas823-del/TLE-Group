@@ -1,18 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import type { Draft } from "@/components/simulator";
 import { STYLES, TIERS, clampArea, estimateCents, type StyleId, type TierId } from "@/lib/estimate";
 import { mznFromCents } from "@/lib/format";
-import { pushLocalLead } from "@/lib/local-leads";
-import { getCaptchaChallenge, submitPublicLead } from "@/lib/studio.functions";
+import { site } from "@/lib/site";
 
-type FieldErrors = { nome?: string; email?: string; telefone?: string; captcha?: string };
-
-type Challenge = {
-  token: string;
-  question: string;
-  turnstileSiteKey?: string;
-};
+type FieldErrors = { nome?: string; email?: string; telefone?: string };
 
 const defaultDraft: Draft = { area: 180, style: "pedra", tier: "estudo" };
 
@@ -23,6 +16,38 @@ const DELIVERY_WEEKS: Record<TierId, { min: number; max: number }> = {
   completo: { min: 8, max: 12 },
 };
 
+function buildWaMessage(params: {
+  nome: string;
+  email: string;
+  telefone: string;
+  area: number;
+  styleLabel: string;
+  tierLabel: string;
+  totalLabel: string;
+  prazo: string;
+  ideias: string;
+}): string {
+  const lines = [
+    `Olá, TLE Group. Pedido de cotação via site.`,
+    ``,
+    `Nome: ${params.nome}`,
+    `Telefone: ${params.telefone}`,
+  ];
+  if (params.email) lines.push(`E-mail: ${params.email}`);
+  lines.push(
+    ``,
+    `Metragem: ${params.area} m²`,
+    `Partido: ${params.styleLabel}`,
+    `Entrega: ${params.tierLabel}`,
+    `Referência: ${params.totalLabel}`,
+    `Prazo estimado: ${params.prazo}`,
+  );
+  if (params.ideias) {
+    lines.push(``, `Ideias do projeto:`, params.ideias);
+  }
+  return lines.join("\n");
+}
+
 export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
   const { t } = useI18n();
   const [draft, setDraft] = useState<Draft>(initialDraft ?? defaultDraft);
@@ -30,13 +55,8 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
   const [mensagem, setMensagem] = useState("");
-  const [company, setCompany] = useState("");
-  const [captchaAnswer, setCaptchaAnswer] = useState("");
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [formError, setFormError] = useState("");
-  const [pending, setPending] = useState(false);
-  const [result, setResult] = useState<"cloud" | "local" | null>(null);
+  const [sent, setSent] = useState(false);
 
   const total = estimateCents(draft.area, draft.style, draft.tier);
   const styleLabel = t.styles[draft.style].label;
@@ -46,93 +66,50 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
     weeks.min === weeks.max
       ? `${weeks.min} ${t.quote.weeks}`
       : `${weeks.min}–${weeks.max} ${t.quote.weeks}`;
+  const totalLabel = mznFromCents(total);
 
-  async function loadChallenge() {
-    try {
-      const next = await getCaptchaChallenge();
-      setChallenge(next);
-      setCaptchaAnswer("");
-    } catch {
-      setChallenge(null);
-    }
-  }
-
-  useEffect(() => {
-    void loadChallenge();
-  }, []);
-
-  function validate(nomeVal: string, emailVal: string, telefoneVal: string, answer: string): FieldErrors {
+  function validate(nomeVal: string, emailVal: string, telefoneVal: string): FieldErrors {
     const next: FieldErrors = {};
     if (nomeVal.trim().length < 2) next.nome = t.quote.errName;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal.trim())) next.email = t.quote.errEmail;
+    if (emailVal.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal.trim())) {
+      next.email = t.quote.errEmail;
+    }
     const digits = telefoneVal.replace(/\D/g, "");
     if (digits.length < 9 || digits.length > 13) next.telefone = t.quote.errPhone;
-    if (!answer.trim()) next.captcha = t.quote.errCaptcha;
     return next;
   }
 
-  async function onSubmit(event: React.FormEvent) {
+  function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setFormError("");
-    const next = validate(nome, email, telefone, captchaAnswer);
+    const next = validate(nome, email, telefone);
     setErrors(next);
     if (Object.keys(next).length) return;
-    if (!challenge?.token) {
-      setFormError(t.quote.errSubmit);
-      void loadChallenge();
-      return;
-    }
+    if (!site.phoneWa) return;
 
-    const payload = {
-      name: nome.trim(),
+    const text = buildWaMessage({
+      nome: nome.trim(),
       email: email.trim(),
-      phone: telefone.trim(),
-      areaM2: draft.area,
-      style: draft.style,
-      complexity: draft.tier,
-      message: mensagem.trim(),
-      company: company.trim(),
-      captchaToken: challenge.token,
-      captchaAnswer: captchaAnswer.trim(),
-    };
-    setPending(true);
-    try {
-      await submitPublicLead({ data: payload });
-      setResult("cloud");
-    } catch (caught) {
-      const message = caught instanceof Error ? caught.message : "";
-      const isSoft =
-        !message ||
-        /network|fetch|failed to fetch|timeout/i.test(message);
-      if (isSoft && !company.trim()) {
-        pushLocalLead({
-          name: payload.name,
-          email: payload.email,
-          phone: payload.phone,
-          areaM2: payload.areaM2,
-          style: payload.style,
-          complexity: payload.complexity,
-          message: payload.message,
-        });
-        setResult("local");
-      } else {
-        setFormError(message || t.quote.errSubmit);
-        void loadChallenge();
-      }
-    } finally {
-      setPending(false);
-    }
+      telefone: telefone.trim(),
+      area: draft.area,
+      styleLabel,
+      tierLabel,
+      totalLabel,
+      prazo,
+      ideias: mensagem.trim(),
+    });
+
+    const href = `https://wa.me/${site.phoneWa}?text=${encodeURIComponent(text)}`;
+    window.open(href, "_blank", "noopener,noreferrer");
+    setSent(true);
   }
 
-  if (result) {
+  if (sent) {
     return (
       <div role="status" className="space-y-4">
         <p className="font-display text-[1.75rem] font-semibold tracking-[-0.03em]">{t.quote.received}</p>
-        <p className="text-[14px] text-mute">
-          {result === "cloud" ? t.quote.receivedCloud : t.quote.receivedLocal}
-        </p>
+        <p className="text-[14px] text-mute">{t.quote.receivedWhatsApp}</p>
         <div className="border-t border-line pt-4 text-[13px] text-mute">
-          <p>{mznFromCents(total)}</p>
+          <p>{totalLabel}</p>
           <p className="mt-1">
             {draft.area} m² · {styleLabel} · {tierLabel}
           </p>
@@ -140,6 +117,13 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
             {t.quote.delivery}: {prazo}
           </p>
         </div>
+        <button
+          type="button"
+          className="text-[13px] text-mute underline-offset-4 hover:underline"
+          onClick={() => setSent(false)}
+        >
+          {t.quote.sendAnother}
+        </button>
       </div>
     );
   }
@@ -225,7 +209,7 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
           <div>
             <p className="text-[11px] tracking-wide text-mute uppercase">{t.estimate.ref}</p>
             <p className="mt-1 font-display text-[1.75rem] leading-none font-semibold tracking-[-0.03em]">
-              {mznFromCents(total)}
+              {totalLabel}
             </p>
           </div>
           <div className="text-right">
@@ -238,30 +222,8 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
 
       {/* Contacto */}
       <div className="space-y-4">
-        <div className="hidden" aria-hidden="true">
-          <label htmlFor="empresa">Company</label>
-          <input
-            id="empresa"
-            name="company"
-            value={company}
-            onChange={(event) => setCompany(event.target.value)}
-            tabIndex={-1}
-            autoComplete="off"
-            suppressHydrationWarning
-          />
-        </div>
-
         <Field id="nome" label={t.quote.name} value={nome} onChange={setNome} error={errors.nome} autoComplete="name" />
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="email"
-            label={t.quote.email}
-            value={email}
-            onChange={setEmail}
-            error={errors.email}
-            type="email"
-            autoComplete="email"
-          />
           <Field
             id="telefone"
             label={t.quote.phone}
@@ -271,48 +233,24 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
             type="tel"
             autoComplete="tel"
           />
+          <Field
+            id="email"
+            label={`${t.quote.email} (${t.quote.optional})`}
+            value={email}
+            onChange={setEmail}
+            error={errors.email}
+            type="email"
+            autoComplete="email"
+          />
         </div>
 
-        {challenge ? (
-          <label className="block text-[12px] text-mute" htmlFor="captcha">
-            {challenge.question}
-            <input
-              id="captcha"
-              inputMode="numeric"
-              autoComplete="off"
-              value={captchaAnswer}
-              onChange={(event) => setCaptchaAnswer(event.target.value)}
-              aria-invalid={Boolean(errors.captcha)}
-              aria-describedby={errors.captcha ? "captcha-erro" : undefined}
-              className="field mt-1.5 w-full max-w-[8rem]"
-              suppressHydrationWarning
-            />
-            {errors.captcha ? (
-              <span id="captcha-erro" className="mt-1 block text-[12px] text-timber-deep">
-                {errors.captcha}
-              </span>
-            ) : null}
-          </label>
-        ) : (
-          <p className="text-[13px] text-mute">{t.quote.captchaLoading}</p>
-        )}
-
-        {formError ? (
-          <p role="alert" className="text-[13px] text-timber-deep">
-            {formError}
-          </p>
-        ) : null}
-
-        <button
-          type="submit"
-          disabled={pending || !challenge}
-          className="btn-cta btn-cta--dark mt-1 w-full disabled:opacity-60 sm:w-auto"
-        >
-          {pending ? t.quote.sending : t.quote.send}
+        <button type="submit" className="btn-cta btn-cta--dark mt-1 w-full sm:w-auto">
+          {t.quote.sendWhatsApp}
           <span className="btn-cta__icon" aria-hidden>
             →
           </span>
         </button>
+        <p className="text-[12px] text-mute">{t.quote.whatsAppHint}</p>
       </div>
     </form>
   );
