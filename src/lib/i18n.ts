@@ -17,7 +17,7 @@ export const messages = {
       close: "Fechar",
     },
     hero: {
-      kicker: "Maputo · Visualização residencial",
+      kicker: "Inhambane · Construção civil",
       title: "A casa, antes da primeira parede.",
       cta: "Pedir cotação",
       projects: "Ver projetos",
@@ -111,12 +111,15 @@ export const messages = {
     quote: {
       kicker: "Cotação",
       title: "Conte o terreno.",
-      lead: "O pedido leva a estimativa desta página. Respondemos com a imagem e a referência em meticais.",
+      lead: "Indique a metragem, o partido e as ideias provisórias. Respondemos com a referência em meticais.",
       phone: "Telefone",
       email: "E-mail",
       address: "Morada",
       name: "Nome",
-      message: "Mensagem",
+      message: "Ideias do projeto",
+      messagePlaceholder:
+        "Descreva como imagina a casa: número de quartos, salas, cozinha, terreno (largura/profundidade), materiais, orientação, orçamento aproximado ou qualquer detalhe importante.",
+      projectIdeas: "Ideias provisórias",
       send: "Enviar",
       sending: "A enviar…",
       received: "Pedido recebido.",
@@ -175,7 +178,7 @@ export const messages = {
       close: "Close",
     },
     hero: {
-      kicker: "Maputo · Residential visualisation",
+      kicker: "Inhambane · Civil construction",
       title: "The house, before the first wall.",
       cta: "Request a quote",
       projects: "View projects",
@@ -269,12 +272,15 @@ export const messages = {
     quote: {
       kicker: "Quote",
       title: "Tell us about the site.",
-      lead: "Your request includes this page's estimate. We reply with the image and a metical reference.",
+      lead: "Share floor area, massing and your provisional ideas. We reply with a metical reference.",
       phone: "Phone",
       email: "Email",
       address: "Address",
       name: "Name",
-      message: "Message",
+      message: "Project ideas",
+      messagePlaceholder:
+        "Describe how you imagine the house: number of bedrooms, living areas, kitchen, plot (width/depth), materials, orientation, approximate budget or any important detail.",
+      projectIdeas: "Provisional ideas",
       send: "Send",
       sending: "Sending…",
       received: "Request received.",
