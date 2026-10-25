@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import { LangToggle } from "@/components/lang-toggle";
@@ -30,7 +30,6 @@ function scrollToId(id: string) {
 
 export function SiteHeader() {
   const { t } = useI18n();
-  const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -204,7 +203,7 @@ export function SiteFooter() {
   );
 }
 
-/** Floating WhatsApp — visível com phoneWa configurado */
+/** Floating WhatsApp — ícone da marca, com phoneWa configurado */
 export function WhatsAppButton() {
   if (!waHref) return null;
   return (
@@ -212,11 +211,18 @@ export function WhatsAppButton() {
       href={waHref}
       target="_blank"
       rel="noreferrer"
-      className="no-print fixed right-4 bottom-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-[13px] font-semibold text-white shadow-lg transition hover:opacity-90"
+      className="no-print fixed right-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition hover:scale-105 hover:opacity-95 active:scale-100"
       aria-label="WhatsApp TLE Group"
       title="WhatsApp"
     >
-      WA
+      <img
+        src="/brand/whatsapp.svg"
+        alt=""
+        width={56}
+        height={56}
+        className="h-14 w-14"
+        decoding="async"
+      />
     </a>
   );
 }
