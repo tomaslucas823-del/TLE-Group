@@ -11,11 +11,11 @@ import { site } from "@/lib/site";
 export const Route = createFileRoute("/_site/")({
   head: () => ({
     meta: [
-      { title: "TLE Arquitetura" },
+      { title: "TLE Group" },
       {
         name: "description",
         content:
-          "Visualização residencial em Maputo. A casa vista inteira antes da obra.",
+          "TLE Group — Total Link Engenharia & Construções. Soluções técnicas em construção civil em Inhambane.",
       },
     ],
   }),
@@ -146,7 +146,12 @@ function HomePage() {
             </h2>
             <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-mute">{t.quote.lead}</p>
             <div className="mt-8 space-y-3 text-[14px]">
-              <p>{site.phoneDisplay}</p>
+              <p>
+                <a href={`tel:${site.phoneDisplay.replace(/\s/g, "")}`} className="underline-offset-4 hover:underline">
+                  {site.phoneDisplay}
+                </a>
+              </p>
+              <p className="text-mute">WhatsApp · e-Mola {site.emolaDisplay}</p>
               <p>
                 <a href={`mailto:${site.email}`} className="underline-offset-4 hover:underline">
                   {site.email}
