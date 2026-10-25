@@ -33,6 +33,11 @@ html.dark {
   --color-timber: #f5f5f7;
   --color-timber-deep: #ffffff;
   --color-line: #3a3a3c;
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
 }
 
 @layer base {
@@ -76,6 +81,14 @@ html.dark {
   ::selection {
     background: var(--color-ink);
     color: var(--color-paper);
+  }
+
+  /* Kill browser accent blue on form controls */
+  input,
+  select,
+  textarea,
+  button {
+    accent-color: var(--color-ink);
   }
 }
 
@@ -418,6 +431,49 @@ html.dark {
   color: #000;
 }
 
+/* Choice chips — replace native selects (no OS blue) */
+.choice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.choice-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.45rem 0.9rem;
+  color: var(--color-ink);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.choice-chip:hover {
+  border-color: var(--color-ink);
+}
+
+.choice-chip--active {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.choice-chip--active:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+  opacity: 0.92;
+}
+
 .nav-pills {
   display: inline-flex;
   align-items: center;
@@ -571,10 +627,32 @@ input[type="range"].meter::-moz-range-thumb {
   color: var(--color-ink);
   outline: none;
   transition: border-color 0.15s ease;
+  /* Avoid blue autofill / system highlight where possible */
+  color-scheme: inherit;
 }
 
 .field:focus {
   border-bottom-color: var(--color-ink);
+}
+
+select.field {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--color-mute) 50%),
+    linear-gradient(135deg, var(--color-mute) 50%, transparent 50%);
+  background-position:
+    calc(100% - 12px) 55%,
+    calc(100% - 7px) 55%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 1.5rem;
+}
+
+select.field option,
+select.field optgroup {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {
