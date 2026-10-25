@@ -203,7 +203,7 @@ export function SiteFooter() {
   );
 }
 
-/** Floating WhatsApp — imagem exacta do utilizador */
+/** Floating WhatsApp — tamanho discreto, visual premium */
 export function WhatsAppButton() {
   if (!waHref) return null;
   return (
@@ -211,16 +211,16 @@ export function WhatsAppButton() {
       href={waHref}
       target="_blank"
       rel="noreferrer"
-      className="no-print fixed right-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition hover:scale-105 hover:opacity-95 active:scale-100"
+      className="no-print fixed right-4 bottom-4 z-40 flex h-11 w-11 items-center justify-center rounded-full shadow-md transition hover:scale-105 hover:opacity-90 active:scale-100 md:right-5 md:bottom-5"
       aria-label="WhatsApp TLE Group"
       title="WhatsApp"
     >
       <img
         src="/brand/whatsapp.png"
         alt=""
-        width={56}
-        height={56}
-        className="h-14 w-14 object-contain"
+        width={44}
+        height={44}
+        className="h-11 w-11 object-contain"
         decoding="async"
       />
     </a>
