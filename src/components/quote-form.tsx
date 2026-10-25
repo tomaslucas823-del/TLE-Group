@@ -259,12 +259,11 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
         />
       </div>
 
-      {/* Project parameters */}
       <div className="rounded-2xl border border-line px-5 py-5">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+        <div className="space-y-5">
           <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor="area">
             {t.estimate.area}
-            <div className="mt-2 flex items-baseline gap-1.5">
+            <div className="mt-2 flex max-w-[10rem] items-baseline gap-1.5">
               <input
                 id="area"
                 type="number"
@@ -282,45 +281,54 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
             </div>
           </label>
 
-          <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor="tier">
-            {t.estimate.tier}
-            <select
-              id="tier"
-              value={draft.tier}
-              onChange={(e) => setDraft((d) => ({ ...d, tier: e.target.value as TierId }))}
-              className="field mt-2 w-full text-[15px]"
-              suppressHydrationWarning
-            >
-              {TIERS.map((tier) => (
-                <option key={tier.id} value={tier.id}>
-                  {t.tiers[tier.id].label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <fieldset className="min-w-0 border-0 p-0">
+            <legend className="text-[11px] font-medium tracking-[0.04em] text-mute uppercase">
+              {t.estimate.tier}
+            </legend>
+            <div className="choice-grid" role="radiogroup" aria-label={t.estimate.tier}>
+              {TIERS.map((tier) => {
+                const active = draft.tier === tier.id;
+                return (
+                  <button
+                    key={tier.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    className={`choice-chip${active ? " choice-chip--active" : ""}`}
+                    onClick={() => setDraft((d) => ({ ...d, tier: tier.id }))}
+                  >
+                    {t.tiers[tier.id].label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          <fieldset className="min-w-0 border-0 p-0">
+            <legend className="text-[11px] font-medium tracking-[0.04em] text-mute uppercase">
+              {t.estimate.style}
+            </legend>
+            <div className="choice-grid" role="radiogroup" aria-label={t.estimate.style}>
+              {STYLES.map((s) => {
+                const active = draft.style === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    className={`choice-chip${active ? " choice-chip--active" : ""}`}
+                    onClick={() => setDraft((d) => ({ ...d, style: s.id }))}
+                  >
+                    {t.styles[s.id].label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
 
           <label
-            className="col-span-2 block text-[11px] font-medium tracking-[0.04em] text-mute uppercase"
-            htmlFor="style"
-          >
-            {t.estimate.style}
-            <select
-              id="style"
-              value={draft.style}
-              onChange={(e) => setDraft((d) => ({ ...d, style: e.target.value as StyleId }))}
-              className="field mt-2 w-full text-[15px]"
-              suppressHydrationWarning
-            >
-              {STYLES.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {t.styles[s.id].label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label
-            className="col-span-2 block text-[11px] font-medium tracking-[0.04em] text-mute uppercase"
+            className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase"
             htmlFor="mensagem"
           >
             {t.quote.message}
@@ -337,7 +345,6 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
           </label>
         </div>
 
-        {/* Estimate strip */}
         <div className="mt-5 flex flex-wrap items-end justify-between gap-4 border-t border-line pt-5">
           <div>
             <p className="text-[11px] font-medium tracking-[0.06em] text-mute uppercase">{t.estimate.ref}</p>
@@ -353,7 +360,6 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
         <p className="mt-3 text-[12px] leading-relaxed text-mute">{t.estimate.disclaimer}</p>
       </div>
 
-      {/* Contact + security */}
       <div className="rounded-2xl border border-line px-5 py-5">
         <div className="space-y-4">
           <Field id="nome" label={t.quote.name} value={nome} onChange={setNome} error={errors.nome} autoComplete="name" />
