@@ -49,8 +49,13 @@ export type {
   StudioData,
 };
 
+function rateStudioMutation(userId: string, action: string, limit = 60) {
+  assertRateLimit(`studio:${action}:${userId}`, limit, 10 * 60 * 1000);
+}
+
 export const getCaptchaChallenge = createServerFn({ method: "GET" }).handler(async () => {
-  assertRateLimit(`captcha:${clientIp()}`, 30, 10 * 60 * 1000);
+  // 15 desafios / 10 min por IP — dificulta farming de tokens
+  assertRateLimit(`captcha:${clientIp()}`, 15, 10 * 60 * 1000);
   return createMathChallenge();
 });
 
@@ -148,7 +153,8 @@ export const submitPublicLead = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (data.honeypot) return { id: 0, ok: true };
     const ip = clientIp();
-    assertRateLimit(`public-lead:${ip}`, 8, 10 * 60 * 1000);
+    // 5 leads / 10 min por IP
+    assertRateLimit(`public-lead:${ip}`, 5, 10 * 60 * 1000);
     await assertCaptcha({
       captchaToken: data.captchaToken,
       captchaAnswer: data.captchaAnswer,
@@ -176,6 +182,7 @@ export const submitLead = createServerFn({ method: "POST" })
   .validator((input: unknown) => normalizeLead(input))
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "submit-lead", 30);
     const sql = await getSql();
     const cents = estimateCents(data.areaM2, data.style, data.complexity);
     const rows = await sql<{ id: number }>`
@@ -204,6 +211,7 @@ export const importLocalLeads = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "import-leads", 10);
     const sql = await getSql();
     for (const lead of data) {
       const cents = estimateCents(lead.areaM2, lead.style, lead.complexity);
@@ -231,6 +239,7 @@ export const setLeadStatus = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "lead-status", 40);
     const sql = await getSql();
     const owner = publicLeadOwnerId();
     await sql`
@@ -251,6 +260,7 @@ export const deleteLead = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "delete-lead", 20);
     const sql = await getSql();
     const owner = publicLeadOwnerId();
     await sql`
@@ -275,6 +285,7 @@ export const addClient = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "add-client", 30);
     const sql = await getSql();
     await sql`
       insert into clients (user_id, name, email, phone, city, notes)
@@ -297,6 +308,7 @@ export const addMeeting = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "add-meeting", 30);
     const sql = await getSql();
     await sql`
       insert into meetings (user_id, client_name, title, starts_at, place, notes)
@@ -344,6 +356,7 @@ export const createProposal = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "create-proposal", 20);
     const sql = await getSql();
     const owner = publicLeadOwnerId();
 
@@ -425,6 +438,7 @@ export const setInstallment = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "set-installment", 40);
     const sql = await getSql();
     await sql`
       update installments set status = ${data.status}, method = ${data.method}
@@ -444,6 +458,7 @@ export const setApproval = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     const scope = await resolvePortalScope(context.userId);
+    rateStudioMutation(context.userId, "set-approval", 40);
     const sql = await getSql();
     const workspaceId = scope.workspaceId;
 
@@ -479,6 +494,7 @@ export const linkClientAccount = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
+    rateStudioMutation(context.userId, "link-client", 10);
     const sql = await getSql();
     const owned = await sql<{ id: number }>`
       select id from clients where id = ${data.clientId} and user_id = ${context.userId}
