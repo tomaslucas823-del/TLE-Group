@@ -33,7 +33,6 @@ function HomePage() {
 
   return (
     <main>
-      {/* Hero — single media layer (no poster+video ghost) */}
       <section className="relative flex min-h-[70svh] items-center justify-center overflow-hidden bg-black text-white md:min-h-[78svh]">
         <div className="absolute inset-0">
           {playHero ? (
@@ -79,7 +78,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Projects — Apple module spacing */}
       <section className="bg-paper">
         <div className="mx-auto max-w-[980px] px-4 py-12 md:py-16">
           <Reveal variant="up" className="text-center">
@@ -102,7 +100,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Services */}
       <section id="servicos" className="bg-stone">
         <div className="mx-auto max-w-[980px] px-4 py-12 md:py-16">
           <Reveal variant="up" className="text-center">
@@ -123,7 +120,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Full-bleed image — edge to edge, no side padding */}
       <section className="overflow-hidden bg-black">
         <img
           src="/renders/pavilhao-dia.webp"
@@ -135,34 +131,50 @@ function HomePage() {
         />
       </section>
 
-      {/* Contact */}
       <section id="contacto" className="bg-paper">
-        <div className="mx-auto grid max-w-[980px] gap-10 px-4 py-12 md:grid-cols-2 md:gap-12 md:py-16">
-          <Reveal variant="up">
-            <h2 className="font-display text-[1.75rem] font-semibold tracking-[-0.03em] md:text-[2.25rem]">
-              {t.quote.title}
-            </h2>
-            <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-mute">{t.quote.lead}</p>
-            <div className="mt-8 space-y-3 text-[14px]">
-              <p>
-                <a href={`tel:${site.phoneDisplay.replace(/\s/g, "")}`} className="underline-offset-4 hover:underline">
-                  {site.phoneDisplay}
-                </a>
-              </p>
-              <p className="text-mute">WhatsApp · e-Mola {site.emolaDisplay}</p>
-              <p>
-                <a href={`mailto:${site.email}`} className="underline-offset-4 hover:underline">
-                  {site.email}
-                </a>
-              </p>
-              <p className="text-mute">
-                {site.city}, {site.country}
-              </p>
-            </div>
-          </Reveal>
-          <Reveal variant="up" delay={40}>
-            <QuoteForm />
-          </Reveal>
+        <div className="mx-auto max-w-[980px] px-4 py-16 md:py-20">
+          <div className="grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-16 md:items-start">
+            <Reveal variant="up" className="md:sticky md:top-20">
+              <p className="text-[12px] font-medium tracking-[0.14em] text-mute uppercase">{t.quote.kicker}</p>
+              <h2 className="mt-3 font-display text-[2rem] font-semibold tracking-[-0.03em] md:text-[2.4rem]">
+                {t.quote.title}
+              </h2>
+              <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-mute">{t.quote.lead}</p>
+
+              <dl className="mt-10 space-y-5 text-[14px]">
+                <div>
+                  <dt className="text-[11px] font-medium tracking-[0.08em] text-mute uppercase">{t.quote.phone}</dt>
+                  <dd className="mt-1.5">
+                    <a
+                      href={`tel:${site.phoneDisplay.replace(/\s/g, "")}`}
+                      className="underline-offset-4 hover:underline"
+                    >
+                      {site.phoneDisplay}
+                    </a>
+                  </dd>
+                  <dd className="mt-1 text-[13px] text-mute">WhatsApp · e-Mola</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] font-medium tracking-[0.08em] text-mute uppercase">{t.quote.email}</dt>
+                  <dd className="mt-1.5">
+                    <a href={`mailto:${site.email}`} className="underline-offset-4 hover:underline">
+                      {site.email}
+                    </a>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] font-medium tracking-[0.08em] text-mute uppercase">{t.quote.address}</dt>
+                  <dd className="mt-1.5 text-mute">
+                    {site.city}, {site.country}
+                  </dd>
+                </div>
+              </dl>
+            </Reveal>
+
+            <Reveal variant="up" delay={40}>
+              <QuoteForm />
+            </Reveal>
+          </div>
         </div>
       </section>
     </main>
