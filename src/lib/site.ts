@@ -1,29 +1,31 @@
 export const site = {
-  name: "TLE Arquitetura",
-  legalName: "TLE Visualização Arquitetónica, Lda",
-  /** Substituir pelo NUIT real. */
+  name: "TLE Group",
+  /** Total Link Engenharia & Construções */
+  legalName: "TLE Group — Total Link Engenharia & Construções",
+  /** Substituir pelo NUIT real quando disponível. */
   nuit: "000 000 000",
-  city: "Maputo",
+  city: "Inhambane",
   country: "Moçambique",
-  /** Morada definitiva - ainda por indicar. */
-  address: "Morada a indicar, Maputo",
+  address: "Inhambane, Moçambique",
   /** E-mail definitivo - ainda por indicar. */
   email: "contacto@tle.co.mz",
-  /** Telefone definitivo - ainda por indicar. */
-  phoneDisplay: "+258 8X XXX XXXX",
-  /** Só dígitos, com indicativo. Vazio = o botão de WhatsApp fica oculto. */
-  phoneWa: "",
+  phoneDisplay: "+258 86 591 3385",
+  /** Só dígitos, com indicativo. Activa o botão de WhatsApp. */
+  phoneWa: "258865913385",
+  /** Mesmo número para contacto e pagamentos móveis (e-Mola / M-Pesa). */
+  emolaDisplay: "+258 86 591 3385",
   /** URL completa ou vazio até existir a página. */
   instagram: "",
   facebook: "",
   linkedin: "",
-  domain: "https://www.tlearquitetura.co.mz",
+  domain: "https://www.tlegroup.co.mz",
   /** Cole o ID de medição (G-XXXXXXXX) quando o Google Analytics estiver criado. Vazio = não carrega script. */
   gaId: "",
+  tagline: "Soluções técnicas em construção civil",
 } as const;
 
 export const waHref = site.phoneWa
   ? `https://wa.me/${site.phoneWa}?text=${encodeURIComponent(
-      "Olá, TLE. Quero conversar sobre um projeto residencial.",
+      "Olá, TLE Group. Quero conversar sobre um projeto de construção.",
     )}`
   : "";
