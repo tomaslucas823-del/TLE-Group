@@ -1,7 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
-import type { Draft } from "@/components/simulator";
-import { STYLES, TIERS, clampArea, estimateCents, type StyleId, type TierId } from "@/lib/estimate";
+import {
+  BEDROOMS,
+  DELIVERY_WEEKS,
+  FINISHES,
+  FLOORS,
+  STYLES,
+  TIERS,
+  bedroomLabel,
+  estimateFromBrief,
+  finishLabel,
+  floorLabel,
+  parseOptionalArea,
+  type BedroomId,
+  type FinishId,
+  type FloorId,
+  type StyleId,
+  type TierId,
+} from "@/lib/estimate";
 import { mznFromCents } from "@/lib/format";
 import { site } from "@/lib/site";
 import { getCaptchaChallenge, submitPublicLead } from "@/lib/studio.functions";
@@ -38,17 +54,28 @@ type Challenge = {
   turnstileSiteKey?: string;
 };
 
-const defaultDraft: Draft = { area: 180, style: "pedra", tier: "estudo" };
-
-const DELIVERY_WEEKS: Record<TierId, { min: number; max: number }> = {
-  estudo: { min: 2, max: 3 },
-  executivo: { min: 5, max: 7 },
-  completo: { min: 8, max: 12 },
+export type QuoteDraft = {
+  bedrooms: BedroomId;
+  floors: FloorId;
+  finish: FinishId;
+  style: StyleId;
+  tier: TierId;
+  /** Opcional */
+  area: string;
 };
 
-export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
+const defaultDraft: QuoteDraft = {
+  bedrooms: "t3",
+  floors: "1",
+  finish: "essencial",
+  style: "pedra",
+  tier: "estudo",
+  area: "",
+};
+
+export function QuoteForm({ draft: initialDraft }: { draft?: Partial<QuoteDraft> }) {
   const { t } = useI18n();
-  const [draft, setDraft] = useState<Draft>(initialDraft ?? defaultDraft);
+  const [draft, setDraft] = useState<QuoteDraft>({ ...defaultDraft, ...initialDraft });
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -65,15 +92,33 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
   const turnstileRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
 
-  const total = estimateCents(draft.area, draft.style, draft.tier);
-  const styleLabel = t.styles[draft.style].label;
-  const tierLabel = t.tiers[draft.tier].label;
+  const areaM2 = parseOptionalArea(draft.area);
+  const total = estimateFromBrief({
+    bedrooms: draft.bedrooms,
+    floors: draft.floors,
+    finish: draft.finish,
+    style: draft.style,
+    tier: draft.tier,
+    areaM2,
+  });
+  const styleLabel = t.styles[draft.style]?.label ?? draft.style;
+  const tierLabel = t.tiers[draft.tier]?.label ?? draft.tier;
   const weeks = DELIVERY_WEEKS[draft.tier];
   const prazo =
     weeks.min === weeks.max
       ? `${weeks.min} ${t.quote.weeks}`
-      : `${weeks.min}–${weeks.max} ${t.quote.weeks}`;
+      : `${weeks.min}-${weeks.max} ${t.quote.weeks}`;
   const totalLabel = mznFromCents(total);
+  const briefLine = [
+    bedroomLabel(draft.bedrooms),
+    floorLabel(draft.floors),
+    finishLabel(draft.finish),
+    styleLabel,
+    tierLabel,
+    areaM2 ? `${areaM2} m²` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   async function loadChallenge() {
     try {
@@ -173,6 +218,11 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
       return;
     }
 
+    const composedMessage = [briefLine, mensagem.trim()].filter(Boolean).join("\n\n");
+    const areaForLead =
+      areaM2 ??
+      (BEDROOMS.find((b) => b.id === draft.bedrooms)?.baseArea ?? 140);
+
     setPending(true);
     try {
       await submitPublicLead({
@@ -180,10 +230,10 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
           name: nome.trim(),
           email: email.trim(),
           phone: telefone.trim(),
-          areaM2: draft.area,
+          areaM2: areaForLead,
           style: draft.style,
           complexity: draft.tier,
-          message: mensagem.trim(),
+          message: composedMessage,
           company: company.trim(),
           captchaToken: challenge.token,
           captchaAnswer: captchaAnswer.trim(),
@@ -213,8 +263,9 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
       `Olá, TLE Group. Já enviei cotação pelo site.`,
       `Nome: ${nome.trim()}`,
       `Tel: ${telefone.trim()}`,
-      `${draft.area} m² · ${styleLabel} · ${tierLabel}`,
+      briefLine,
       totalLabel,
+      `Prazo ref.: ${prazo}`,
     ].join("\n");
     const waUrl = site.phoneWa
       ? `https://wa.me/${site.phoneWa}?text=${encodeURIComponent(waText)}`
@@ -224,11 +275,9 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
       <div role="status" className="rounded-2xl border border-line bg-stone/40 px-6 py-8 text-center">
         <p className="font-display text-[1.5rem] font-semibold tracking-[-0.03em]">{t.quote.received}</p>
         <p className="mx-auto mt-2 max-w-sm text-[14px] leading-relaxed text-mute">{t.quote.receivedCloud}</p>
-        <div className="mx-auto mt-6 max-w-xs space-y-1 pt-5 text-[13px] text-mute">
+        <div className="mx-auto mt-6 max-w-sm space-y-1 pt-5 text-[13px] text-mute">
           <p className="text-[1.15rem] font-medium text-ink">{totalLabel}</p>
-          <p>
-            {draft.area} m² · {styleLabel} · {tierLabel}
-          </p>
+          <p>{briefLine}</p>
           <p>
             {t.quote.delivery}: {prazo}
           </p>
@@ -261,25 +310,74 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
 
       <div className="rounded-2xl border border-line px-5 py-5">
         <div className="space-y-5">
-          <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor="area">
-            {t.estimate.area}
-            <div className="mt-2 flex max-w-[10rem] items-baseline gap-1.5">
-              <input
-                id="area"
-                type="number"
-                min={40}
-                max={800}
-                step={10}
-                value={draft.area}
-                onChange={(e) =>
-                  setDraft((d) => ({ ...d, area: clampArea(Number(e.target.value)) }))
-                }
-                className="field w-full text-[15px]"
-                suppressHydrationWarning
-              />
-              <span className="shrink-0 text-[13px] text-mute">m²</span>
+          <fieldset className="min-w-0 border-0 p-0">
+            <legend className="text-[11px] font-medium tracking-[0.04em] text-mute uppercase">
+              Quartos
+            </legend>
+            <div className="choice-grid" role="radiogroup" aria-label="Quartos">
+              {BEDROOMS.map((b) => {
+                const active = draft.bedrooms === b.id;
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    className={`choice-chip${active ? " choice-chip--active" : ""}`}
+                    onClick={() => setDraft((d) => ({ ...d, bedrooms: b.id }))}
+                  >
+                    {b.label}
+                  </button>
+                );
+              })}
             </div>
-          </label>
+          </fieldset>
+
+          <fieldset className="min-w-0 border-0 p-0">
+            <legend className="text-[11px] font-medium tracking-[0.04em] text-mute uppercase">
+              Pisos
+            </legend>
+            <div className="choice-grid" role="radiogroup" aria-label="Pisos">
+              {FLOORS.map((f) => {
+                const active = draft.floors === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    className={`choice-chip${active ? " choice-chip--active" : ""}`}
+                    onClick={() => setDraft((d) => ({ ...d, floors: f.id }))}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          <fieldset className="min-w-0 border-0 p-0">
+            <legend className="text-[11px] font-medium tracking-[0.04em] text-mute uppercase">
+              Acabamentos
+            </legend>
+            <div className="choice-grid" role="radiogroup" aria-label="Acabamentos">
+              {FINISHES.map((f) => {
+                const active = draft.finish === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    className={`choice-chip${active ? " choice-chip--active" : ""}`}
+                    onClick={() => setDraft((d) => ({ ...d, finish: f.id }))}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
 
           <fieldset className="min-w-0 border-0 p-0">
             <legend className="text-[11px] font-medium tracking-[0.04em] text-mute uppercase">
@@ -326,6 +424,26 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Draft }) {
               })}
             </div>
           </fieldset>
+
+          <label className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase" htmlFor="area">
+            {t.estimate.area}{" "}
+            <span className="normal-case tracking-normal text-mute">(opcional)</span>
+            <div className="mt-2 flex max-w-[10rem] items-baseline gap-1.5">
+              <input
+                id="area"
+                type="number"
+                min={40}
+                max={800}
+                step={10}
+                value={draft.area}
+                placeholder="—"
+                onChange={(e) => setDraft((d) => ({ ...d, area: e.target.value }))}
+                className="field w-full text-[15px]"
+                suppressHydrationWarning
+              />
+              <span className="shrink-0 text-[13px] text-mute">m²</span>
+            </div>
+          </label>
 
           <label
             className="block text-[11px] font-medium tracking-[0.04em] text-mute uppercase"
