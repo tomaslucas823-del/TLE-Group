@@ -13,28 +13,40 @@ export type DeliveryCategory = {
   images: DeliveryShot[];
 };
 
+/**
+ * Samples of real TLE delivery quality.
+ * Renders use existing portfolio assets; technical sheets will be replaced
+ * with anonymized pages from project PDFs (public/entrega/*).
+ */
 export const deliveryCategories: DeliveryCategory[] = [
   {
     id: "renders",
     label: "Renderizações",
     labelEn: "Renders",
-    description: "Imagens exteriores de alta definição. O volume, a luz e os materiais antes da primeira parede.",
-    descriptionEn: "High-definition exterior images. Volume, light and materials before the first wall.",
+    description:
+      "Imagens exteriores de alta definição. O volume, a luz e os materiais antes da primeira parede.",
+    descriptionEn:
+      "High-definition exterior images. Volume, light and materials before the first wall.",
     images: [
       {
-        src: "/entrega/render-01.webp",
+        src: `/renders/${encodeURIComponent("WhatsApp Image 2026-10-21 at 20.36.44.jpeg")}`,
         alt: "Fachada principal com garagem e volume branco",
         caption: "Fachada principal",
       },
       {
-        src: "/entrega/render-02.webp",
-        alt: "Vista lateral com ripado e jardim",
-        caption: "Vista lateral",
+        src: `/renders/${encodeURIComponent("WhatsApp Image 2026-10-21 at 20.36.45.jpeg")}`,
+        alt: "Vista da rua com laje contínua",
+        caption: "Vista da rua",
       },
       {
-        src: "/entrega/render-03.webp",
-        alt: "Vista traseira e lateral com vegetação",
-        caption: "Vista de conjunto",
+        src: `/renders/${encodeURIComponent("WhatsApp Image 2026-10-21 at 20.36.46.jpeg")}`,
+        alt: "Entrada coberta com painel de madeira",
+        caption: "Entrada",
+      },
+      {
+        src: "/renders/veu-frente.webp",
+        alt: "Fachada com pórtico e pedra",
+        caption: "Volume e chegada",
       },
     ],
   },
@@ -42,23 +54,25 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "plantas",
     label: "Plantas",
     labelEn: "Floor plans",
-    description: "Plantas cotadas, zoneamento e implantação. A distribuição que a obra vai executar.",
-    descriptionEn: "Dimensioned plans, zoning and site layout. The distribution the build will execute.",
+    description:
+      "Plantas cotadas, zoneamento e implantação. A distribuição que a obra vai executar. Amostras técnicas do estúdio.",
+    descriptionEn:
+      "Dimensioned plans, zoning and site layout. The distribution the build will execute. Studio technical samples.",
     images: [
       {
-        src: "/entrega/planta-01.webp",
-        alt: "Planta baixa com zoneamento de áreas",
-        caption: "Planta baixa · zoneamento",
+        src: "/renders/oculus-jardim.webp",
+        alt: "Representação de volume e planta conceptual",
+        caption: "Conceito de planta · volume",
       },
       {
-        src: "/entrega/planta-02.webp",
-        alt: "Planta de implantação",
-        caption: "Implantação",
+        src: "/renders/linear-dia.webp",
+        alt: "Fachada linear correspondente a planta alongada",
+        caption: "Partido linear",
       },
       {
-        src: "/entrega/situacao-01.webp",
-        alt: "Planta de situação e mapa de localização",
-        caption: "Situação",
+        src: "/renders/pavilhao-dia.webp",
+        alt: "Pavilhão de chegada",
+        caption: "Chegada e pórtico",
       },
     ],
   },
@@ -66,18 +80,25 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "cortes",
     label: "Cortes e elevações",
     labelEn: "Sections & elevations",
-    description: "Cortes técnicos, alturas e relações entre espaços. O que a secção mostra e a elevação confirma.",
-    descriptionEn: "Technical sections, heights and spatial relationships. What the cut shows and the elevation confirms.",
+    description:
+      "Cortes técnicos, alturas e relações entre espaços. O que a secção mostra e a elevação confirma.",
+    descriptionEn:
+      "Technical sections, heights and spatial relationships. What the cut shows and the elevation confirms.",
     images: [
       {
-        src: "/entrega/corte-01.webp",
-        alt: "Cortes longitudinais com cotas e níveis",
-        caption: "Cortes · níveis e cotas",
+        src: "/renders/oculus-fachada.webp",
+        alt: "Elevação com óculo e volumetria",
+        caption: "Elevação · óculo",
       },
       {
-        src: "/entrega/localizacao-01.webp",
-        alt: "Planta de localização do terreno",
-        caption: "Localização",
+        src: "/renders/veu-lateral.webp",
+        alt: "Elevação lateral com ripado",
+        caption: "Elevação lateral",
+      },
+      {
+        src: "/renders/linear-ripado.webp",
+        alt: "Detalhe de elevação com ripado",
+        caption: "Detalhe de elevação",
       },
     ],
   },
