@@ -4,10 +4,10 @@ import { site } from "@/lib/site";
 export const Route = createFileRoute("/_site/privacidade")({
   head: () => ({
     meta: [
-      { title: "Política de Privacidade - TLE Arquitetura" },
+      { title: "Política de Privacidade - TLE Group" },
       {
         name: "description",
-        content: "Como a TLE trata nome, contacto e dados de projeto.",
+        content: "Como a TLE Group trata nome, contacto e dados de projeto.",
       },
     ],
   }),
@@ -48,9 +48,8 @@ function PrivacyPage() {
         <section>
           <h2 className="font-display text-2xl font-semibold">Seus direitos</h2>
           <p className="mt-3">
-            Pode pedir acesso, correção ou eliminação dos seus dados pelo e-mail {site.email}. O
-            NUIT, o telefone, a morada e as redes publicados no rodapé são provisórios até o estúdio
-            os substituir.
+            Pode pedir acesso, correção ou eliminação dos seus dados pelo e-mail {site.email} ou
+            pelo telefone {site.phoneDisplay}.
           </p>
         </section>
       </div>
