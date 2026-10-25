@@ -6,10 +6,10 @@ import { projects } from "@/data/projects";
 export const Route = createFileRoute("/_site/portfolio/")({
   head: () => ({
     meta: [
-      { title: "Trabalho - TLE Arquitetura" },
+      { title: "Trabalho - TLE Group" },
       {
         name: "description",
-        content: "Casas desenhadas em imagem, antes da obra. Maputo e arredores.",
+        content: "Projectos de construção civil. Inhambane, Moçambique.",
       },
     ],
   }),
@@ -21,11 +21,11 @@ function PortfolioPage() {
     <main className="pt-20">
       <header className="mx-auto flex max-w-6xl items-end justify-between gap-6 px-5 py-8">
         <Reveal variant="left">
-          <h1 className="font-display text-4xl leading-none font-normal md:text-6xl">Casas</h1>
+          <h1 className="font-display text-4xl leading-none font-normal md:text-6xl">Projectos</h1>
         </Reveal>
         <Reveal variant="right" delay={80}>
           <p className="max-w-xs text-right text-sm text-mute">
-            {projects.length} residências vistas inteiras antes da primeira parede.
+            {projects.length} projectos com acompanhamento e dicas de construção.
           </p>
         </Reveal>
       </header>
