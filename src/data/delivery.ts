@@ -13,7 +13,7 @@ export type DeliveryCategory = {
   images: DeliveryShot[];
 };
 
-/** Samples of real TLE delivery quality. Upload matching files to public/entrega/. */
+/** Samples of real TLE delivery quality. */
 export const deliveryCategories: DeliveryCategory[] = [
   {
     id: "renders",
@@ -76,11 +76,6 @@ export const deliveryCategories: DeliveryCategory[] = [
         alt: "Planta de situação e localização",
         caption: "Planta de situação",
       },
-      {
-        src: "/entrega/planta-vaos.webp",
-        alt: "Planta de vãos, portas e janelas",
-        caption: "Mapa de vãos",
-      },
     ],
   },
   {
@@ -121,23 +116,13 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "estrutura",
     label: "Estrutura",
     labelEn: "Structure",
-    description: "Fundação, pilares, sapatas e vigas de piso.",
-    descriptionEn: "Foundations, columns, footings and floor beams.",
+    description: "Fundação e vigas de piso.",
+    descriptionEn: "Foundations and floor beams.",
     images: [
       {
         src: "/entrega/estrutura-fundacao.webp",
         alt: "Planta de fundação com sapatas e eixos",
         caption: "Planta de fundação",
-      },
-      {
-        src: "/entrega/estrutura-pilares.webp",
-        alt: "Quadro de pilares e pormenores de armadura",
-        caption: "Quadro de pilares",
-      },
-      {
-        src: "/entrega/estrutura-sapatas-vigas.webp",
-        alt: "Pormenores de sapatas e vigas de piso",
-        caption: "Sapatas e vigas",
       },
       {
         src: "/entrega/estrutura-vigas-piso.webp",
