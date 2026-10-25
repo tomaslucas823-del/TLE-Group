@@ -1,7 +1,7 @@
 export const site = {
   name: "TLE Group",
   /** Total Link Engenharia & Construções */
-  legalName: "TLE Group — Total Link Engenharia & Construções",
+  legalName: "TLE Group - Total Link Engenharia & Construções",
   /** Substituir pelo NUIT real quando disponível. */
   nuit: "000 000 000",
   city: "Inhambane",
@@ -26,6 +26,6 @@ export const site = {
 
 export const waHref = site.phoneWa
   ? `https://wa.me/${site.phoneWa}?text=${encodeURIComponent(
-      "Olá, TLE Group. Quero conversar sobre um projeto de construção.",
+      "Olá, TLE Group. Quero conversar sobre um projecto de construção.",
     )}`
   : "";
