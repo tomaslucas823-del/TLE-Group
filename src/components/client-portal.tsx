@@ -16,8 +16,16 @@ export function ClientPortal({ data, onChange }: { data: StudioData; onChange: (
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState<number | null>(null);
   const [tab, setTab] = useState<PieceCategory>("aparencia");
+
   const project = data.projects[0];
-  if (!project) {
+  const projectId = project?.id ?? 0;
+
+  const checklist = useMemo(
+    () => (projectId ? projectPieceChecklist(projectId, data.approvals) : null),
+    [projectId, data.approvals],
+  );
+
+  if (!project || !checklist) {
     return (
       <div className="space-y-4">
         <p className="text-mute">Ainda não há um projeto nesta conta.</p>
@@ -28,14 +36,11 @@ export function ClientPortal({ data, onChange }: { data: StudioData; onChange: (
       </div>
     );
   }
+
   const client = data.clients.find((item) => item.id === project.client_id);
   const steps = data.milestones.filter((item) => item.project_id === project.id);
   const shots = data.approvals.filter((item) => item.project_id === project.id);
   const proposal = data.proposals[0];
-  const checklist = useMemo(
-    () => projectPieceChecklist(project.id, data.approvals),
-    [project.id, data.approvals],
-  );
   const tabPieces = shots.filter((s) => s.category === tab);
 
   async function toggleApproval(id: number, approved: boolean) {
@@ -74,7 +79,6 @@ export function ClientPortal({ data, onChange }: { data: StudioData; onChange: (
         <img src={project.cover} alt="" width={1600} height={900} className="aspect-video w-full object-cover" />
       </header>
 
-      {/* Checklist das 3 fases */}
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {PIECE_CATEGORIES.map((cat) => {
           const info = checklist[cat];
