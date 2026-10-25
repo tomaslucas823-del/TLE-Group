@@ -13,7 +13,7 @@ export type DeliveryCategory = {
   images: DeliveryShot[];
 };
 
-/** Samples of TLE delivery quality. Technical sheets (schematic where full raster pending). */
+/** Samples of real TLE delivery quality. Upload matching files to public/entrega/. */
 export const deliveryCategories: DeliveryCategory[] = [
   {
     id: "renders",
@@ -58,23 +58,28 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "plantas",
     label: "Plantas",
     labelEn: "Floor plans",
-    description: "Plantas cotadas, mobiladas e tipologias (ex.: T2 / T3).",
-    descriptionEn: "Dimensioned and furnished plans (e.g. T2 / T3).",
+    description: "Plantas cotadas, mobiladas e tipologias (ex.: T3).",
+    descriptionEn: "Dimensioned and furnished plans (e.g. T3).",
     images: [
       {
-        src: "/entrega/planta-t3.svg",
-        alt: "Planta baixa tipologia T3 com zoneamento de compartimentos",
+        src: "/entrega/planta-mobilada-t3.webp",
+        alt: "Planta baixa mobilada tipologia T3 com zoneamento",
         caption: "Planta mobilada · T3",
       },
       {
-        src: "/entrega/planta-t2.svg",
-        alt: "Planta baixa tipologia T2",
-        caption: "Planta · T2",
+        src: "/entrega/planta-cotada.webp",
+        alt: "Planta baixa cotada com dimensões",
+        caption: "Planta cotada",
       },
       {
-        src: "/entrega/planta-t3.svg",
-        alt: "Distribuição de quartos e áreas comuns",
-        caption: "Zoneamento",
+        src: "/entrega/planta-situacao.webp",
+        alt: "Planta de situação e localização",
+        caption: "Planta de situação",
+      },
+      {
+        src: "/entrega/planta-vaos.webp",
+        alt: "Planta de vãos, portas e janelas",
+        caption: "Mapa de vãos",
       },
     ],
   },
@@ -82,23 +87,33 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "cortes",
     label: "Cortes e elevações",
     labelEn: "Sections",
-    description: "Cortes transversais e relações de altura / volumetria interna.",
-    descriptionEn: "Sections and height relationships / interior volume.",
+    description: "Cortes transversais e alçados com paredes e volumetria interna.",
+    descriptionEn: "Sections and elevations with walls and interior volume.",
     images: [
       {
-        src: "/entrega/corte-transversal.svg",
-        alt: "Corte transversal esquemático",
-        caption: "Corte transversal",
+        src: "/entrega/corte-aa-bb.webp",
+        alt: "Secções de corte AA e BB",
+        caption: "Cortes AA · BB",
       },
       {
-        src: "/entrega/corte-intermedio.svg",
-        alt: "Corte intermédio com níveis",
-        caption: "Corte intermédio",
+        src: "/entrega/corte-cc-dd.webp",
+        alt: "Secções de corte CC e DD",
+        caption: "Cortes CC · DD",
       },
       {
-        src: "/entrega/corte-transversal.svg",
-        alt: "Relação de alturas e paredes",
-        caption: "Alturas e paredes",
+        src: "/entrega/corte-ee-ff.webp",
+        alt: "Secções de corte EE e FF",
+        caption: "Cortes EE · FF",
+      },
+      {
+        src: "/entrega/alcado-laterais.webp",
+        alt: "Alçados laterais esquerdo e direito",
+        caption: "Alçados laterais",
+      },
+      {
+        src: "/entrega/alcado-frontal-posterior.webp",
+        alt: "Alçados frontal e posterior",
+        caption: "Alçados frontal · posterior",
       },
     ],
   },
@@ -106,18 +121,28 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "estrutura",
     label: "Estrutura",
     labelEn: "Structure",
-    description: "Fundação, pilares e elementos estruturais (amostras esquemáticas).",
-    descriptionEn: "Foundations, columns and structural elements (schematic samples).",
+    description: "Fundação, pilares, sapatas e vigas de piso.",
+    descriptionEn: "Foundations, columns, footings and floor beams.",
     images: [
       {
-        src: "/entrega/corte-intermedio.svg",
-        alt: "Esquema estrutural de referência",
-        caption: "Esquema estrutural",
+        src: "/entrega/estrutura-fundacao.webp",
+        alt: "Planta de fundação com sapatas e eixos",
+        caption: "Planta de fundação",
       },
       {
-        src: "/entrega/corte-transversal.svg",
-        alt: "Corte com indicação de elementos estruturais",
-        caption: "Corte estrutural",
+        src: "/entrega/estrutura-pilares.webp",
+        alt: "Quadro de pilares e pormenores de armadura",
+        caption: "Quadro de pilares",
+      },
+      {
+        src: "/entrega/estrutura-sapatas-vigas.webp",
+        alt: "Pormenores de sapatas e vigas de piso",
+        caption: "Sapatas e vigas",
+      },
+      {
+        src: "/entrega/estrutura-vigas-piso.webp",
+        alt: "Planta e pormenores de vigas de piso",
+        caption: "Vigas de piso",
       },
     ],
   },
