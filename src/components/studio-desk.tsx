@@ -8,6 +8,7 @@ import {
   addClient,
   addMeeting,
   createProposal,
+  deleteLead,
   setInstallment,
   setLeadStatus,
   type StudioData,
@@ -44,6 +45,14 @@ export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () 
     } finally {
       setBusy(false);
     }
+  }
+
+  function confirmDeleteLead(lead: StudioData["leads"][number]) {
+    const ok = window.confirm(
+      `Apagar o lead de ${lead.name}? Esta ação não pode ser desfeita.`,
+    );
+    if (!ok) return;
+    void run(() => deleteLead({ data: { id: lead.id } }));
   }
 
   const openLeads = data.leads.filter((lead) => lead.status === "novo").length;
@@ -136,14 +145,27 @@ export function StudioDesk({ data, onChange }: { data: StudioData; onChange: () 
                     ))}
                   </select>
                 </label>
-                <button
-                  type="button"
-                  disabled={busy}
-                  className={cn(buttonVariants({ variant: "line" }), "disabled:opacity-60")}
-                  onClick={() => run(() => createProposal({ data: { leadId: lead.id } }))}
-                >
-                  Gerar proposta
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className={cn(buttonVariants({ variant: "line" }), "disabled:opacity-60")}
+                    onClick={() => run(() => createProposal({ data: { leadId: lead.id } }))}
+                  >
+                    Gerar proposta
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className={cn(
+                      buttonVariants({ variant: "line" }),
+                      "text-timber-deep disabled:opacity-60",
+                    )}
+                    onClick={() => confirmDeleteLead(lead)}
+                  >
+                    Apagar
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
