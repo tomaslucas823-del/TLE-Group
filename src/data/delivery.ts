@@ -13,7 +13,7 @@ export type DeliveryCategory = {
   images: DeliveryShot[];
 };
 
-/** Samples of real TLE delivery quality. Client PII removed. */
+/** Samples of real TLE delivery quality. Client side-blocks cropped. */
 export const deliveryCategories: DeliveryCategory[] = [
   {
     id: "renders",
@@ -58,38 +58,28 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "plantas",
     label: "Plantas",
     labelEn: "Floor plans",
-    description: "Disposição dos quartos e tipologias (T2, T3).",
-    descriptionEn: "Room layout and typologies (T2, T3).",
+    description: "Plantas cotadas, mobiladas e tipologias (ex.: T3).",
+    descriptionEn: "Dimensioned and furnished plans (e.g. T3).",
     images: [
       {
-        src: "/entrega/planta-t2.svg",
-        alt: "Planta esquemática tipologia T2 com dois quartos",
-        caption: "T2 · dois quartos",
+        src: "/entrega/planta-mobilada-t3.svg",
+        alt: "Planta baixa mobilada tipologia T3 com zoneamento",
+        caption: "Planta mobilada · T3",
       },
       {
-        src: "/entrega/planta-t3.svg",
-        alt: "Planta esquemática tipologia T3 com três quartos e suíte",
-        caption: "T3 · três quartos",
+        src: "/entrega/planta-cotada.svg",
+        alt: "Planta baixa cotada com dimensões",
+        caption: "Planta cotada",
       },
       {
-        src: "/renders/linear-garagem.webp",
-        alt: "Organização de chegada e garagem",
-        caption: "Chegada e garagem",
+        src: "/entrega/planta-situacao.svg",
+        alt: "Planta de situação e localização",
+        caption: "Planta de situação",
       },
       {
-        src: "/renders/jardim-estrelitzia.webp",
-        alt: "Relação com o jardim e limites do terreno",
-        caption: "Implantação",
-      },
-      {
-        src: "/renders/veu-entrada.webp",
-        alt: "Entrada e sequência de espaços",
-        caption: "Entrada",
-      },
-      {
-        src: "/renders/linear-detalhe.webp",
-        alt: "Detalhe de partido linear",
-        caption: "Detalhe",
+        src: "/entrega/planta-vaos.svg",
+        alt: "Planta de vãos, portas e janelas",
+        caption: "Mapa de vãos",
       },
     ],
   },
@@ -97,38 +87,62 @@ export const deliveryCategories: DeliveryCategory[] = [
     id: "cortes",
     label: "Cortes e elevações",
     labelEn: "Sections",
-    description: "Cortes transversais e intermédios: paredes, materiais e volume interno.",
-    descriptionEn: "Transverse and intermediate sections: walls, materials, interior volume.",
+    description: "Cortes transversais e alçados com paredes e volumetria interna.",
+    descriptionEn: "Sections and elevations with walls and interior volume.",
     images: [
       {
-        src: "/entrega/corte-transversal.svg",
-        alt: "Corte transversal com pisos e volumetria interna",
-        caption: "Corte transversal",
+        src: "/entrega/corte-aa-bb.svg",
+        alt: "Secções de corte AA e BB",
+        caption: "Cortes AA · BB",
       },
       {
-        src: "/entrega/corte-intermedio.svg",
-        alt: "Corte intermédio com paredes, lajes e acabamentos",
-        caption: "Corte intermédio",
+        src: "/entrega/corte-cc-dd.svg",
+        alt: "Secções de corte CC e DD",
+        caption: "Cortes CC · DD",
       },
       {
-        src: "/renders/veu-lateral.webp",
-        alt: "Elevação lateral com ripado",
-        caption: "Elevação lateral",
+        src: "/entrega/corte-ee-ff.svg",
+        alt: "Secções de corte EE e FF",
+        caption: "Cortes EE · FF",
       },
       {
-        src: "/renders/linear-ripado.webp",
-        alt: "Detalhe de elevação com ripado e vãos",
-        caption: "Ripado",
+        src: "/entrega/alcado-laterais.svg",
+        alt: "Alçados laterais esquerdo e direito",
+        caption: "Alçados laterais",
       },
       {
-        src: "/renders/pavilhao-coluna.webp",
-        alt: "Corte e coluna do pavilhão",
-        caption: "Corte · coluna",
+        src: "/entrega/alcado-frontal-posterior.svg",
+        alt: "Alçados frontal e posterior",
+        caption: "Alçados frontal · posterior",
+      },
+    ],
+  },
+  {
+    id: "estrutura",
+    label: "Estrutura",
+    labelEn: "Structure",
+    description: "Fundação, pilares, sapatas e vigas de piso.",
+    descriptionEn: "Foundations, columns, footings and floor beams.",
+    images: [
+      {
+        src: "/entrega/estrutura-fundacao.svg",
+        alt: "Planta de fundação com sapatas e eixos",
+        caption: "Planta de fundação",
       },
       {
-        src: "/renders/oculus-rua.webp",
-        alt: "Vista da rua e proporções",
-        caption: "Vista da rua",
+        src: "/entrega/estrutura-pilares.svg",
+        alt: "Quadro de pilares e pormenores de armadura",
+        caption: "Quadro de pilares",
+      },
+      {
+        src: "/entrega/estrutura-sapatas-vigas.svg",
+        alt: "Pormenores de sapatas e vigas de piso",
+        caption: "Sapatas e vigas",
+      },
+      {
+        src: "/entrega/estrutura-vigas-piso.svg",
+        alt: "Planta e pormenores de vigas de piso",
+        caption: "Vigas de piso",
       },
     ],
   },
