@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" fill="none">
+  <rect width="640" height="360" fill="#f5f5f3"/>
+  <g stroke="#1d1d1f" stroke-width="2">
+    <!-- exterior wall left -->
+    <rect x="180" y="60" width="28" height="240"/>
+    <!-- interior wall -->
+    <rect x="320" y="100" width="16" height="200"/>
+    <!-- exterior wall right -->
+    <rect x="460" y="60" width="28" height="240"/>
+    <!-- slabs -->
+    <path d="M180 300 H488"/>
+    <path d="M180 100 H488" stroke-width="1.5"/>
+    <path d="M180 200 H488" stroke-width="1.5"/>
+  </g>
+  <!-- insulation / material bands -->
+  <g stroke="#1d1d1f" stroke-width="0.7" opacity="0.4">
+    <path d="M184 70 V290 M190 70 V290 M196 70 V290 M202 70 V290"/>
+    <path d="M466 70 V290 M472 70 V290 M478 70 V290 M484 70 V290"/>
+  </g>
+  <!-- dimension ticks -->
+  <g stroke="#6e6e73" stroke-width="1">
+    <path d="M150 60 V300"/>
+    <path d="M145 60 H155 M145 100 H155 M145 200 H155 M145 300 H155"/>
+  </g>
+  <g fill="#1d1d1f" font-family="system-ui,sans-serif" font-size="11">
+    <text x="250" y="155">Pé-direito</text>
+    <text x="250" y="250">Paredes e acabamentos</text>
+    <text x="340" y="90" text-anchor="middle">Laje</text>
+  </g>
+  <text x="40" y="340" fill="#6e6e73" font-family="system-ui,sans-serif" font-size="11">Corte intermédio · paredes, lajes e materiais</text>
+</svg>
