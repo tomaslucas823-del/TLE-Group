@@ -16,6 +16,7 @@ import { Route as SiteLoginRouteImport } from './routes/_site/login'
 import { Route as SitePortalRouteImport } from './routes/_site/portal'
 import { Route as SitePrivacidadeRouteImport } from './routes/_site/privacidade'
 import { Route as SiteSimuladorRouteImport } from './routes/_site/simulador'
+import { Route as SiteEntregaRouteImport } from './routes/_site/entrega'
 import { Route as SitePortfolioIndexRouteImport } from './routes/_site/portfolio/index'
 import { Route as SitePortfolioSlugRouteImport } from './routes/_site/portfolio/$slug'
 import { Route as SitePropostaIdRouteImport } from './routes/_site/proposta/$id'
@@ -55,6 +56,11 @@ const SiteSimuladorRoute = SiteSimuladorRouteImport.update({
   path: '/simulador',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteEntregaRoute = SiteEntregaRouteImport.update({
+  id: '/entrega',
+  path: '/entrega',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SitePortfolioIndexRoute = SitePortfolioIndexRouteImport.update({
   id: '/portfolio/',
   path: '/portfolio/',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof SitePortalRoute
   '/privacidade': typeof SitePrivacidadeRoute
   '/simulador': typeof SiteSimuladorRoute
+  '/entrega': typeof SiteEntregaRoute
   '/portfolio/$slug': typeof SitePortfolioSlugRoute
   '/proposta/$id': typeof SitePropostaIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/portal': typeof SitePortalRoute
   '/privacidade': typeof SitePrivacidadeRoute
   '/simulador': typeof SiteSimuladorRoute
+  '/entrega': typeof SiteEntregaRoute
   '/': typeof SiteIndexRoute
   '/portfolio/$slug': typeof SitePortfolioSlugRoute
   '/proposta/$id': typeof SitePropostaIdRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/_site/portal': typeof SitePortalRoute
   '/_site/privacidade': typeof SitePrivacidadeRoute
   '/_site/simulador': typeof SiteSimuladorRoute
+  '/_site/entrega': typeof SiteEntregaRoute
   '/_site/': typeof SiteIndexRoute
   '/_site/portfolio/$slug': typeof SitePortfolioSlugRoute
   '/_site/proposta/$id': typeof SitePropostaIdRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/privacidade'
     | '/simulador'
+    | '/entrega'
     | '/portfolio/$slug'
     | '/proposta/$id'
     | '/api/auth/$'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/privacidade'
     | '/simulador'
+    | '/entrega'
     | '/'
     | '/portfolio/$slug'
     | '/proposta/$id'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/_site/portal'
     | '/_site/privacidade'
     | '/_site/simulador'
+    | '/_site/entrega'
     | '/_site/'
     | '/_site/portfolio/$slug'
     | '/_site/proposta/$id'
@@ -210,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteSimuladorRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/entrega': {
+      id: '/_site/entrega'
+      path: '/entrega'
+      fullPath: '/entrega'
+      preLoaderRoute: typeof SiteEntregaRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/portfolio/': {
       id: '/_site/portfolio/'
       path: '/portfolio'
@@ -247,6 +266,7 @@ interface SiteRouteChildren {
   SitePortalRoute: typeof SitePortalRoute
   SitePrivacidadeRoute: typeof SitePrivacidadeRoute
   SiteSimuladorRoute: typeof SiteSimuladorRoute
+  SiteEntregaRoute: typeof SiteEntregaRoute
   SiteIndexRoute: typeof SiteIndexRoute
   SitePortfolioSlugRoute: typeof SitePortfolioSlugRoute
   SitePropostaIdRoute: typeof SitePropostaIdRoute
@@ -259,6 +279,7 @@ const SiteRouteChildren: SiteRouteChildren = {
   SitePortalRoute: SitePortalRoute,
   SitePrivacidadeRoute: SitePrivacidadeRoute,
   SiteSimuladorRoute: SiteSimuladorRoute,
+  SiteEntregaRoute: SiteEntregaRoute,
   SiteIndexRoute: SiteIndexRoute,
   SitePortfolioSlugRoute: SitePortfolioSlugRoute,
   SitePropostaIdRoute: SitePropostaIdRoute,
