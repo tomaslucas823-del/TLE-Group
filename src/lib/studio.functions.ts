@@ -241,6 +241,26 @@ export const setLeadStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const deleteLead = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: unknown) => {
+    const row = (input ?? {}) as Record<string, unknown>;
+    const id = Number(row.id);
+    if (!Number.isInteger(id) || id < 1) throw new Error("Lead inválido.");
+    return { id };
+  })
+  .handler(async ({ context, data }) => {
+    await requireStudio(context.userId);
+    const sql = await getSql();
+    const owner = publicLeadOwnerId();
+    await sql`
+      delete from leads
+      where id = ${data.id}
+        and (user_id = ${context.userId} or user_id = ${owner} or user_id = ${PUBLIC_LEAD_INBOX})
+    `;
+    return { ok: true };
+  });
+
 export const addClient = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: unknown) => {
