@@ -15,7 +15,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Estúdio de visualização residencial em Maputo. A casa desenhada antes da primeira parede, com cotação em meticais.",
+          "TLE Group — Total Link Engenharia & Construções. Soluções técnicas em construção civil em Inhambane, Moçambique.",
       },
       { name: "theme-color", content: "#ffffff" },
       { name: "color-scheme", content: "light dark" },
