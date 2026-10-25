@@ -203,7 +203,7 @@ export function SiteFooter() {
   );
 }
 
-/** Floating WhatsApp — ícone da marca, com phoneWa configurado */
+/** Floating WhatsApp — usa a imagem exacta em /brand/whatsapp.png */
 export function WhatsAppButton() {
   if (!waHref) return null;
   return (
@@ -216,11 +216,11 @@ export function WhatsAppButton() {
       title="WhatsApp"
     >
       <img
-        src="/brand/whatsapp.svg"
+        src="/brand/whatsapp.png"
         alt=""
         width={56}
         height={56}
-        className="h-14 w-14"
+        className="h-14 w-14 object-contain"
         decoding="async"
       />
     </a>
