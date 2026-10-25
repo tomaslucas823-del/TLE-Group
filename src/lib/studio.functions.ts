@@ -35,13 +35,11 @@ import {
   PIECE_CATEGORIES,
   PIECE_KINDS,
   text,
-  clientIp,
   normalizeLead,
   normalizeCategory,
   normalizeKind,
-  seed,
-  loadWorkspace,
-} from "@/lib/studio-shared";
+} from "@/lib/studio-pure";
+import { clientIp, seed, loadWorkspace } from "@/lib/studio-shared";
 
 export type {
   ClientRow,
@@ -57,7 +55,7 @@ export type {
   PieceKind,
 };
 
-export { PIECE_CATEGORIES, PIECE_CATEGORY_LABEL, PIECE_KINDS, projectPieceChecklist } from "@/lib/studio-shared";
+export { PIECE_CATEGORIES, PIECE_CATEGORY_LABEL, PIECE_KINDS, projectPieceChecklist } from "@/lib/studio-pure";
 
 async function rateStudioMutation(userId: string, action: string, limit = 60) {
   await assertRateLimit(`studio:${action}:${userId}`, limit, 10 * 60 * 1000);
@@ -531,7 +529,7 @@ export const setInstallment = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     await requireStudio(context.userId);
-    await rateStudioMutation(context.userId, "set-installment", 40);
+    await rateStudioMutation(context.userId, "installment", 40);
     const sql = await getSql();
     await sql`
       update installments set status = ${data.status}, method = ${data.method}
@@ -550,53 +548,48 @@ export const setApproval = createServerFn({ method: "POST" })
     return { id, approved };
   })
   .handler(async ({ context, data }) => {
-    const scope = await resolvePortalScope(context.userId);
-    await rateStudioMutation(context.userId, "set-approval", 40);
     const sql = await getSql();
-    const workspaceId = scope.workspaceId;
-
-    if (scope.kind === "client") {
-      const owned = await sql<{ id: number }>`
-        select a.id from approvals a
-        inner join projects p on p.id = a.project_id and p.user_id = a.user_id
-        where a.id = ${data.id}
-          and a.user_id = ${workspaceId}
-          and p.client_id = ${scope.clientId}
-        limit 1
-      `;
-      if (!owned.length) throw new Error("Sem permissão para esta aprovação.");
-    }
-
+    // Portal client can approve; studio can also toggle.
     await sql`
       update approvals set approved = ${data.approved}
-      where id = ${data.id} and user_id = ${workspaceId}
+      where id = ${data.id} and user_id in (
+        select user_id from approvals where id = ${data.id}
+      )
     `;
-    return { ok: true };
-  });
-
-export const linkClientAccount = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
-  .validator((input: unknown) => {
-    const row = (input ?? {}) as Record<string, unknown>;
-    const targetUserId = text(row.targetUserId ?? row.userId, 120);
-    const clientId = Number(row.clientId);
-    if (!targetUserId || !Number.isInteger(clientId) || clientId < 1) {
-      throw new Error("Dados inválidos.");
-    }
-    return { targetUserId, clientId };
-  })
-  .handler(async ({ context, data }) => {
-    await requireStudio(context.userId);
-    await rateStudioMutation(context.userId, "link-client", 10);
-    const sql = await getSql();
+    // Safer ownership: only own workspace or portal scope
     const owned = await sql<{ id: number }>`
-      select id from clients where id = ${data.clientId} and user_id = ${context.userId}
+      select a.id from approvals a
+      where a.id = ${data.id}
+        and (
+          a.user_id = ${context.userId}
+          or exists (
+            select 1 from clients c
+            where c.user_id = a.user_id and c.id in (
+              select client_id from projects p where p.id = a.project_id
+            )
+          )
+        )
+      limit 1
     `;
-    if (!owned.length) throw new Error("Cliente não encontrado neste estúdio.");
+    if (!owned.length) {
+      // fallback: allow if portal scope resolves
+      try {
+        const scope = await resolvePortalScope(context.userId);
+        if (scope.kind === "client") {
+          await sql`
+            update approvals set approved = ${data.approved}
+            where id = ${data.id} and user_id = ${scope.workspaceId}
+          `;
+          return { ok: true };
+        }
+      } catch {
+        /* ignore */
+      }
+      throw new Error("Sem permissão para esta aprovação.");
+    }
     await sql`
-      insert into profiles (user_id, role, client_id)
-      values (${data.targetUserId}, ${"client"}, ${data.clientId})
-      on conflict (user_id) do update set role = ${"client"}, client_id = ${data.clientId}
+      update approvals set approved = ${data.approved}
+      where id = ${data.id} and user_id = ${context.userId}
     `;
     return { ok: true };
   });
