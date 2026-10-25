@@ -71,23 +71,26 @@ function EntregaPage() {
 
       <section className="mx-auto max-w-[980px] px-4 py-6 md:py-8">
         <div
+          key={category.id}
           className={cn(
             "grid gap-2.5 md:gap-3",
             isTechnical ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-2 md:grid-cols-3",
           )}
         >
-          {category.images.map((img) => (
+          {category.images.map((img, index) => (
             <figure key={img.src} className="group">
-              <div className="aspect-[4/3] overflow-hidden bg-[#f5f5f3]">
+              <div className="relative aspect-[4/3] overflow-hidden bg-[#f0f0ee]">
                 <img
                   src={img.src}
                   alt={img.alt}
                   width={800}
                   height={600}
-                  loading="lazy"
+                  loading={index < 2 ? "eager" : "lazy"}
                   decoding="async"
+                  fetchPriority={index === 0 ? "high" : "auto"}
+                  sizes={isTechnical ? "(max-width: 640px) 100vw, 480px" : "(max-width: 768px) 50vw, 320px"}
                   className={cn(
-                    "h-full w-full transition duration-300 group-hover:opacity-95",
+                    "h-full w-full transition-opacity duration-200",
                     isTechnical ? "object-contain p-2" : "object-cover",
                   )}
                 />
