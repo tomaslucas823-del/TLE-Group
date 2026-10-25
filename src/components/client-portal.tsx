@@ -2,14 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { brlFromCents } from "@/lib/format";
+import { setApproval, type StudioData } from "@/lib/studio.functions";
 import {
-  setApproval,
-  type StudioData,
   type PieceCategory,
   PIECE_CATEGORIES,
   PIECE_CATEGORY_LABEL,
   projectPieceChecklist,
-} from "@/lib/studio.functions";
+} from "@/lib/studio-pure";
 import { cn } from "@/lib/cn";
 
 export function ClientPortal({ data, onChange }: { data: StudioData; onChange: () => void }) {
