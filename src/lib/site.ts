@@ -29,3 +29,10 @@ export const waHref = site.phoneWa
       "Olá, TLE Group. Quero conversar sobre um projecto de construção.",
     )}`
   : "";
+
+/** NUIT ainda provisório — esconde ou marca em propostas públicas se for o placeholder. */
+export const nuitIsProvisional = site.nuit.replace(/\s/g, "") === "000000000";
+
+export function nuitLabel(): string {
+  return nuitIsProvisional ? "NUIT a indicar" : `NUIT ${site.nuit}`;
+}
