@@ -11,12 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SiteRouteImport } from './routes/_site'
 import { Route as SiteIndexRouteImport } from './routes/_site/index'
+import { Route as SiteEntregaRouteImport } from './routes/_site/entrega'
 import { Route as SiteEstudioRouteImport } from './routes/_site/estudio'
 import { Route as SiteLoginRouteImport } from './routes/_site/login'
 import { Route as SitePortalRouteImport } from './routes/_site/portal'
 import { Route as SitePrivacidadeRouteImport } from './routes/_site/privacidade'
 import { Route as SiteSimuladorRouteImport } from './routes/_site/simulador'
-import { Route as SiteEntregaRouteImport } from './routes/_site/entrega'
 import { Route as SiteTermosRouteImport } from './routes/_site/termos'
 import { Route as SitePortfolioIndexRouteImport } from './routes/_site/portfolio/index'
 import { Route as SitePortfolioSlugRouteImport } from './routes/_site/portfolio/$slug'
@@ -30,6 +30,11 @@ const SiteRoute = SiteRouteImport.update({
 const SiteIndexRoute = SiteIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteEntregaRoute = SiteEntregaRouteImport.update({
+  id: '/entrega',
+  path: '/entrega',
   getParentRoute: () => SiteRoute,
 } as any)
 const SiteEstudioRoute = SiteEstudioRouteImport.update({
@@ -55,11 +60,6 @@ const SitePrivacidadeRoute = SitePrivacidadeRouteImport.update({
 const SiteSimuladorRoute = SiteSimuladorRouteImport.update({
   id: '/simulador',
   path: '/simulador',
-  getParentRoute: () => SiteRoute,
-} as any)
-const SiteEntregaRoute = SiteEntregaRouteImport.update({
-  id: '/entrega',
-  path: '/entrega',
   getParentRoute: () => SiteRoute,
 } as any)
 const SiteTermosRoute = SiteTermosRouteImport.update({
@@ -90,12 +90,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
+  '/entrega': typeof SiteEntregaRoute
   '/estudio': typeof SiteEstudioRoute
   '/login': typeof SiteLoginRoute
   '/portal': typeof SitePortalRoute
   '/privacidade': typeof SitePrivacidadeRoute
   '/simulador': typeof SiteSimuladorRoute
-  '/entrega': typeof SiteEntregaRoute
   '/termos': typeof SiteTermosRoute
   '/portfolio/$slug': typeof SitePortfolioSlugRoute
   '/proposta/$id': typeof SitePropostaIdRoute
@@ -103,12 +103,12 @@ export interface FileRoutesByFullPath {
   '/portfolio/': typeof SitePortfolioIndexRoute
 }
 export interface FileRoutesByTo {
+  '/entrega': typeof SiteEntregaRoute
   '/estudio': typeof SiteEstudioRoute
   '/login': typeof SiteLoginRoute
   '/portal': typeof SitePortalRoute
   '/privacidade': typeof SitePrivacidadeRoute
   '/simulador': typeof SiteSimuladorRoute
-  '/entrega': typeof SiteEntregaRoute
   '/termos': typeof SiteTermosRoute
   '/': typeof SiteIndexRoute
   '/portfolio/$slug': typeof SitePortfolioSlugRoute
@@ -119,12 +119,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_site': typeof SiteRouteWithChildren
+  '/_site/entrega': typeof SiteEntregaRoute
   '/_site/estudio': typeof SiteEstudioRoute
   '/_site/login': typeof SiteLoginRoute
   '/_site/portal': typeof SitePortalRoute
   '/_site/privacidade': typeof SitePrivacidadeRoute
   '/_site/simulador': typeof SiteSimuladorRoute
-  '/_site/entrega': typeof SiteEntregaRoute
   '/_site/termos': typeof SiteTermosRoute
   '/_site/': typeof SiteIndexRoute
   '/_site/portfolio/$slug': typeof SitePortfolioSlugRoute
@@ -136,12 +136,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/entrega'
     | '/estudio'
     | '/login'
     | '/portal'
     | '/privacidade'
     | '/simulador'
-    | '/entrega'
     | '/termos'
     | '/portfolio/$slug'
     | '/proposta/$id'
@@ -149,12 +149,12 @@ export interface FileRouteTypes {
     | '/portfolio/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/entrega'
     | '/estudio'
     | '/login'
     | '/portal'
     | '/privacidade'
     | '/simulador'
-    | '/entrega'
     | '/termos'
     | '/'
     | '/portfolio/$slug'
@@ -164,12 +164,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_site'
+    | '/_site/entrega'
     | '/_site/estudio'
     | '/_site/login'
     | '/_site/portal'
     | '/_site/privacidade'
     | '/_site/simulador'
-    | '/_site/entrega'
     | '/_site/termos'
     | '/_site/'
     | '/_site/portfolio/$slug'
@@ -197,6 +197,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof SiteIndexRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/entrega': {
+      id: '/_site/entrega'
+      path: '/entrega'
+      fullPath: '/entrega'
+      preLoaderRoute: typeof SiteEntregaRouteImport
       parentRoute: typeof SiteRoute
     }
     '/_site/estudio': {
@@ -232,13 +239,6 @@ declare module '@tanstack/react-router' {
       path: '/simulador'
       fullPath: '/simulador'
       preLoaderRoute: typeof SiteSimuladorRouteImport
-      parentRoute: typeof SiteRoute
-    }
-    '/_site/entrega': {
-      id: '/_site/entrega'
-      path: '/entrega'
-      fullPath: '/entrega'
-      preLoaderRoute: typeof SiteEntregaRouteImport
       parentRoute: typeof SiteRoute
     }
     '/_site/termos': {
@@ -280,12 +280,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface SiteRouteChildren {
+  SiteEntregaRoute: typeof SiteEntregaRoute
   SiteEstudioRoute: typeof SiteEstudioRoute
   SiteLoginRoute: typeof SiteLoginRoute
   SitePortalRoute: typeof SitePortalRoute
   SitePrivacidadeRoute: typeof SitePrivacidadeRoute
   SiteSimuladorRoute: typeof SiteSimuladorRoute
-  SiteEntregaRoute: typeof SiteEntregaRoute
   SiteTermosRoute: typeof SiteTermosRoute
   SiteIndexRoute: typeof SiteIndexRoute
   SitePortfolioSlugRoute: typeof SitePortfolioSlugRoute
@@ -294,12 +294,12 @@ interface SiteRouteChildren {
 }
 
 const SiteRouteChildren: SiteRouteChildren = {
+  SiteEntregaRoute: SiteEntregaRoute,
   SiteEstudioRoute: SiteEstudioRoute,
   SiteLoginRoute: SiteLoginRoute,
   SitePortalRoute: SitePortalRoute,
   SitePrivacidadeRoute: SitePrivacidadeRoute,
   SiteSimuladorRoute: SiteSimuladorRoute,
-  SiteEntregaRoute: SiteEntregaRoute,
   SiteTermosRoute: SiteTermosRoute,
   SiteIndexRoute: SiteIndexRoute,
   SitePortfolioSlugRoute: SitePortfolioSlugRoute,
