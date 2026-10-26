@@ -72,6 +72,10 @@ Na agenda do estúdio, “Abrir no Google Calendar” cria o evento num separado
 ## Segurança
 
 - Consultas com parâmetros, não SQL montado à mão.
-- Cada conta só lê e escreve as suas linhas.
+- Cada conta só lê e escreve as suas linhas (isolamento por `user_id` no servidor).
 - A palavra-passe do login social não fica no estúdio.
-- O formulário público valida nome, e-mail e telefone e ignora o campo escondido `empresa`.
+- O formulário público valida nome, e-mail e telefone, tem honeypot, captcha e rate limit; ignora o campo escondido `empresa`.
+- Status de leads e parcelas têm CHECK constraints na base (migração `0005_status_checks.sql`).
+- Erros em produção não expõem stack traces nem mensagens internas.
+- IDs internos são sequenciais, mas todas as queries filtram por `user_id` — o risco de enumeração é baixo.
+- NUIT provisório (`000 000 000`) é mostrado como “NUIT a indicar” até ser preenchido em `src/lib/site.ts`.
