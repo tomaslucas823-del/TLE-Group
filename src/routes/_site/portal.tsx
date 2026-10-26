@@ -1,14 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { requireSessionOrRedirect } from "@/lib/auth/require-session";
 import { useCallback, useEffect, useState } from "react";
 import { ClientPortal } from "@/components/client-portal";
 import { SessionGate } from "@/components/session-gate";
 import { loadPortal, type StudioData } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_site/portal")({
+  beforeLoad: () => requireSessionOrRedirect("/portal"),
   head: () => ({
     meta: [
       { title: "Portal do cliente - TLE Group" },
       { name: "description", content: "Acompanhe etapas, aprove imagens e baixe a proposta." },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: PortalPage,

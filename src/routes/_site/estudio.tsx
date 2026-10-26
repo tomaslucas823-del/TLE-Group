@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { requireSessionOrRedirect } from "@/lib/auth/require-session";
 import { useCallback, useEffect, useState } from "react";
 import { SessionGate } from "@/components/session-gate";
 import { StudioDesk } from "@/components/studio-desk";
@@ -6,10 +7,12 @@ import { clearLocalLeads, readLocalLeads } from "@/lib/local-leads";
 import { importLocalLeads, loadStudio, type StudioData } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_site/estudio")({
+  beforeLoad: () => requireSessionOrRedirect("/estudio"),
   head: () => ({
     meta: [
       { title: "Estúdio - TLE Group" },
       { name: "description", content: "CRM, propostas, agenda e parcelas da TLE Group." },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: EstudioPage,
