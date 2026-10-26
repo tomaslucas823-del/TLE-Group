@@ -79,3 +79,13 @@ Na agenda do estúdio, “Abrir no Google Calendar” cria o evento num separado
 - Erros em produção não expõem stack traces nem mensagens internas.
 - IDs internos são sequenciais, mas todas as queries filtram por `user_id` — o risco de enumeração é baixo.
 - NUIT provisório (`000 000 000`) é mostrado como “NUIT a indicar” até ser preenchido em `src/lib/site.ts`.
+- Rotas `/portal`, `/estudio` e `/proposta/*` exigem sessão no servidor (`requireSessionOrRedirect`) e no cliente (`SessionGate`).
+
+## Produção — checklist de segurança
+
+1. **Domínio canónico** — `site.domain`, Vercel, DNS, `BETTER_AUTH_URL` e este `sitemap.xml` devem usar o **mesmo** host (`https://www.tlegroup.co.mz`).
+2. **Auth ligada** — `VITE_AUTH_ENABLED` não pode ser `false` com `DATABASE_URL` definido.
+3. **Rate limit distribuído** — defina `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` (sem isto o limite é só por instância).
+4. **Secrets** — `BETTER_AUTH_SECRET` (ou `CAPTCHA_SECRET`) obrigatório em produção.
+5. **Rotas privadas** — `/portal`, `/estudio` e `/proposta/*` exigem sessão (server) e estão em `Disallow` no `robots.txt`; não estão no sitemap.
+6. **Reporte** — `/.well-known/security.txt` e `SECURITY.md`.
