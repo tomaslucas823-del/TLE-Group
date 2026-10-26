@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { requireSessionOrRedirect } from "@/lib/auth/require-session";
 import { useEffect, useState } from "react";
 import { SessionGate } from "@/components/session-gate";
 import { buttonVariants } from "@/components/ui/button";
@@ -7,10 +8,12 @@ import { site, nuitLabel } from "@/lib/site";
 import { loadStudio, type InstallmentRow, type ProposalRow } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_site/proposta/$id")({
+  beforeLoad: ({ params }) => requireSessionOrRedirect(`/proposta/${params.id}`),
   head: () => ({
     meta: [
       { title: "Proposta - TLE Group" },
       { name: "description", content: "Proposta com escopo e cronograma de pagamento." },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: ProposalRoute,
@@ -111,8 +114,8 @@ function ProposalSheet({ id }: { id: string }) {
           <thead>
             <tr className="border-b border-line text-mute">
               <th className="py-2 font-medium">Etapa</th>
-              <th className="py-2 font-medium">Quando</th>
               <th className="py-2 text-right font-medium">Valor</th>
+              <th className="py-2 font-medium">Quando</th>
             </tr>
           </thead>
           <tbody>
@@ -125,8 +128,8 @@ function ProposalSheet({ id }: { id: string }) {
                     {part.method ? ` · ${part.method}` : ""}
                   </span>
                 </td>
-                <td className="py-3 text-mute">{part.due_label}</td>
                 <td className="py-3 text-right">{brlFromCents(part.amount_cents)}</td>
+                <td className="py-3 text-mute">{part.due_label}</td>
               </tr>
             ))}
           </tbody>
