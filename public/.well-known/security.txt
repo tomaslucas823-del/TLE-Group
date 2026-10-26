@@ -1,0 +1,5 @@
+Contact: mailto:contacto@tle.co.mz
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: pt, en
+Canonical: https://www.tlegroup.co.mz/.well-known/security.txt
+Policy: https://github.com/tomaslucas823-del/TLE-Group/blob/main/SECURITY.md

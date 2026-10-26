@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.tlearquitetura.co.mz/sitemap.xml
+# Áreas autenticadas — não indexar
+Disallow: /portal
+Disallow: /estudio
+Disallow: /login
+Disallow: /proposta/
+Disallow: /api/
+
+Sitemap: https://www.tlegroup.co.mz/sitemap.xml
