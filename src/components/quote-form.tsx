@@ -8,7 +8,6 @@ import {
   STYLES,
   TIERS,
   bedroomLabel,
-  estimateConstructionCents,
   estimateFromBrief,
   finishLabel,
   floorLabel,
@@ -94,16 +93,14 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Partial<QuoteDraft>
   const widgetIdRef = useRef<string | null>(null);
 
   const areaM2 = parseOptionalArea(draft.area);
-  const briefInput = {
+  const total = estimateFromBrief({
     bedrooms: draft.bedrooms,
     floors: draft.floors,
     finish: draft.finish,
     style: draft.style,
     tier: draft.tier,
     areaM2,
-  };
-  const total = estimateFromBrief(briefInput);
-  const constructionTotal = estimateConstructionCents(briefInput);
+  });
   const styleLabel = t.styles[draft.style]?.label ?? draft.style;
   const tierLabel = t.tiers[draft.tier]?.label ?? draft.tier;
   const weeks = DELIVERY_WEEKS[draft.tier];
@@ -112,7 +109,6 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Partial<QuoteDraft>
       ? `${weeks.min} ${t.quote.weeks}`
       : `${weeks.min}-${weeks.max} ${t.quote.weeks}`;
   const totalLabel = mznFromCents(total);
-  const constructionLabel = mznFromCents(constructionTotal);
   const briefLine = [
     bedroomLabel(draft.bedrooms),
     floorLabel(draft.floors),
@@ -268,8 +264,7 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Partial<QuoteDraft>
       `Nome: ${nome.trim()}`,
       `Tel: ${telefone.trim()}`,
       briefLine,
-      `Projecto (ref.): ${totalLabel}`,
-      `Obra (ordem de grandeza): ${constructionLabel}`,
+      `Plantas de obra (ref.): ${totalLabel}`,
       `Prazo ref.: ${prazo}`,
     ].join("\n");
     const waUrl = site.phoneWa
@@ -282,9 +277,7 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Partial<QuoteDraft>
         <p className="mx-auto mt-2 max-w-sm text-[14px] leading-relaxed text-mute">{t.quote.receivedCloud}</p>
         <div className="mx-auto mt-6 max-w-sm space-y-1 pt-5 text-[13px] text-mute">
           <p className="text-[1.15rem] font-medium text-ink">{totalLabel}</p>
-          <p className="text-[12px]">Projecto · referência</p>
-          <p className="mt-2 text-[1.05rem] font-medium text-ink">{constructionLabel}</p>
-          <p className="text-[12px]">Obra · ordem de grandeza</p>
+          <p className="text-[12px]">Plantas de obra · referência</p>
           <p className="mt-2">{briefLine}</p>
           <p>
             {t.quote.delivery}: {prazo}
@@ -471,35 +464,24 @@ export function QuoteForm({ draft: initialDraft }: { draft?: Partial<QuoteDraft>
           </label>
         </div>
 
-        <div className="mt-6 grid gap-4 pt-1 sm:grid-cols-2">
+        <div className="mt-6 flex flex-wrap items-end justify-between gap-4 pt-1">
           <div>
             <p className="text-[11px] font-medium tracking-[0.06em] text-mute uppercase">
-              Projecto · {t.estimate.ref}
+              Plantas de obra · {t.estimate.ref}
             </p>
-            <p className="mt-1 font-display text-[1.5rem] leading-none font-semibold tracking-[-0.03em]">
+            <p className="mt-1 font-display text-[1.65rem] leading-none font-semibold tracking-[-0.03em]">
               {totalLabel}
             </p>
-            <p className="mt-1.5 text-[12px] text-mute">Honorários de projecto (referência)</p>
-          </div>
-          <div>
-            <p className="text-[11px] font-medium tracking-[0.06em] text-mute uppercase">
-              Obra · ordem de grandeza
-            </p>
-            <p className="mt-1 font-display text-[1.5rem] leading-none font-semibold tracking-[-0.03em]">
-              {constructionLabel}
-            </p>
             <p className="mt-1.5 text-[12px] text-mute">
-              Base em mapa de quantidades real (estrutura → reboco)
+              Pacote personalizado (plantas, cortes e nível de entrega)
             </p>
           </div>
-        </div>
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
-          <p className="text-[12px] leading-relaxed text-mute">{t.estimate.disclaimer}</p>
           <div className="text-right">
             <p className="text-[11px] font-medium tracking-[0.06em] text-mute uppercase">{t.quote.delivery}</p>
             <p className="mt-1 text-[15px] font-medium">{prazo}</p>
           </div>
         </div>
+        <p className="mt-3 text-[12px] leading-relaxed text-mute">{t.estimate.disclaimer}</p>
       </div>
 
       <div className="rounded-2xl border border-line px-5 py-5">
