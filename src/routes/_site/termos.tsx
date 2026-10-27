@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { site, nuitLabel } from "@/lib/site";
+import { site } from "@/lib/site";
 
 export const Route = createFileRoute("/_site/termos")({
   head: () => ({
@@ -19,7 +19,7 @@ function TermsPage() {
     <main className="mx-auto max-w-3xl px-5 pt-28 pb-20">
       <h1 className="font-display text-5xl font-normal">Termos e condições</h1>
       <p className="mt-4 text-sm text-mute">
-        {site.legalName} · {nuitLabel()} · {site.city}, {site.country}
+        {site.legalName} · {site.city}, {site.country}
       </p>
       <div className="mt-10 space-y-8 text-charcoal">
         <section>
