@@ -65,6 +65,49 @@ export const FINISHES = [
   { id: "premium", label: "Premium", note: "Acabamentos e orientações de projecto elevados.", factor: 1.28 },
 ] as const;
 
+/**
+ * Fases de obra com valores reais do mapa de quantidades (MZN).
+ * Fases a 0 = ainda sem quantificação no mapa (acabamentos).
+ */
+export const WORK_PHASES = [
+  { id: "implantacao", label: "Implantação", totalMzn: 18_422, included: true },
+  { id: "sapatas", label: "Sapatas isoladas", totalMzn: 172_236, completed: true },
+  { id: "baldrame", label: "Viga de pavimento / baldrame", totalMzn: 365_453, completed: true },
+  { id: "pilares", label: "Pilares", totalMzn: 154_779, completed: true },
+  { id: "alvenaria", label: "Alvenaria (blocos)", totalMzn: 474_098, completed: true },
+  { id: "vigas", label: "Vigas", totalMzn: 275_152, completed: true },
+  { id: "lajes-piso", label: "Lajes de piso", totalMzn: 65_737, completed: true },
+  { id: "contra-piso", label: "Contra-piso", totalMzn: 31_464, completed: true },
+  { id: "laje-cobertura", label: "Laje de cobertura", totalMzn: 258_314, completed: true },
+  { id: "reboco", label: "Reboco", totalMzn: 388_470, completed: true },
+  { id: "gesso", label: "Gesso", totalMzn: 0, completed: false },
+  { id: "portas", label: "Portas", totalMzn: 0, completed: false },
+  { id: "janelas", label: "Janelas", totalMzn: 0, completed: false },
+  { id: "cobertura", label: "Chapas / telhas", totalMzn: 0, completed: false },
+  { id: "pintura", label: "Pintura", totalMzn: 0, completed: false },
+  { id: "revest-piso", label: "Revestimentos de piso", totalMzn: 0, completed: false },
+  { id: "revest-parede", label: "Revestimentos de parede", totalMzn: 0, completed: false },
+] as const;
+
+/** Total quantificado no mapa (estrutura até reboco). */
+export const WORK_MAP_TOTAL_MZN = WORK_PHASES.reduce((sum, p) => sum + p.totalMzn, 0);
+
+/** Área de referência do mapa (~casa T3). */
+export const WORK_REF_AREA_M2 = 130;
+
+/** Custo médio quantificado por m² (estrutura → reboco). */
+export const WORK_COST_PER_M2 = WORK_MAP_TOTAL_MZN / WORK_REF_AREA_M2;
+
+/**
+ * Multiplicador para fases de acabamento ainda não quantificadas no mapa.
+ * Essencial ≈ só o quantificado; intermédio/premium acrescentam ordem de grandeza.
+ */
+const WORK_FINISH_FACTOR: Record<(typeof FINISHES)[number]["id"], number> = {
+  essencial: 1.15,
+  intermedio: 1.35,
+  premium: 1.55,
+};
+
 export type StyleId = (typeof STYLES)[number]["id"];
 export type TierId = (typeof TIERS)[number]["id"];
 export type BedroomId = (typeof BEDROOMS)[number]["id"];
@@ -134,9 +177,17 @@ export type EstimateInput = {
   areaM2?: number | null;
 };
 
+function resolveArea(input: EstimateInput): number {
+  const bed = BEDROOMS.find((b) => b.id === input.bedrooms) ?? BEDROOMS[1];
+  const fl = FLOORS.find((f) => f.id === input.floors) ?? FLOORS[0];
+  return (
+    parseOptionalArea(input.areaM2 ?? null) ??
+    bed.baseArea * (fl.id === "1" ? 1 : fl.id === "2" ? 0.85 : 0.75)
+  );
+}
+
 /**
- * Estimativa em cêntimos de metical (referência preliminar).
- * Base em tipologia + pisos + acabamentos + partido + nível de entrega.
+ * Estimativa de honorários de projecto em cêntimos de metical (referência preliminar).
  */
 export function estimateFromBrief(input: EstimateInput) {
   const bed = BEDROOMS.find((b) => b.id === input.bedrooms) ?? BEDROOMS[1];
@@ -145,7 +196,7 @@ export function estimateFromBrief(input: EstimateInput) {
   const style = STYLES.find((s) => s.id === input.style)?.factor ?? 1;
   const tier = TIERS.find((t) => t.id === input.tier)?.factor ?? 1;
 
-  const area = parseOptionalArea(input.areaM2 ?? null) ?? bed.baseArea * (fl.id === "1" ? 1 : fl.id === "2" ? 0.85 : 0.75);
+  const area = resolveArea(input);
 
   const base =
     area <= 80
@@ -162,6 +213,22 @@ export function estimateFromBrief(input: EstimateInput) {
 
   const total = base * bed.factor * fl.factor * fin.factor * style * tier;
   return Math.round(total / 100_000) * 100_000;
+}
+
+/**
+ * Estimativa de custo de obra (materiais/construção) em cêntimos de metical.
+ * Baseada no mapa de quantidades real (estrutura → reboco) + factor de acabamentos.
+ * É ordem de grandeza, não orçamento fechado.
+ */
+export function estimateConstructionCents(input: EstimateInput) {
+  const fl = FLOORS.find((f) => f.id === input.floors) ?? FLOORS[0];
+  const finishId = (FINISHES.find((f) => f.id === input.finish) ?? FINISHES[0]).id;
+  const area = resolveArea(input);
+
+  const baseMzn = WORK_COST_PER_M2 * area * fl.factor * WORK_FINISH_FACTOR[finishId];
+  const cents = Math.round(baseMzn * 100);
+  // Arredondar para 1000 MZN
+  return Math.round(cents / 100_000) * 100_000;
 }
 
 /** Compat: area + style + tier (simulador antigo / leads). */
