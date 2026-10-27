@@ -2,8 +2,8 @@ export const site = {
   name: "TLE Group",
   /** Total Link Engenharia & Construções */
   legalName: "TLE Group - Total Link Engenharia & Construções",
-  /** Substituir pelo NUIT real quando disponível. */
-  nuit: "000 000 000",
+  /** Sem NUIT por agora — a empresa ainda não dispõe. */
+  nuit: "",
   city: "Inhambane",
   country: "Moçambique",
   address: "Inhambane, Moçambique",
@@ -30,9 +30,10 @@ export const waHref = site.phoneWa
     )}`
   : "";
 
-/** NUIT ainda provisório — esconde ou marca em propostas públicas se for o placeholder. */
-export const nuitIsProvisional = site.nuit.replace(/\s/g, "") === "000000000";
+/** NUIT não disponível — nunca mostrar no site. */
+export const nuitIsProvisional = true;
 
+/** Mantido por compatibilidade; devolve string vazia. */
 export function nuitLabel(): string {
-  return nuitIsProvisional ? "NUIT a indicar" : `NUIT ${site.nuit}`;
+  return "";
 }
