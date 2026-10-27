@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { SessionGate } from "@/components/session-gate";
 import { buttonVariants } from "@/components/ui/button";
 import { brlFromCents } from "@/lib/format";
-import { site, nuitLabel } from "@/lib/site";
+import { site } from "@/lib/site";
 import { loadStudio, type InstallmentRow, type ProposalRow } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_site/proposta/$id")({
@@ -93,7 +93,7 @@ function ProposalSheet({ id }: { id: string }) {
         <p className="font-display text-2xl font-normal">TLE Group</p>
         <h1 className="mt-6 font-display text-3xl font-semibold">Proposta</h1>
         <p className="mt-2 text-sm text-mute">
-          {site.legalName} · {nuitLabel()} · {site.city}
+          {site.legalName} · {site.city}
         </p>
         <p className="mt-1 text-sm text-mute">
           {site.phoneDisplay} · WhatsApp · e-Mola
