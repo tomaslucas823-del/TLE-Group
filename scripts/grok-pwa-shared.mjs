@@ -30,21 +30,21 @@ const SHARE_META_KEYS = new Set([
 
 export function escapeHtml(value) {
   return String(value)
-    .replaceAll("&", "&")
-    .replaceAll("<", "<")
-    .replaceAll(">", ">")
-    .replaceAll('"', """)
+    .replaceAll("&", "&" + "amp;")
+    .replaceAll("<", "&" + "lt;")
+    .replaceAll(">", "&" + "gt;")
+    .replaceAll('"', "&" + "quot;")
     .replaceAll("'", "&#39;");
 }
 
 /** Inverse of escapeHtml. Decode & last so a single pass undoes one encode. */
 function unescapeHtml(value) {
   return String(value)
-    .replaceAll("<", "<")
-    .replaceAll(">", ">")
-    .replaceAll(""", '"')
+    .replaceAll("&" + "lt;", "<")
+    .replaceAll("&" + "gt;", ">")
+    .replaceAll("&" + "quot;", '"')
     .replaceAll("&#39;", "'")
-    .replaceAll("&", "&");
+    .replaceAll("&" + "amp;", "&");
 }
 
 /** 6-digit hex for the og.grok.me placeholder, or "" if site.color is missing/invalid. */
@@ -419,10 +419,6 @@ function insertBeforeHeadClose(html, snippet) {
 
 export function normalizeHeadContext(ctx = {}) {
   const cwd = ctx.cwd ?? process.cwd();
-  // Middleware passes a baked `site`. Still consult the workspace so a
-  // public/og.jpg generated after that snapshot (or missed by a wrong cwd)
-  // wins over the og.grok.me placeholder. Vercel has no public/ to read, so
-  // a correct bake is unchanged.
   const site = applyCustomCardFromFs(
     ctx.site !== undefined ? ctx.site : snapshotOgIdentity(cwd).site,
     cwd,
